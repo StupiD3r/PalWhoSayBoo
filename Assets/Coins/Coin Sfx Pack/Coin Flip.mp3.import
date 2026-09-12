@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://ccniro7mdeefw"
+path="res://.godot/imported/Coin Flip.mp3-c3d48cb46c81ea88ed52ae3882a54992.mp3str"
+
+[deps]
+
+source_file="res://Assets/Coins/Coin Sfx Pack/Coin Flip.mp3"
+dest_files=["res://.godot/imported/Coin Flip.mp3-c3d48cb46c81ea88ed52ae3882a54992.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
