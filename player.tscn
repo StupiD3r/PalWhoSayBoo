@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://dmihpmcucrcc6"]
+
+[ext_resource type="Script" uid="uid://c1xd2o4b7hu4" path="res://BasicMovement.gd" id="1_4flbx"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_l7je2"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_l7je2"]
+
+[node name="Player" type="CharacterBody3D" unique_id=1822780786]
+script = ExtResource("1_4flbx")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1269143112]
+mesh = SubResource("CapsuleMesh_l7je2")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2121807305]
+shape = SubResource("CapsuleShape3D_l7je2")
+debug_color = Color(0.5495927, 0.56436205, 3.85046e-07, 0.41960785)
