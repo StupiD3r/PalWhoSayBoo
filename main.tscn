@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://daqnt04w5lqyj" path="res://floor.tscn" id="1_0xm2m"]
 [ext_resource type="PackedScene" uid="uid://dmihpmcucrcc6" path="res://player.tscn" id="2_h2yge"]
+[ext_resource type="PackedScene" uid="uid://bnoxmcoegary0" path="res://platforms.tscn" id="3_h2yge"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_rdekd"]
 
@@ -11,10 +12,13 @@
 physics_material_override = SubResource("PhysicsMaterial_rdekd")
 
 [node name="Player" parent="." unique_id=1822780786 instance=ExtResource("2_h2yge")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4304624, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.9667819, 0)
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=798876693]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4591436, 3.3302727)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1200505044]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5359092, 4.5764985, -0.38344383)
+
+[node name="Platform" parent="." unique_id=1228769927 instance=ExtResource("3_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1.2361528, 0, 0, 0, 1, 2.4337144, 0.9079828, 0)
