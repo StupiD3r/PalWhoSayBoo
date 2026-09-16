@@ -1,17 +1,36 @@
-[gd_scene format=3 uid="uid://dmihpmcucrcc6"]
+[gd_scene format=3 uid="uid://usjvkst7qus0"]
 
-[ext_resource type="Script" uid="uid://c1xd2o4b7hu4" path="res://BasicMovement.gd" id="1_4flbx"]
+[ext_resource type="PackedScene" uid="uid://6krmbaypjbcp" path="res://Assets/chara/KayKit_Adventurers_2.0_FREE/KayKit_Adventurers_2.0_FREE/Characters/gltf/Barbarian.glb" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://c1xd2o4b7hu4" path="res://basicmovement.gd" id="1_onrkg"]
+[ext_resource type="Animation" uid="uid://j57f46h5cpmj" path="res://Assets/chara/KayKit_Character_Animations_1.1/KayKit_Character_Animations_1.1/Animations/gltf/Rig_Medium/Idle_A.res" id="3_i3pqv"]
+[ext_resource type="Animation" uid="uid://b0c4jdbdnfjuj" path="res://Assets/chara/KayKit_Adventurers_2.0_FREE/KayKit_Adventurers_2.0_FREE/Animations/gltf/Rig_Medium/Walking_A.res" id="4_hqtel"]
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_l7je2"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_hqtel"]
+_data = {
+&"Idle_A": ExtResource("3_i3pqv"),
+&"Walking_A": ExtResource("4_hqtel")
+}
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_l7je2"]
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
+height = 2.536377
 
-[node name="Player" type="CharacterBody3D" unique_id=1822780786]
-script = ExtResource("1_4flbx")
+[node name="Player" type="CharacterBody3D" unique_id=187821194 node_paths=PackedStringArray("twist_pivot", "pitch_pivot")]
+script = ExtResource("1_onrkg")
+twist_pivot = NodePath("TwistPivot")
+pitch_pivot = NodePath("TwistPivot/PitchPivot")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1269143112]
-mesh = SubResource("CapsuleMesh_l7je2")
+[node name="Barbarian" parent="." unique_id=1227756784 instance=ExtResource("1_ig7tw")]
+transform = Transform3D(-0.9999989, 0, -0.0014456188, 0, 1, 0, 0.0014456188, 0, -0.9999989, 0, 0, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2121807305]
-shape = SubResource("CapsuleShape3D_l7je2")
-debug_color = Color(0.5495927, 0.56436205, 3.85046e-07, 0.41960785)
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Barbarian" unique_id=1791729434]
+libraries/global = SubResource("AnimationLibrary_hqtel")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=100845396]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2305908, 0)
+shape = SubResource("CapsuleShape3D_0xm2m")
+
+[node name="TwistPivot" type="Node3D" parent="." unique_id=74649789]
+
+[node name="PitchPivot" type="Camera3D" parent="TwistPivot" unique_id=1448518032]
+transform = Transform3D(0.9999955, -0.0028275312, -0.00099474, 0.0029971, 0.9479641, 0.3183634, 4.2796135e-05, -0.31836492, 0.94796824, 0, 2.481628, 1.7235332)
+current = true
