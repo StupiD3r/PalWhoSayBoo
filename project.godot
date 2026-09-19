@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="PalWhoSayBoo"
-run/main_scene="uid://g8pbjitwms52"
+run/main_scene="uid://b4kv2o18ar86j"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 
 [display]
