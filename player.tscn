@@ -14,7 +14,7 @@ _data = {
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
 height = 2.536377
 
-[node name="Player" type="CharacterBody3D" unique_id=187821194 node_paths=PackedStringArray("twist_pivot", "pitch_pivot")]
+[node name="Player" type="CharacterBody3D" unique_id=187821194 node_paths=PackedStringArray("twist_pivot", "pitch_pivot") groups=["Player"]]
 script = ExtResource("1_onrkg")
 twist_pivot = NodePath("TwistPivot")
 pitch_pivot = NodePath("TwistPivot/PitchPivot")
