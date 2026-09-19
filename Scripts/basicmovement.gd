@@ -20,8 +20,10 @@ extends CharacterBody3D
 
 @onready var animation_player: AnimationPlayer = $"Man/AnimationPlayer"
 
-# --- CLIMBING STATE ---
+# --- CLIMBING STATE & SIGNALS ---
 var is_climbing = false
+signal climbing_started
+signal climbing_stopped
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -38,13 +40,15 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	# --- Handle Mouse Look Panning and Tilting ---
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		# Completely freeze all camera panning if the player is on the pole
 		if is_climbing:
-			return 
-
-		# Normal ground movement rotation
-		rotate_y(-event.relative.x * MOUSE_SENSITIVITY)
+			# STATIC BODY IN FIRST PERSON: Pan using the twist pivot instead of rotating the whole body
+			if twist_pivot:
+				twist_pivot.rotate_y(-event.relative.x * MOUSE_SENSITIVITY)
+		else:
+			# NORMAL GROUND LOOK: Rotate the entire character body left/right
+			rotate_y(-event.relative.x * MOUSE_SENSITIVITY)
 		
+		# Pitch: Look up/down (applies in both ground and climbing states)
 		if pitch_pivot:
 			pitch_pivot.rotate_x(-event.relative.y * MOUSE_SENSITIVITY)
 			var clamped_pitch = clamp(pitch_pivot.rotation.x, deg_to_rad(PITCH_MIN), deg_to_rad(PITCH_MAX))
@@ -56,12 +60,12 @@ func _physics_process(delta: float) -> void:
 
 	# --- 1. CLIMBING OVERRIDE ---
 	if is_climbing:
-		var climb_dir = Input.get_axis("move_down", "move_up")
-		velocity.y = climb_dir * CLIMB_SPEED
+		# Manual WASD movement disabled during typing minigame!
 		velocity.x = 0
+		velocity.y = 0
 		velocity.z = 0
 		
-		# Detach or jump off pole
+		# Spacebar acts as the exit key to dismount from the pole
 		if Input.is_action_just_pressed("jump"):
 			is_climbing = false
 			velocity.y = JUMP_VELOCITY
@@ -74,9 +78,12 @@ func _physics_process(delta: float) -> void:
 			
 			if third_person_cam:
 				third_person_cam.current = true
+			
+			# EMIT SIGNAL TO HIDE TYPING UI
+			climbing_stopped.emit()
 		
 		move_and_slide()
-		_update_climbing_animations(climb_dir)
+		_update_climbing_animations(0.0) # Pause or keep idle climbing frame
 		return
 
 	# --- 2. NORMAL GRAVITY ---
@@ -131,18 +138,15 @@ func _update_climbing_animations(climb_dir: float) -> void:
 			animation_player.pause()
 
 # --- ATTACH TRIGGER ---
-# --- ATTACH TRIGGER ---
 func start_climbing(pole_position):
 	is_climbing = true
 	velocity = Vector3.ZERO
 	
 	global_position.x = pole_position.x
-	global_position.z = pole_position.z + 0.6 
+	global_position.z = pole_position.z + 0.6
 	
-	# Make the player face directly toward the pole position
 	look_at(Vector3(pole_position.x, global_position.y, pole_position.z), Vector3.UP)
 	
-	# Reset camera pan offsets so the first-person camera aims straight forward
 	if twist_pivot:
 		twist_pivot.rotation.y = 0
 	if pitch_pivot:
@@ -150,3 +154,6 @@ func start_climbing(pole_position):
 	
 	if first_person_cam:
 		first_person_cam.current = true
+
+	# Trigger the typing UI!
+	climbing_started.emit()

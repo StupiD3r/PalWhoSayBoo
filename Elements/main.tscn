@@ -3,21 +3,33 @@
 [ext_resource type="PackedScene" uid="uid://daqnt04w5lqyj" path="res://Elements/floor.tscn" id="1_u0chy"]
 [ext_resource type="PackedScene" uid="uid://usjvkst7qus0" path="res://Elements/player.tscn" id="2_42cfe"]
 [ext_resource type="PackedScene" uid="uid://crd8g2d50ivjx" path="res://Elements/bamboo_pole.tscn" id="3_lebuw"]
+[ext_resource type="PackedScene" uid="uid://cd41qf3inb8km" path="res://TypingUI.tscn" id="4_42cfe"]
 
 [node name="Node3D" type="Node3D" unique_id=1181372035]
-
-[node name="Floor" parent="." unique_id=1885804087 instance=ExtResource("1_u0chy")]
 
 [node name="Player" parent="." unique_id=187821194 instance=ExtResource("2_42cfe")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 7)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=38223985]
-transform = Transform3D(1, 0, 0, 0, 0.9851215, -0.17185903, 0, 0.17185903, 0.9851215, 0, 8.276175, 12.812405)
+transform = Transform3D(0.96592593, 0.044480402, 0.2549683, -0.06698733, 0.9945193, 0.08027731, -0.25000006, -0.094621554, 0.9636115, 0, 8.276175, 12.812405)
 
 [node name="DirectionalLight3D2" type="DirectionalLight3D" parent="." unique_id=402557779]
 transform = Transform3D(1, 0, 0, 0, -0.76780283, 0.64068615, 0, -0.64068615, -0.76780283, 0, 8.916, -6.478182)
 
-[node name="Node3D" type="Node3D" parent="." unique_id=381597924]
+[node name="Bamboo" type="Node3D" parent="." unique_id=381597924]
 transform = Transform3D(0.5, 0, 0, 0, 1, 0, 0, 0, 0.5, 4.2575827, 0, 0)
 
-[node name="BambooPole" parent="Node3D" unique_id=389191382 instance=ExtResource("3_lebuw")]
+[node name="BambooPole" parent="Bamboo" unique_id=389191382 instance=ExtResource("3_lebuw")]
+
+[node name="Node" type="Node3D" parent="." unique_id=610304789]
+
+[node name="Floor" parent="Node" unique_id=1885804087 instance=ExtResource("1_u0chy")]
+
+[node name="Floor2" parent="Node" unique_id=1458062615 instance=ExtResource("1_u0chy")]
+transform = Transform3D(-5.9604645e-08, -1, 0, 1, -5.9604645e-08, 0, 0, 0, 1, -10, 10, 0)
+
+[node name="TypingUI" parent="." unique_id=709281357 node_paths=PackedStringArray("player") instance=ExtResource("4_42cfe")]
+player = NodePath("../Player")
+
+[connection signal="climbing_started" from="Player" to="TypingUI" method="start_typing_minigame"]
+[connection signal="climbing_stopped" from="Player" to="TypingUI" method="stop_typing_minigame"]

@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://cd41qf3inb8km"]
+
+[ext_resource type="Script" uid="uid://bj3x0wr07c8uk" path="res://typing_game.gd" id="1_wrqru"]
+
+[node name="TypingUI" type="Control" unique_id=709281357 node_paths=PackedStringArray("word_label")]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_wrqru")
+word_label = NodePath("Label")
+
+[node name="Label" type="RichTextLabel" parent="." unique_id=1105784837]
+layout_mode = 0
+offset_right = 1152.0
+offset_bottom = 640.0
+bbcode_enabled = true
+horizontal_alignment = 1
