@@ -3,9 +3,9 @@ extends Control
 @export var word_label: RichTextLabel
 @export var player: CharacterBody3D
 
-var easy_words = ["pole", "coin", "grip", "slip", "grab", "fast", "jump", "high", "win", "tree"]
-var medium_words = ["bamboo", "grease", "steady", "effort", "prize", "reach", "height", "sweat"]
-var hard_words = ["palosebo", "slippery", "tradition", "festival", "champion", "challenge"]
+var easy_words = ["poste", "barya", "kapit", "dulas", "hawak", "bilis", "talon", "tangkad", "panalo", "punongkahoy"]
+var medium_words = ["kawayan", "grasa", "panatag", "pagsisikap", "premyo", "abot", "taas", "pawis"]
+var hard_words = ["palosebo", "madulas", "tradisyon", "piyesta", "kampyeon", "pagsubok"]
 
 var current_word = ""
 var typed_text = ""
