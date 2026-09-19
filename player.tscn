@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://6krmbaypjbcp" path="res://Assets/chara/KayKit_Adventurers_2.0_FREE/KayKit_Adventurers_2.0_FREE/Characters/gltf/Barbarian.glb" id="1_ig7tw"]
 [ext_resource type="Script" uid="uid://c1xd2o4b7hu4" path="res://BasicMovement.gd" id="1_onrkg"]
-[ext_resource type="Animation" uid="uid://j57f46h5cpmj" path="res://Assets/chara/KayKit_Character_Animations_1.1/KayKit_Character_Animations_1.1/Animations/gltf/Rig_Medium/Idle_A.res" id="3_i3pqv"]
+[ext_resource type="Animation" uid="uid://bdcb7vlimkpjo" path="res://Assets/chara/KayKit_Character_Animations_1.1/KayKit_Character_Animations_1.1/Animations/gltf/Rig_Medium/Idle_A.res" id="3_i3pqv"]
 [ext_resource type="Animation" uid="uid://dpi80j1cbyxse" path="res://Assets/chara/KayKit_Adventurers_2.0_FREE/KayKit_Adventurers_2.0_FREE/Animations/gltf/Rig_Medium/Walking_A.res" id="4_hqtel"]
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_hqtel"]

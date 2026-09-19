@@ -3,12 +3,13 @@
 [ext_resource type="PackedScene" uid="uid://daqnt04w5lqyj" path="res://floor.tscn" id="1_ig7tw"]
 [ext_resource type="PackedScene" uid="uid://usjvkst7qus0" path="res://player.tscn" id="2_0xm2m"]
 [ext_resource type="PackedScene" uid="uid://vlxcjk311rjm" path="res://coin.tscn" id="3_h2yge"]
+[ext_resource type="PackedScene" uid="uid://crd8g2d50ivjx" path="res://bamboo_pole.tscn" id="4_1bvp3"]
 
 [node name="Node3D" type="Node3D" unique_id=1181372035]
 
 [node name="Floor" parent="." unique_id=1885804087 instance=ExtResource("1_ig7tw")]
 
-[node name="Player" parent="." unique_id=1786928713 groups=["Player"] instance=ExtResource("2_0xm2m")]
+[node name="Player" parent="." unique_id=1786928713 instance=ExtResource("2_0xm2m")]
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=38223985]
 transform = Transform3D(1, 0, 0, 0, 0.7091509, 0.7050567, 0, -0.7050567, 0.7091509, 0, 8.276175, 7.132024)
@@ -18,3 +19,8 @@ transform = Transform3D(1, 0, 0, 0, -0.76780283, 0.64068615, 0, -0.64068615, -0.
 
 [node name="Coin" parent="." unique_id=1964783980 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7802191, 0.32439327, -6.593278)
+
+[node name="Node3D" type="Node3D" parent="." unique_id=381597924]
+transform = Transform3D(0.5, 0, 0, 0, 1, 0, 0, 0, 0.5, 4.2575827, 0, 0)
+
+[node name="BambooPole" parent="Node3D" unique_id=389191382 instance=ExtResource("4_1bvp3")]
