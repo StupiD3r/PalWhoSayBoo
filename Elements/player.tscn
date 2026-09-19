@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://usjvkst7qus0"]
+
+[ext_resource type="Script" uid="uid://d3hkp25145c4o" path="res://Scripts/basicmovement.gd" id="1_2ft67"]
+[ext_resource type="PackedScene" uid="uid://dkujflqjl8x1v" path="res://Assets/chara/man.glb" id="2_1pq33"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_b0il4"]
+radius = 0.6948242
+height = 4.8952637
+
+[node name="Player" type="CharacterBody3D" unique_id=187821194 node_paths=PackedStringArray("third_person_cam", "first_person_cam", "twist_pivot", "pitch_pivot") groups=["Player"]]
+script = ExtResource("1_2ft67")
+third_person_cam = NodePath("TwistPivot/ThirdPersonCamera")
+first_person_cam = NodePath("TwistPivot/ThirdPersonCamera/FirstPersonCamera")
+twist_pivot = NodePath("TwistPivot")
+pitch_pivot = NodePath("TwistPivot/ThirdPersonCamera")
+
+[node name="Man" parent="." unique_id=30659308 instance=ExtResource("2_1pq33")]
+transform = Transform3D(-0.9999989, 0, -0.0014456188, 0, 1, 0, 0.0014456188, 0, -0.9999989, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=764926982]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.413208, 0)
+shape = SubResource("CapsuleShape3D_b0il4")
+
+[node name="TwistPivot" type="Node3D" parent="." unique_id=74649789]
+
+[node name="ThirdPersonCamera" type="Camera3D" parent="TwistPivot" unique_id=1448518032]
+transform = Transform3D(0.9999955, -0.002827531, -0.0009947406, 0.0029662857, 0.8858307, 0.4639992, -0.0004308004, -0.4640001, 0.88583505, 0, 5.0851135, 3.89681)
+current = true
+
+[node name="FirstPersonCamera" type="Camera3D" parent="TwistPivot/ThirdPersonCamera" unique_id=195937673]
+transform = Transform3D(0.99999285, -0.0012944668, -0.0035704267, -0.0032448391, 0.19730502, -0.9803368, 0.0019734765, 0.9803414, 0.19729951, -0.0041157845, 1.2016332, -3.812952)

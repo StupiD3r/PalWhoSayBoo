@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://vlxcjk311rjm"]
+
+[ext_resource type="Script" uid="uid://cxp4o30mebxem" path="res://Scripts/coin.gd" id="1_0t63x"]
+[ext_resource type="PackedScene" uid="uid://b26jkw2qp2yn8" path="res://Assets/Coins/coin_new_blend_glb/coin_new.glb" id="1_d5gmh"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_d5gmh"]
+radius = 1.5
+
+[node name="Coin" type="Area3D" unique_id=1964783980]
+script = ExtResource("1_0t63x")
+
+[node name="coin_new" parent="." unique_id=368172371 instance=ExtResource("1_d5gmh")]
+transform = Transform3D(1, 0, 0, 0, -0.003725152, -1.0024414, 0, 0.60221285, -0.0062008756, 0, 1.2524498, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1126547017]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0327873, 0)
+shape = SubResource("SphereShape3D_d5gmh")

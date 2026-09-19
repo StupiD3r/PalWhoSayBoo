@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://g8pbjitwms52"]
+
+[ext_resource type="PackedScene" uid="uid://daqnt04w5lqyj" path="res://Elements/floor.tscn" id="1_u0chy"]
+[ext_resource type="PackedScene" uid="uid://usjvkst7qus0" path="res://Elements/player.tscn" id="2_42cfe"]
+[ext_resource type="PackedScene" uid="uid://crd8g2d50ivjx" path="res://Elements/bamboo_pole.tscn" id="3_lebuw"]
+
+[node name="Node3D" type="Node3D" unique_id=1181372035]
+
+[node name="Floor" parent="." unique_id=1885804087 instance=ExtResource("1_u0chy")]
+
+[node name="Player" parent="." unique_id=187821194 instance=ExtResource("2_42cfe")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 7)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=38223985]
+transform = Transform3D(1, 0, 0, 0, 0.9851215, -0.17185903, 0, 0.17185903, 0.9851215, 0, 8.276175, 12.812405)
+
+[node name="DirectionalLight3D2" type="DirectionalLight3D" parent="." unique_id=402557779]
+transform = Transform3D(1, 0, 0, 0, -0.76780283, 0.64068615, 0, -0.64068615, -0.76780283, 0, 8.916, -6.478182)
+
+[node name="Node3D" type="Node3D" parent="." unique_id=381597924]
+transform = Transform3D(0.5, 0, 0, 0, 1, 0, 0, 0, 0.5, 4.2575827, 0, 0)
+
+[node name="BambooPole" parent="Node3D" unique_id=389191382 instance=ExtResource("3_lebuw")]
