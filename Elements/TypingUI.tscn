@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://cd41qf3inb8km"]
 
-[ext_resource type="Script" uid="uid://bj3x0wr07c8uk" path="res://typing_game.gd" id="1_wrqru"]
+[ext_resource type="Script" uid="uid://bj3x0wr07c8uk" path="res://Scripts/typing_game.gd" id="1_fn6aa"]
 
 [node name="TypingUI" type="Control" unique_id=709281357 node_paths=PackedStringArray("word_label")]
 layout_mode = 3
 anchors_preset = 0
-script = ExtResource("1_wrqru")
+script = ExtResource("1_fn6aa")
 word_label = NodePath("Label")
 
 [node name="Label" type="RichTextLabel" parent="." unique_id=1105784837]

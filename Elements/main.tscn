@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://daqnt04w5lqyj" path="res://Elements/floor.tscn" id="1_u0chy"]
 [ext_resource type="PackedScene" uid="uid://usjvkst7qus0" path="res://Elements/player.tscn" id="2_42cfe"]
 [ext_resource type="PackedScene" uid="uid://crd8g2d50ivjx" path="res://Elements/bamboo_pole.tscn" id="3_lebuw"]
-[ext_resource type="PackedScene" uid="uid://cd41qf3inb8km" path="res://TypingUI.tscn" id="4_42cfe"]
+[ext_resource type="PackedScene" uid="uid://cd41qf3inb8km" path="res://Elements/TypingUI.tscn" id="4_42cfe"]
 
 [node name="Node3D" type="Node3D" unique_id=1181372035]
 

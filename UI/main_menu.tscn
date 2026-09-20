@@ -1,7 +1,8 @@
 [gd_scene format=3 uid="uid://b4kv2o18ar86j"]
 
-[ext_resource type="FontFile" uid="uid://8tyqvpfpqvvr" path="res://HororDramaDemoRegular.ttf" id="1_06t4h"]
-[ext_resource type="Script" uid="uid://dhavuodofhpyy" path="res://main_menu.gd" id="1_7vrkn"]
+[ext_resource type="FontFile" uid="uid://8tyqvpfpqvvr" path="res://UI/HororDramaDemoRegular.ttf" id="1_06t4h"]
+[ext_resource type="Script" uid="uid://dhavuodofhpyy" path="res://Scripts/main_menu.gd" id="1_7vrkn"]
+[ext_resource type="AudioStream" uid="uid://dkylmmxvpv830" path="res://horror-bass-ambiance-sound-effect-sfx-bgm-for-videos-films-copyrightfree_PbxbNN3Z.mp3" id="3_d8nwk"]
 
 [node name="Main_menu" type="Control" unique_id=1425458090]
 layout_mode = 3
@@ -57,5 +58,9 @@ offset_right = 941.0
 offset_bottom = 409.0
 theme_override_font_sizes/font_size = 30
 text = "PLAY"
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=257586691]
+stream = ExtResource("3_d8nwk")
+autoplay = true
 
 [connection signal="pressed" from="Button" to="." method="play"]

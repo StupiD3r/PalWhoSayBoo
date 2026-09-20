@@ -1,0 +1,64 @@
+[gd_scene format=3 uid="uid://c85o5urklh8he"]
+
+[ext_resource type="PackedScene" uid="uid://daqnt04w5lqyj" path="res://Elements/floor.tscn" id="1_1qaew"]
+[ext_resource type="PackedScene" uid="uid://usjvkst7qus0" path="res://Elements/player.tscn" id="2_7oqma"]
+
+[node name="Node3D" type="Node3D" unique_id=936504810]
+
+[node name="Node3D" type="Node3D" parent="." unique_id=203971939]
+
+[node name="Player" parent="Node3D" unique_id=187821194 instance=ExtResource("2_7oqma")]
+transform = Transform3D(-0.4330127, 0, -0.24999999, 0, 0.5, 0, 0.24999999, 0, -0.4330127, 0, 0, -3)
+
+[node name="Skeleton3D" parent="Node3D/Player/Man/RootNode/HumanArmature" parent_id_path=PackedInt32Array(187821194, 30659308, 1422836718) index="0" unique_id=486623772]
+bones/1/position = Vector3(0.0070825294, 0.0037582086, -0.009649247)
+bones/1/rotation = Quaternion(0.25713804, 0.54383695, 0.79849887, 0.022825798)
+bones/1/scale = Vector3(1.0000005, 1, 1.0000004)
+bones/7/position = Vector3(-4.9794835e-10, 0.0019534416, 9.313226e-10)
+bones/7/rotation = Quaternion(-0.0025349904, 0.00083643897, 0.06897371, 0.9976149)
+bones/7/scale = Vector3(1.0000002, 1.0000006, 1.0000002)
+bones/25/position = Vector3(9.313226e-10, 0.008284604, 3.259629e-09)
+bones/25/rotation = Quaternion(0.46110332, 0.00450853, -0.14515167, 0.8753824)
+bones/25/scale = Vector3(0.9999999, 0.9999973, 1.0000033)
+bones/28/position = Vector3(0.0029976198, 0.011007167, 0.018037945)
+bones/28/rotation = Quaternion(0.112944506, 8.9473936e-08, 0.06542651, 0.9914449)
+bones/28/scale = Vector3(1, 0.9999999, 0.99999976)
+bones/29/position = Vector3(-0.004839397, 0.00060092413, -0.00022905893)
+bones/29/rotation = Quaternion(-0.05649688, 0.6933953, 0.7162535, 0.05469913)
+bones/29/scale = Vector3(1.0000001, 0.9999997, 1.0000001)
+
+[node name="Foot_L" parent="Node3D/Player/Man/RootNode/HumanArmature/Skeleton3D" index="0" unique_id=208436496]
+transform = Transform3D(-0.86671823, 0.2432301, 0.4354763, -0.3858225, -0.88024485, -0.27624282, 0.31613517, -0.407441, 0.8567677, 0.00705057, 0.009652045, 0.003699358)
+override_pose = true
+
+[node name="Head" parent="Node3D/Player/Man/RootNode/HumanArmature/Skeleton3D" index="1" unique_id=1888706008]
+transform = Transform3D(0.9905235, -0.13718027, 0.0067071617, -0.011429846, -0.13099775, -0.99131715, 0.1368677, 0.9818462, -0.13132426, 3.4086406e-07, -0.0008290149, 0.042231128)
+override_pose = true
+
+[node name="LowerLeg_L" parent="Node3D/Player/Man/RootNode/HumanArmature/Skeleton3D" index="6" unique_id=277221679]
+transform = Transform3D(0.93751115, 0.3183721, -0.14039749, -0.14012823, 0.71478605, 0.6851689, 0.31849056, -0.6226741, 0.71473294, 0.0034239404, -0.0022197813, 0.012988862)
+override_pose = true
+
+[node name="PoleTarget_L" parent="Node3D/Player/Man/RootNode/HumanArmature/Skeleton3D" index="8" unique_id=1833310574]
+transform = Transform3D(0.99143875, -0.12973341, 0.014779866, -0.014778495, -0.22395664, -0.9744868, 0.12973358, 0.96592575, -0.22395657, 0.0029656738, -0.018035151, 0.010948313)
+override_pose = true
+
+[node name="Foot_R" parent="Node3D/Player/Man/RootNode/HumanArmature/Skeleton3D" index="9" unique_id=382782226]
+transform = Transform3D(-0.98763245, -0.15670565, -0.0050759166, 0.15678796, -0.98711276, -0.03202224, 7.5661296e-06, -0.032422066, 0.99947447, -0.0048713516, 0.00023185089, 0.0005420724)
+override_pose = true
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1687125812]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9631492, -0.5979538)
+keep_aspect = 0
+
+[node name="Floor2" parent="." unique_id=1885804087 instance=ExtResource("1_1qaew")]
+transform = Transform3D(0.9999994, 3.2515924e-05, 0.0010598333, -0.0010591918, 0.076977916, 0.9970322, -4.9161492e-05, -0.9970328, 0.07697791, 0, 0, -8)
+
+[node name="Floor" parent="." unique_id=1357854029 instance=ExtResource("1_1qaew")]
+
+[node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=1530059146]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 1)
+omni_range = 4096.0
+
+[editable path="Node3D/Player"]
+[editable path="Node3D/Player/Man"]
