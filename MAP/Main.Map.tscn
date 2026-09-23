@@ -27,6 +27,11 @@ size = Vector3(9, 0.4, 12.5)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.7050624, 2.5441005, -0.42944145)
 size = Vector3(0.2, 4, 20.257813)
 
+[node name="CSGBox3D8" type="CSGBox3D" parent="house/CSGBox3D" unique_id=1695772492]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0.017, 0.445, 7.261)
+operation = 2
+size = Vector3(0.3, 3.7010498, 1.8386192)
+
 [node name="CSGBox3D7" type="CSGBox3D" parent="house/CSGBox3D" unique_id=620458973]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.042, -0.149, -8.579)
 operation = 2
@@ -131,6 +136,14 @@ size = Vector3(0.3, 3.7010498, 1.8386192)
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -0.018, -0.149, -0.31)
 operation = 2
 size = Vector3(0.3, 3.7010498, 1.8386192)
+
+[node name="CSGPolygon3D" type="CSGPolygon3D" parent="house" unique_id=538015462]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 21.84, 0, 4.5000005, 10.200001)
+polygon = PackedVector2Array(-5.8, 0, 0.6, 1.5, 0.6, 1.5, 8, -0.1)
+
+[node name="CSGPolygon3D2" type="CSGPolygon3D" parent="house" unique_id=1473198895]
+transform = Transform3D(-3.1209932e-08, 0, -15.415, 0, 0.714, 0, 0.714, 0, -6.7381103e-07, -14.215, 4.5, -7.495)
+polygon = PackedVector2Array(-5.8, 0, 0.6, 1.5, 0.6, 1.5, 8, -0.1)
 
 [node name="world_ground" type="Node3D" parent="." unique_id=856825940]
 
