@@ -139,11 +139,11 @@ size = Vector3(0.3, 3.7010498, 1.8386192)
 
 [node name="CSGPolygon3D" type="CSGPolygon3D" parent="house" unique_id=538015462]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 21.84, 0, 4.5000005, 10.200001)
-polygon = PackedVector2Array(-5.8, 0, 0.6, 1.5, 0.6, 1.5, 8, -0.1)
+polygon = PackedVector2Array(-5.8, 0, 0.6, 2.4, 0.6, 2.4, 8, -0.1)
 
 [node name="CSGPolygon3D2" type="CSGPolygon3D" parent="house" unique_id=1473198895]
 transform = Transform3D(-3.1209932e-08, 0, -15.415, 0, 0.714, 0, 0.714, 0, -6.7381103e-07, -14.215, 4.5, -7.495)
-polygon = PackedVector2Array(-5.8, 0, 0.6, 1.5, 0.6, 1.5, 8, -0.1)
+polygon = PackedVector2Array(-5.8, 0, 0.6, 3, 0.6, 3, 8, -0.1)
 
 [node name="world_ground" type="Node3D" parent="." unique_id=856825940]
 
