@@ -10,10 +10,10 @@
 [node name="Player" parent="Node3D" unique_id=187821194 instance=ExtResource("2_7oqma")]
 transform = Transform3D(-0.4330127, 0, -0.24999999, 0, 0.5, 0, 0.24999999, 0, -0.4330127, 0, 0, -3)
 
-[node name="Skeleton3D" parent="Node3D/Player/Man/RootNode/HumanArmature" parent_id_path=PackedInt32Array(187821194, 30659308, 1422836718) index="0" unique_id=486623772]
-bones/1/position = Vector3(0.0070825294, 0.0037582086, -0.009649247)
-bones/1/rotation = Quaternion(0.25713804, 0.54383695, 0.79849887, 0.022825798)
-bones/1/scale = Vector3(1.0000005, 1, 1.0000004)
+[node name="Skeleton3D" parent="Node3D/Player/Man/RootNode/HumanArmature" parent_id_path=PackedInt32Array(187821194, 30659308, 1784005059) index="0" unique_id=1269611037]
+bones/1/position = Vector3(0.007082533, 0.0037582088, -0.009649251)
+bones/1/rotation = Quaternion(0.21665676, 0.45416063, 0.8613283, -0.07008256)
+bones/1/scale = Vector3(1.0000006, 1, 1.0000004)
 bones/7/position = Vector3(-4.9794835e-10, 0.0019534416, 9.313226e-10)
 bones/7/rotation = Quaternion(-0.0025349904, 0.00083643897, 0.06897371, 0.9976149)
 bones/7/scale = Vector3(1.0000002, 1.0000006, 1.0000002)
@@ -27,23 +27,23 @@ bones/29/position = Vector3(-0.004839397, 0.00060092413, -0.00022905893)
 bones/29/rotation = Quaternion(-0.05649688, 0.6933953, 0.7162535, 0.05469913)
 bones/29/scale = Vector3(1.0000001, 0.9999997, 1.0000001)
 
-[node name="Foot_L" parent="Node3D/Player/Man/RootNode/HumanArmature/Skeleton3D" index="0" unique_id=208436496]
-transform = Transform3D(-0.86671823, 0.2432301, 0.4354763, -0.3858225, -0.88024485, -0.27624282, 0.31613517, -0.407441, 0.8567677, 0.00705057, 0.009652045, 0.003699358)
+[node name="Foot_L" parent="Node3D/Player/Man/RootNode/HumanArmature/Skeleton3D" index="0" unique_id=720727897]
+transform = Transform3D(-0.896297, 0.3175227, 0.30956817, -0.43688336, -0.7519947, -0.49359584, 0.07606574, -0.5776532, 0.8127308, 0.007050574, 0.009652048, 0.0036993583)
 override_pose = true
 
-[node name="Head" parent="Node3D/Player/Man/RootNode/HumanArmature/Skeleton3D" index="1" unique_id=1888706008]
+[node name="Head" parent="Node3D/Player/Man/RootNode/HumanArmature/Skeleton3D" index="1" unique_id=1590740732]
 transform = Transform3D(0.9905235, -0.13718027, 0.0067071617, -0.011429846, -0.13099775, -0.99131715, 0.1368677, 0.9818462, -0.13132426, 3.4086406e-07, -0.0008290149, 0.042231128)
 override_pose = true
 
-[node name="LowerLeg_L" parent="Node3D/Player/Man/RootNode/HumanArmature/Skeleton3D" index="6" unique_id=277221679]
+[node name="LowerLeg_L" parent="Node3D/Player/Man/RootNode/HumanArmature/Skeleton3D" index="6" unique_id=1213460006]
 transform = Transform3D(0.93751115, 0.3183721, -0.14039749, -0.14012823, 0.71478605, 0.6851689, 0.31849056, -0.6226741, 0.71473294, 0.0034239404, -0.0022197813, 0.012988862)
 override_pose = true
 
-[node name="PoleTarget_L" parent="Node3D/Player/Man/RootNode/HumanArmature/Skeleton3D" index="8" unique_id=1833310574]
+[node name="PoleTarget_L" parent="Node3D/Player/Man/RootNode/HumanArmature/Skeleton3D" index="8" unique_id=1706681200]
 transform = Transform3D(0.99143875, -0.12973341, 0.014779866, -0.014778495, -0.22395664, -0.9744868, 0.12973358, 0.96592575, -0.22395657, 0.0029656738, -0.018035151, 0.010948313)
 override_pose = true
 
-[node name="Foot_R" parent="Node3D/Player/Man/RootNode/HumanArmature/Skeleton3D" index="9" unique_id=382782226]
+[node name="Foot_R" parent="Node3D/Player/Man/RootNode/HumanArmature/Skeleton3D" index="9" unique_id=1045941417]
 transform = Transform3D(-0.98763245, -0.15670565, -0.0050759166, 0.15678796, -0.98711276, -0.03202224, 7.5661296e-06, -0.032422066, 0.99947447, -0.0048713516, 0.00023185089, 0.0005420724)
 override_pose = true
 
