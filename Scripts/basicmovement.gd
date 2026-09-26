@@ -1,9 +1,10 @@
 extends CharacterBody3D
 
 # --- Movement Settings ---
-@export var SPEED : float = 5.0
-@export var ACCELERATION : float = 10.0
-@export var DECELERATION : float = 10.0
+@export var WALK_SPEED : float = 5.0
+@export var RUN_SPEED : float = 25.0
+@export var ACCELERATION : float = 50.0
+@export var DECELERATION : float = 50.0
 @export var JUMP_VELOCITY : float = 4.5
 @export var CLIMB_SPEED : float = 3.0
 
@@ -94,13 +95,16 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = JUMP_VELOCITY
 
-	# --- 4. NORMAL WALKING ---
+	# --- 4. NORMAL WALKING / RUNNING ---
 	var input_dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var direction := (global_transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	
+	# Determine current speed based on whether the run button is held down
+	var current_speed = RUN_SPEED if Input.is_action_pressed("run") else WALK_SPEED
+	
 	if direction:
-		velocity.x = move_toward(velocity.x, direction.x * SPEED, ACCELERATION * delta)
-		velocity.z = move_toward(velocity.z, direction.z * SPEED, ACCELERATION * delta)
+		velocity.x = move_toward(velocity.x, direction.x * current_speed, ACCELERATION * delta)
+		velocity.z = move_toward(velocity.z, direction.z * current_speed, ACCELERATION * delta)
 	else:
 		velocity.x = move_toward(velocity.x, 0, DECELERATION * delta)
 		velocity.z = move_toward(velocity.z, 0, DECELERATION * delta)
@@ -119,8 +123,13 @@ func _update_ground_animations() -> void:
 		if animation_player.current_animation != "HumanArmature|Man_Jump" and animation_player.has_animation("HumanArmature|Man_Jump"):
 			animation_player.play("HumanArmature|Man_Jump")
 	elif horizontal_velocity > 0.1:
-		if animation_player.current_animation != "HumanArmature|Man_Walk" and animation_player.has_animation("HumanArmature|Man_Walk"):
-			animation_player.play("HumanArmature|Man_Walk")
+		# Check if the player is actively holding the run key
+		if Input.is_action_pressed("run"):
+			if animation_player.current_animation != "HumanArmature|Man_Run" and animation_player.has_animation("HumanArmature|Man_Run"):
+				animation_player.play("HumanArmature|Man_Run")
+		else:
+			if animation_player.current_animation != "HumanArmature|Man_Walk" and animation_player.has_animation("HumanArmature|Man_Walk"):
+				animation_player.play("HumanArmature|Man_Walk")
 	else:
 		if animation_player.current_animation != "HumanArmature|Man_Idle" and animation_player.has_animation("HumanArmature|Man_Idle"):
 			animation_player.play("HumanArmature|Man_Idle")

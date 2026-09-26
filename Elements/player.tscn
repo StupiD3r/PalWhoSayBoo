@@ -24,7 +24,7 @@ shape = SubResource("CapsuleShape3D_b0il4")
 [node name="TwistPivot" type="Node3D" parent="." unique_id=74649789]
 
 [node name="ThirdPersonCamera" type="Camera3D" parent="TwistPivot" unique_id=1448518032]
-transform = Transform3D(0.9999955, -0.002827531, -0.0009947406, 0.0029662857, 0.8858307, 0.4639992, -0.0004308004, -0.4640001, 0.88583505, 0, 5.0851135, 3.89681)
+transform = Transform3D(0.9999955, -0.002827531, -0.0009947406, 0.0029662857, 0.8858307, 0.4639992, -0.0004308004, -0.4640001, 0.88583505, 0, 4.466167, -0.4208932)
 current = true
 
 [node name="FirstPersonCamera" type="Camera3D" parent="TwistPivot/ThirdPersonCamera" unique_id=195937673]
