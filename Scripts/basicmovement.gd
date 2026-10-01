@@ -1,10 +1,9 @@
 extends CharacterBody3D
 
 # --- Movement Settings ---
-@export var WALK_SPEED : float = 5.0
-@export var RUN_SPEED : float = 25.0
-@export var ACCELERATION : float = 50.0
-@export var DECELERATION : float = 50.0
+@export var SPEED : float = 5.0
+@export var ACCELERATION : float = 10.0
+@export var DECELERATION : float = 10.0
 @export var JUMP_VELOCITY : float = 4.5
 @export var CLIMB_SPEED : float = 3.0
 
@@ -19,7 +18,8 @@ extends CharacterBody3D
 @export var twist_pivot: Node3D
 @export var pitch_pivot: Node3D
 
-@onready var animation_player: AnimationPlayer = $"Man/AnimationPlayer"
+# Updated to target the new Player child node
+@onready var animation_player: AnimationPlayer = $"Player/AnimationPlayer"
 
 # --- CLIMBING STATE & SIGNALS ---
 var is_climbing = false
@@ -29,6 +29,7 @@ signal climbing_stopped
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	
+	# PLACEHOLDER: Update "HumanArmature|Man_Idle" when you import a Mixamo Idle animation
 	if animation_player and animation_player.has_animation("HumanArmature|Man_Idle"):
 		animation_player.play("HumanArmature|Man_Idle")
 
@@ -95,16 +96,13 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = JUMP_VELOCITY
 
-	# --- 4. NORMAL WALKING / RUNNING ---
+	# --- 4. NORMAL WALKING ---
 	var input_dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var direction := (global_transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	
-	# Determine current speed based on whether the run button is held down
-	var current_speed = RUN_SPEED if Input.is_action_pressed("run") else WALK_SPEED
-	
 	if direction:
-		velocity.x = move_toward(velocity.x, direction.x * current_speed, ACCELERATION * delta)
-		velocity.z = move_toward(velocity.z, direction.z * current_speed, ACCELERATION * delta)
+		velocity.x = move_toward(velocity.x, direction.x * SPEED, ACCELERATION * delta)
+		velocity.z = move_toward(velocity.z, direction.z * SPEED, ACCELERATION * delta)
 	else:
 		velocity.x = move_toward(velocity.x, 0, DECELERATION * delta)
 		velocity.z = move_toward(velocity.z, 0, DECELERATION * delta)
@@ -120,19 +118,17 @@ func _update_ground_animations() -> void:
 	var horizontal_velocity = Vector2(velocity.x, velocity.z).length()
 
 	if not is_on_floor():
+		# PLACEHOLDER: Update "HumanArmature|Man_Jump" when you import a Mixamo Jump animation
 		if animation_player.current_animation != "HumanArmature|Man_Jump" and animation_player.has_animation("HumanArmature|Man_Jump"):
 			animation_player.play("HumanArmature|Man_Jump")
 	elif horizontal_velocity > 0.1:
-		# Check if the player is actively holding the run key
-		if Input.is_action_pressed("run"):
-			if animation_player.current_animation != "HumanArmature|Man_Run" and animation_player.has_animation("HumanArmature|Man_Run"):
-				animation_player.play("HumanArmature|Man_Run")
-		else:
-			if animation_player.current_animation != "HumanArmature|Man_Walk" and animation_player.has_animation("HumanArmature|Man_Walk"):
-				animation_player.play("HumanArmature|Man_Walk")
+		# Updated to use the Mixamo walking animation
+		if animation_player.current_animation != "mixamo_com" and animation_player.has_animation("mixamo_com"):
+			animation_player.play("mixamo_com")
 	else:
-		if animation_player.current_animation != "HumanArmature|Man_Idle" and animation_player.has_animation("HumanArmature|Man_Idle"):
-			animation_player.play("HumanArmature|Man_Idle")
+		# PLACEHOLDER: Update "HumanArmature|Man_Idle" when you import a Mixamo Idle animation
+		if animation_player.current_animation != "custom/idle2" and animation_player.has_animation("custom/idle2"):
+			animation_player.play("custom/idle2")
 
 # --- CLIMBING ANIMATIONS ---
 func _update_climbing_animations(climb_dir: float) -> void:
@@ -140,8 +136,9 @@ func _update_climbing_animations(climb_dir: float) -> void:
 		return
 
 	if climb_dir != 0:
-		if animation_player.current_animation != "HumanArmature|Man_Walk" and animation_player.has_animation("HumanArmature|Man_Walk"):
-			animation_player.play("HumanArmature|Man_Walk")
+		# Updated to use the Mixamo walking animation (if this is intended for climbing too)
+		if animation_player.current_animation != "mixamo.com" and animation_player.has_animation("mixamo.com"):
+			animation_player.play("mixamo.com")
 	else:
 		if animation_player.is_playing():
 			animation_player.pause()

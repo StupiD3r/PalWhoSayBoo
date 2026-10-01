@@ -8,7 +8,7 @@
 [node name="Node3D" type="Node3D" unique_id=1181372035]
 
 [node name="Player" parent="." unique_id=187821194 instance=ExtResource("2_42cfe")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2, 7)
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -5, 2, 7)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=38223985]
 transform = Transform3D(0.96592593, 0.044480402, 0.2549683, -0.06698733, 0.9945193, 0.08027731, -0.25000006, -0.094621554, 0.9636115, 0, 8.276175, 12.812405)
