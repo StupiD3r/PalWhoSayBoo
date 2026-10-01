@@ -4,20 +4,21 @@
 [ext_resource type="PackedScene" uid="uid://ccn6oihw0kr3v" path="res://Assets/chara/Player.fbx" id="2_2ft67"]
 [ext_resource type="Animation" uid="uid://dvtpnjvok52qg" path="res://Assets/chara/Animation/idle.anim" id="3_1pq33"]
 [ext_resource type="Animation" uid="uid://bj253vy6p50vs" path="res://Assets/chara/Animation/idle2.anim" id="4_twyhr"]
+[ext_resource type="Animation" uid="uid://nilgjl5w1s2s" path="res://Assets/chara/Animation/running.anim" id="5_8a7a3"]
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_twyhr"]
 _data = {
 &"Idle2": ExtResource("3_1pq33"),
-&"idle2": ExtResource("4_twyhr")
+&"idle2": ExtResource("4_twyhr"),
+&"running": ExtResource("5_8a7a3")
 }
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_b0il4"]
 radius = 0.30908203
 height = 2.074463
 
-[node name="Player" type="CharacterBody3D" unique_id=187821194 node_paths=PackedStringArray("third_person_cam", "first_person_cam", "twist_pivot", "pitch_pivot") groups=["Player"]]
+[node name="Player" type="CharacterBody3D" unique_id=187821194 node_paths=PackedStringArray("first_person_cam", "twist_pivot", "pitch_pivot") groups=["Player"]]
 script = ExtResource("1_2ft67")
-third_person_cam = NodePath("")
 first_person_cam = NodePath("TwistPivot/PitchPivot/FirstPersonCam")
 twist_pivot = NodePath("TwistPivot")
 pitch_pivot = NodePath("TwistPivot/PitchPivot")

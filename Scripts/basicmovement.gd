@@ -2,6 +2,7 @@ extends CharacterBody3D
 
 # --- Movement Settings ---
 @export var SPEED : float = 5.0
+@export var SPRINT_SPEED : float = 8.0 
 @export var ACCELERATION : float = 10.0
 @export var DECELERATION : float = 10.0
 @export var JUMP_VELOCITY : float = 4.5
@@ -29,9 +30,8 @@ signal climbing_stopped
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	
-	# PLACEHOLDER: Update "HumanArmature|Man_Idle" when you import a Mixamo Idle animation
-	if animation_player and animation_player.has_animation("HumanArmature|Man_Idle"):
-		animation_player.play("HumanArmature|Man_Idle")
+	if animation_player and animation_player.has_animation("custom/idle2"):
+		animation_player.play("custom/idle2")
 
 func _unhandled_input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("ui_cancel"):
@@ -57,6 +57,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			pitch_pivot.rotation.x = clamped_pitch
 
 func _physics_process(delta: float) -> void:
+	# Check if the run button is pressed
+	var current_speed = SPRINT_SPEED if Input.is_action_pressed("run") else SPEED
+	
 	if not twist_pivot or not pitch_pivot:
 		return
 
@@ -101,8 +104,9 @@ func _physics_process(delta: float) -> void:
 	var direction := (global_transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	
 	if direction:
-		velocity.x = move_toward(velocity.x, direction.x * SPEED, ACCELERATION * delta)
-		velocity.z = move_toward(velocity.z, direction.z * SPEED, ACCELERATION * delta)
+		# FIXED: Now uses current_speed so the player actually moves faster when running
+		velocity.x = move_toward(velocity.x, direction.x * current_speed, ACCELERATION * delta)
+		velocity.z = move_toward(velocity.z, direction.z * current_speed, ACCELERATION * delta)
 	else:
 		velocity.x = move_toward(velocity.x, 0, DECELERATION * delta)
 		velocity.z = move_toward(velocity.z, 0, DECELERATION * delta)
@@ -122,11 +126,15 @@ func _update_ground_animations() -> void:
 		if animation_player.current_animation != "HumanArmature|Man_Jump" and animation_player.has_animation("HumanArmature|Man_Jump"):
 			animation_player.play("HumanArmature|Man_Jump")
 	elif horizontal_velocity > 0.1:
-		# Updated to use the Mixamo walking animation
-		if animation_player.current_animation != "mixamo_com" and animation_player.has_animation("mixamo_com"):
-			animation_player.play("mixamo_com")
+		# Check if running while moving
+		if Input.is_action_pressed("run"):
+			if animation_player.current_animation != "custom/running" and animation_player.has_animation("custom/running"):
+				animation_player.play("custom/running")
+		else:
+			# Play Walk animation
+			if animation_player.current_animation != "mixamo_com" and animation_player.has_animation("mixamo_com"):
+				animation_player.play("mixamo_com")
 	else:
-		# PLACEHOLDER: Update "HumanArmature|Man_Idle" when you import a Mixamo Idle animation
 		if animation_player.current_animation != "custom/idle2" and animation_player.has_animation("custom/idle2"):
 			animation_player.play("custom/idle2")
 
@@ -136,9 +144,8 @@ func _update_climbing_animations(climb_dir: float) -> void:
 		return
 
 	if climb_dir != 0:
-		# Updated to use the Mixamo walking animation (if this is intended for climbing too)
-		if animation_player.current_animation != "mixamo.com" and animation_player.has_animation("mixamo.com"):
-			animation_player.play("mixamo.com")
+		if animation_player.current_animation != "mixamo_com" and animation_player.has_animation("mixamo_com"):
+			animation_player.play("mixamo_com")
 	else:
 		if animation_player.is_playing():
 			animation_player.pause()
