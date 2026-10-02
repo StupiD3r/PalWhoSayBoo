@@ -140,20 +140,6 @@ size = Vector3(0.3, 3.7010498, 1.8386192)
 [node name="world_ground" type="Node3D" parent="." unique_id=856825940]
 
 [node name="garage" type="CSGBox3D" parent="world_ground" unique_id=1339930205]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.352955, 0.5570923, 3.5040627)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.096699, 0.5570923, 12.105625)
 use_collision = true
-size = Vector3(9, 0.2, 12.5)
-
-[node name="front yard" type="CSGBox3D" parent="world_ground" unique_id=1829780320]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.077003, 0.372, 27.409)
-use_collision = true
-size = Vector3(184.6, 0.2, 35.4)
-
-[node name="front yard2" type="CSGBox3D" parent="world_ground" unique_id=691479445]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 110.137, 0.372, 49.438995)
-use_collision = true
-size = Vector3(99, 0.2, 35.4)
-
-[node name="front yard4" type="CSGBox3D" parent="world_ground" unique_id=2083895457]
-transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 124.717, 0.372, 142.864)
-size = Vector3(64.3, 0.2, 87.9)
+size = Vector3(33.926697, 0.2, 44.429688)

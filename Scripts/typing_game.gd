@@ -46,6 +46,12 @@ func _unhandled_input(event: InputEvent):
 			typed_text += typed_char
 			update_ui()
 			
+			# --- TRIGGER MOVEMENT AND ANIMATION PER KEYSTROKE ---
+			if player and player.has_method("climb_step"):
+				# You can pass custom values here if you want to tweak the speed, 
+				# e.g., player.climb_step(0.2, 0.1) for smaller steps
+				player.climb_step() 
+			
 			if typed_text == current_word:
 				on_word_completed()
 
@@ -56,7 +62,6 @@ func update_ui():
 
 func on_word_completed():
 	print("Word Completed!")
-	if player and player.is_climbing:
-		player.global_position.y += 1.0 # Move character up on success
-	
+	# The manual global_position.y bump was removed here because 
+	# the player is now moving smoothly per-letter!
 	get_new_word()

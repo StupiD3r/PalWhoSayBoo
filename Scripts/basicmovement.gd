@@ -3,8 +3,8 @@ extends CharacterBody3D
 # --- Movement Settings ---
 @export var SPEED : float = 5.0
 @export var SPRINT_SPEED : float = 8.0 
-@export var ACCELERATION : float = 10.0
-@export var DECELERATION : float = 10.0
+@export var ACCELERATION : float = 50.0
+@export var DECELERATION : float = 50.0
 @export var JUMP_VELOCITY : float = 4.5
 @export var CLIMB_SPEED : float = 3.0
 
@@ -88,7 +88,6 @@ func _physics_process(delta: float) -> void:
 			climbing_stopped.emit()
 		
 		move_and_slide()
-		_update_climbing_animations(0.0) # Pause or keep idle climbing frame
 		return
 
 	# --- 2. NORMAL GRAVITY ---
@@ -120,35 +119,24 @@ func _update_ground_animations() -> void:
 		return
 
 	var horizontal_velocity = Vector2(velocity.x, velocity.z).length()
+	var blend_time = 0.2 # 0.2 seconds of smooth crossfading
 
 	if not is_on_floor():
 		# PLACEHOLDER: Update "HumanArmature|Man_Jump" when you import a Mixamo Jump animation
-		if animation_player.current_animation != "HumanArmature|Man_Jump" and animation_player.has_animation("HumanArmature|Man_Jump"):
-			animation_player.play("HumanArmature|Man_Jump")
+		if animation_player.current_animation != "custom/jumping" and animation_player.has_animation("custom/jumping"):
+			animation_player.play("custom/jumping", blend_time)
 	elif horizontal_velocity > 0.1:
 		# Check if running while moving
 		if Input.is_action_pressed("run"):
 			if animation_player.current_animation != "custom/running" and animation_player.has_animation("custom/running"):
-				animation_player.play("custom/running")
+				animation_player.play("custom/running", blend_time)
 		else:
 			# Play Walk animation
 			if animation_player.current_animation != "mixamo_com" and animation_player.has_animation("mixamo_com"):
-				animation_player.play("mixamo_com")
+				animation_player.play("mixamo_com", blend_time)
 	else:
 		if animation_player.current_animation != "custom/idle2" and animation_player.has_animation("custom/idle2"):
-			animation_player.play("custom/idle2")
-
-# --- CLIMBING ANIMATIONS ---
-func _update_climbing_animations(climb_dir: float) -> void:
-	if not animation_player:
-		return
-
-	if climb_dir != 0:
-		if animation_player.current_animation != "mixamo_com" and animation_player.has_animation("mixamo_com"):
-			animation_player.play("mixamo_com")
-	else:
-		if animation_player.is_playing():
-			animation_player.pause()
+			animation_player.play("custom/idle2", blend_time)
 
 # --- ATTACH TRIGGER ---
 func start_climbing(pole_position):
@@ -168,5 +156,41 @@ func start_climbing(pole_position):
 	if first_person_cam:
 		first_person_cam.current = true
 
+	# Set the climbing animation and pause it immediately
+	if animation_player.has_animation("custom/climbing"):
+		animation_player.play("custom/climbing")
+		animation_player.pause()
+	else:
+		# If you see this in your Output at the bottom, your name is wrong!
+		print("ERROR: Could not find custom/climbing!")
+
 	# Trigger the typing UI!
 	climbing_started.emit()
+
+# --- MANUAL TYPING MOVEMENT ---
+func climb_step(height_per_key: float = 0.3, anim_time_per_key: float = 0.15) -> void:
+	if not is_climbing or not animation_player:
+		return
+		
+	# 1. Move the character up the pole
+	global_position.y += height_per_key
+	
+	# 2. Safety Check: Force the climbing animation if it somehow got changed
+	if animation_player.assigned_animation != "custom/climbing":
+		animation_player.play("custom/climbing", 0.0)
+		animation_player.pause()
+	
+	# 3. Advance the paused animation forward
+	var current_pos = animation_player.current_animation_position
+	var anim_length = animation_player.current_animation_length
+	
+	# Prevent errors if the animation length is 0 (e.g., corrupted animation)
+	if anim_length > 0:
+		var new_pos = current_pos + anim_time_per_key
+		if new_pos >= anim_length:
+			new_pos -= anim_length
+			
+		animation_player.seek(new_pos, true)
+		print("Stepped animation to frame: ", new_pos)
+	else:
+		print("ERROR: Climbing animation length is 0. Check your animation file!")
