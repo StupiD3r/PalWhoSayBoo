@@ -5,6 +5,13 @@
 [ext_resource type="PackedScene" uid="uid://cd41qf3inb8km" path="res://Elements/TypingUI.tscn" id="4_42cfe"]
 [ext_resource type="PackedScene" uid="uid://cunnc7w2cwt0y" path="res://MAP/Main.Map.tscn" id="4_lebuw"]
 
+[sub_resource type="Environment" id="Environment_b0il4"]
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.001
+
+[sub_resource type="FogMaterial" id="FogMaterial_b0il4"]
+density = 2.0
+
 [node name="Node3D" type="Node3D" unique_id=1181372035]
 
 [node name="Player" parent="." unique_id=187821194 instance=ExtResource("2_42cfe")]
@@ -17,7 +24,7 @@ transform = Transform3D(0.96592593, 0.044480402, 0.2549683, -0.06698733, 0.99451
 transform = Transform3D(1, 0, 0, 0, -0.76780283, 0.64068615, 0, -0.64068615, -0.76780283, 0, 8.916, -6.478182)
 
 [node name="Bamboo" type="Node3D" parent="." unique_id=381597924]
-transform = Transform3D(0.5, 0, 0, 0, 1, 0, 0, 0, 0.5, -2.7424173, 2, 0)
+transform = Transform3D(0.5, 0, 0, 0, 2.9900002, 0, 0, 0, 0.5, -2.7424173, 2, 0)
 
 [node name="BambooPole" parent="Bamboo" unique_id=389191382 instance=ExtResource("3_lebuw")]
 
@@ -26,6 +33,14 @@ player = NodePath("../Player")
 
 [node name="map" parent="." unique_id=908056964 instance=ExtResource("4_lebuw")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 15, 0, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=435497615]
+environment = SubResource("Environment_b0il4")
+
+[node name="FogVolume" type="FogVolume" parent="." unique_id=2088199161]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 30, 12.5)
+size = Vector3(250, 20, 250)
+material = SubResource("FogMaterial_b0il4")
 
 [connection signal="climbing_started" from="Player" to="TypingUI" method="start_typing_minigame"]
 [connection signal="climbing_stopped" from="Player" to="TypingUI" method="stop_typing_minigame"]
