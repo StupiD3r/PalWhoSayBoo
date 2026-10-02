@@ -151,17 +151,18 @@ func start_climbing(pole_position):
 	if twist_pivot:
 		twist_pivot.rotation.y = 0
 	if pitch_pivot:
-		pitch_pivot.rotation.x = 0
+		# THE VERTIGO ANGLE: Tilt camera to look up from below
+		pitch_pivot.rotation_degrees.x = 25.0 
 	
-	if first_person_cam:
-		first_person_cam.current = true
+	# Switch to Third-Person view instead of First-Person
+	if third_person_cam:
+		third_person_cam.current = true
 
 	# Set the climbing animation and pause it immediately
 	if animation_player.has_animation("custom/climbing"):
 		animation_player.play("custom/climbing")
 		animation_player.pause()
 	else:
-		# If you see this in your Output at the bottom, your name is wrong!
 		print("ERROR: Could not find custom/climbing!")
 
 	# Trigger the typing UI!
