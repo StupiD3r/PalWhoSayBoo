@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://ccn6oihw0kr3v" path="res://Assets/chara/Player.fbx" id="2_2ft67"]
 [ext_resource type="Animation" uid="uid://dvtpnjvok52qg" path="res://Assets/chara/Animation/idle.anim" id="3_1pq33"]
 [ext_resource type="Animation" uid="uid://c4p3vag3yayjy" path="res://Assets/chara/Animation/climbing.anim" id="4_qskvw"]
-[ext_resource type="Animation" uid="uid://bj253vy6p50vs" path="res://Assets/chara/Animation/idle2.anim" id="4_twyhr"]
+[ext_resource type="Animation" uid="uid://b5n3ejgdh6ckc" path="res://Assets/chara/Animation/idle2.anim" id="4_twyhr"]
 [ext_resource type="Animation" uid="uid://nilgjl5w1s2s" path="res://Assets/chara/Animation/running.anim" id="5_8a7a3"]
 [ext_resource type="Animation" uid="uid://c6a8ecbdwo1t2" path="res://Assets/chara/Animation/jumping.anim" id="5_esno4"]
 
@@ -21,16 +21,17 @@ _data = {
 radius = 0.30908203
 height = 2.074463
 
-[node name="Player" type="CharacterBody3D" unique_id=187821194 node_paths=PackedStringArray("first_person_cam", "twist_pivot", "pitch_pivot") groups=["Player"]]
+[node name="Player" type="CharacterBody3D" unique_id=187821194 node_paths=PackedStringArray("first_person_cam", "climbing_cam", "twist_pivot", "pitch_pivot") groups=["Player"]]
 script = ExtResource("1_2ft67")
 first_person_cam = NodePath("TwistPivot/PitchPivot/FirstPersonCam")
+climbing_cam = NodePath("Player/Skeleton3D/BoneAttachment3D/ClimbingCam")
 twist_pivot = NodePath("TwistPivot")
 pitch_pivot = NodePath("TwistPivot/PitchPivot")
 
 [node name="Player" parent="." unique_id=1275803203 instance=ExtResource("2_2ft67")]
 transform = Transform3D(-1, 0, 8.940697e-08, 0, 1, 0, -8.940697e-08, 0, -1, 0, 0, 0)
 
-[node name="Skeleton3D" parent="Player" index="0" unique_id=524358015]
+[node name="Skeleton3D" parent="Player" index="0" unique_id=618503007]
 bones/3/position = Vector3(0, 0.1279102, 2.4310637e-10)
 bones/6/rotation = Quaternion(0, 0, 0, 1)
 bones/8/position = Vector3(2.830659e-10, 0.14736071, 2.08242e-09)
@@ -133,7 +134,16 @@ bones/63/rotation = Quaternion(0.32987925, 0.034591172, -0.012096636, 0.94331163
 bones/64/position = Vector3(1.4847884e-10, 0.06943097, -1.6511803e-10)
 bones/64/rotation = Quaternion(6.938894e-18, 1.3010426e-18, 1.7347235e-17, 1)
 
-[node name="AnimationPlayer" parent="Player" index="1" unique_id=1265143217]
+[node name="BoneAttachment3D" type="BoneAttachment3D" parent="Player/Skeleton3D" index="8" unique_id=1942551199]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5574783, -0.012809465)
+bone_name = "mixamorig_Head"
+bone_idx = 5
+
+[node name="ClimbingCam" type="Camera3D" parent="Player/Skeleton3D/BoneAttachment3D" unique_id=1457146733]
+transform = Transform3D(-1, -4.4703487e-08, -7.544452e-08, -9.920953e-10, 0.8660254, -0.5, 8.768861e-08, -0.5, -0.8660254, 2.255971e-08, 1.6111809, 0.2523261)
+fov = 135.0
+
+[node name="AnimationPlayer" parent="Player" index="1" unique_id=1353151492]
 libraries/custom = SubResource("AnimationLibrary_twyhr")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=764926982]
@@ -141,11 +151,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8243408, 0)
 shape = SubResource("CapsuleShape3D_b0il4")
 
 [node name="TwistPivot" type="Node3D" parent="." unique_id=74649789]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.661727, -0.24568546)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.628574, -0.32303798)
 
 [node name="PitchPivot" type="Node3D" parent="TwistPivot" unique_id=28971009]
 
 [node name="FirstPersonCam" type="Camera3D" parent="TwistPivot/PitchPivot" unique_id=1015633174]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.09799171)
+transform = Transform3D(1, 0, 0, 0, 1, -2.9802322e-08, 0, 2.9802322e-08, 1, 0, -0.040551305, 0.09229313)
 
 [editable path="Player"]

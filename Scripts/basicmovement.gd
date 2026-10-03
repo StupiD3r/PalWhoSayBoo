@@ -12,8 +12,10 @@ extends CharacterBody3D
 @export var MOUSE_SENSITIVITY : float = 0.003
 @export var PITCH_MIN : float = -60.0
 @export var PITCH_MAX : float = 60.0
-@export var third_person_cam: Camera3D
 @export var first_person_cam: Camera3D
+@export var climbing_cam: Camera3D 
+var target_climb_y: float = 0.0
+var climb_tween: Tween
 
 # --- Node Connections ---
 @export var twist_pivot: Node3D
@@ -29,6 +31,10 @@ signal climbing_stopped
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	
+	# Force the correct camera on startup!
+	if first_person_cam:
+		first_person_cam.current = true
 	
 	if animation_player and animation_player.has_animation("custom/idle2"):
 		animation_player.play("custom/idle2")
@@ -81,8 +87,9 @@ func _physics_process(delta: float) -> void:
 			if pitch_pivot:
 				pitch_pivot.rotation.x = 0
 			
-			if third_person_cam:
-				third_person_cam.current = true
+			# Switch back to first-person walking view
+			if first_person_cam:
+				first_person_cam.current = true
 			
 			# EMIT SIGNAL TO HIDE TYPING UI
 			climbing_stopped.emit()
@@ -146,26 +153,21 @@ func start_climbing(pole_position):
 	global_position.x = pole_position.x
 	global_position.z = pole_position.z + 0.6
 	
+	target_climb_y = global_position.y # Add this line here!
+	
 	look_at(Vector3(pole_position.x, global_position.y, pole_position.z), Vector3.UP)
 	
-	if twist_pivot:
-		twist_pivot.rotation.y = 0
-	if pitch_pivot:
-		# THE VERTIGO ANGLE: Tilt camera to look up from below
-		pitch_pivot.rotation_degrees.x = 25.0 
+	if twist_pivot: twist_pivot.rotation.y = 0
+	if pitch_pivot: pitch_pivot.rotation_degrees.x = 15.0 
 	
-	# Switch to Third-Person view instead of First-Person
-	if third_person_cam:
-		third_person_cam.current = true
+	# Activate the dedicated climbing camera!
+	if climbing_cam:
+		climbing_cam.current = true
 
-	# Set the climbing animation and pause it immediately
 	if animation_player.has_animation("custom/climbing"):
 		animation_player.play("custom/climbing")
 		animation_player.pause()
-	else:
-		print("ERROR: Could not find custom/climbing!")
 
-	# Trigger the typing UI!
 	climbing_started.emit()
 
 # --- MANUAL TYPING MOVEMENT ---
@@ -173,25 +175,22 @@ func climb_step(height_per_key: float = 0.3, anim_time_per_key: float = 0.15) ->
 	if not is_climbing or not animation_player:
 		return
 		
-	# 1. Move the character up the pole
-	global_position.y += height_per_key
+	# 1. Update the absolute target height so you never lose distance if you type fast
+	target_climb_y += height_per_key
 	
-	# 2. Safety Check: Force the climbing animation if it somehow got changed
+	# 2. Stop the old tween if typing quickly, and smoothly bridge to the new height
+	if climb_tween and climb_tween.is_valid():
+		climb_tween.kill()
+		
+	climb_tween = get_tree().create_tween()
+	climb_tween.tween_property(self, "global_position:y", target_climb_y, 0.15).set_trans(Tween.TRANS_LINEAR)
+	
+	# 3. Let the animation play continuously and naturally
 	if animation_player.assigned_animation != "custom/climbing":
-		animation_player.play("custom/climbing", 0.0)
-		animation_player.pause()
-	
-	# 3. Advance the paused animation forward
-	var current_pos = animation_player.current_animation_position
-	var anim_length = animation_player.current_animation_length
-	
-	# Prevent errors if the animation length is 0 (e.g., corrupted animation)
-	if anim_length > 0:
-		var new_pos = current_pos + anim_time_per_key
-		if new_pos >= anim_length:
-			new_pos -= anim_length
-			
-		animation_player.seek(new_pos, true)
-		print("Stepped animation to frame: ", new_pos)
-	else:
-		print("ERROR: Climbing animation length is 0. Check your animation file!")
+		animation_player.play("custom/climbing")
+		
+	if not animation_player.is_playing():
+		animation_player.play()
+		
+	# 4. Automatically pause the animation exactly when the upward sliding stops!
+	climb_tween.tween_callback(animation_player.pause)
