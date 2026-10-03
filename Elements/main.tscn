@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://usjvkst7qus0" path="res://Elements/player.tscn" id="2_42cfe"]
 [ext_resource type="PackedScene" uid="uid://crd8g2d50ivjx" path="res://Elements/bamboo_pole.tscn" id="3_lebuw"]
 [ext_resource type="PackedScene" uid="uid://cd41qf3inb8km" path="res://Elements/TypingUI.tscn" id="4_42cfe"]
+[ext_resource type="PackedScene" uid="uid://cjqb4dssf6kbj" path="res://UI/HUD.tscn" id="4_i4wgl"]
 [ext_resource type="PackedScene" uid="uid://cunnc7w2cwt0y" path="res://MAP/Main.Map.tscn" id="4_lebuw"]
 
 [sub_resource type="FogMaterial" id="FogMaterial_b0il4"]
@@ -26,6 +27,8 @@ transform = Transform3D(0.5, 0, 0, 0, 2.9900002, 0, 0, 0, 0.5, -2.7424173, 2, 0)
 [node name="TypingUI" parent="." unique_id=709281357 node_paths=PackedStringArray("player") instance=ExtResource("4_42cfe")]
 player = NodePath("../Player")
 
+[node name="HUD" parent="." unique_id=1271115555 instance=ExtResource("4_i4wgl")]
+
 [node name="map" parent="." unique_id=908056964 instance=ExtResource("4_lebuw")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 15, 0, 0)
 
@@ -48,5 +51,9 @@ light_volumetric_fog_energy = 16.0
 light_specular = 0.0
 omni_range = 3412.38
 
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Lightings" unique_id=1180911700]
+transform = Transform3D(1, 0, 0, 0, 0.67829335, 0.7347912, 0, -0.7347912, 0.67829335, 0, 36.0135, 22.866962)
+
 [connection signal="climbing_started" from="Player" to="TypingUI" method="start_typing_minigame"]
 [connection signal="climbing_stopped" from="Player" to="TypingUI" method="stop_typing_minigame"]
+[connection signal="score_changed" from="TypingUI" to="HUD" method="update_score"]
