@@ -27,6 +27,7 @@ fit_content = true
 
 [node name="CurrentWordLabel" type="RichTextLabel" parent="VBoxContainer" unique_id=1105784837]
 layout_mode = 2
+theme_override_font_sizes/normal_font_size = 25
 bbcode_enabled = true
 fit_content = true
 horizontal_alignment = 1
