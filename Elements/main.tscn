@@ -53,6 +53,7 @@ omni_range = 3412.38
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="Lightings" unique_id=1180911700]
 transform = Transform3D(1, 0, 0, 0, 0.67829335, 0.7347912, 0, -0.7347912, 0.67829335, 0, 36.0135, 22.866962)
+visible = false
 
 [connection signal="climbing_started" from="Player" to="TypingUI" method="start_typing_minigame"]
 [connection signal="climbing_stopped" from="Player" to="TypingUI" method="stop_typing_minigame"]

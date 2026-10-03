@@ -23,10 +23,10 @@ height = 2.074463
 
 [node name="Player" type="CharacterBody3D" unique_id=187821194 node_paths=PackedStringArray("first_person_cam", "climbing_cam", "twist_pivot", "pitch_pivot") groups=["Player"]]
 script = ExtResource("1_2ft67")
-first_person_cam = NodePath("TwistPivot/PitchPivot/FirstPersonCam")
+first_person_cam = NodePath("Player/Skeleton3D/BoneAttachment3D2/TwistPivot/PitchPivot/FirstPersonCam")
 climbing_cam = NodePath("Player/Skeleton3D/BoneAttachment3D/ClimbingCam")
-twist_pivot = NodePath("TwistPivot")
-pitch_pivot = NodePath("TwistPivot/PitchPivot")
+twist_pivot = NodePath("Player/Skeleton3D/BoneAttachment3D2/TwistPivot")
+pitch_pivot = NodePath("Player/Skeleton3D/BoneAttachment3D2/TwistPivot/PitchPivot")
 
 [node name="Player" parent="." unique_id=1275803203 instance=ExtResource("2_2ft67")]
 transform = Transform3D(-1, 0, 8.940697e-08, 0, 1, 0, -8.940697e-08, 0, -1, 0, 0, 0)
@@ -142,19 +142,30 @@ bone_idx = 3
 [node name="ClimbingCam" type="Camera3D" parent="Player/Skeleton3D/BoneAttachment3D" unique_id=1457146733]
 transform = Transform3D(-1, -7.327544e-08, -4.817662e-08, -9.920953e-10, 0.5587883, -0.8293103, 8.768861e-08, -0.8293103, -0.5587883, -0.0029783875, -0.24021049, -0.6116085)
 
+[node name="SpotLight3D" type="SpotLight3D" parent="Player/Skeleton3D/BoneAttachment3D" unique_id=1357518856]
+transform = Transform3D(-1, 1.4336428e-08, -8.623926e-08, -5.2735594e-16, 0.9864621, 0.1639896, 8.7422784e-08, 0.1639896, -0.9864621, 6.720692e-08, 0.14668643, 0.76875746)
+light_energy = 10.0
+spot_range = 10.0
+spot_angle = 39.164017
+
+[node name="BoneAttachment3D2" type="BoneAttachment3D" parent="Player/Skeleton3D" index="9" unique_id=547129197]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5574783, -0.012809465)
+bone_name = "mixamorig_Head"
+bone_idx = 5
+
+[node name="TwistPivot" type="Node3D" parent="Player/Skeleton3D/BoneAttachment3D2" unique_id=74649789]
+transform = Transform3D(-1, 0, -8.940697e-08, 0, 1, 0, 8.940697e-08, 0, -1, 2.434708e-08, 0.123506546, 0.28512698)
+
+[node name="PitchPivot" type="Node3D" parent="Player/Skeleton3D/BoneAttachment3D2/TwistPivot" unique_id=28971009]
+
+[node name="FirstPersonCam" type="Camera3D" parent="Player/Skeleton3D/BoneAttachment3D2/TwistPivot/PitchPivot" unique_id=1015633174]
+transform = Transform3D(1, 0, 0, 0, 1, -2.9802322e-08, 0, 2.9802322e-08, 1, 0, -0.040551305, 0.09229313)
+
 [node name="AnimationPlayer" parent="Player" index="1" unique_id=1265143217]
 libraries/custom = SubResource("AnimationLibrary_twyhr")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=764926982]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8243408, 0)
 shape = SubResource("CapsuleShape3D_b0il4")
-
-[node name="TwistPivot" type="Node3D" parent="." unique_id=74649789]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.628574, -0.32303798)
-
-[node name="PitchPivot" type="Node3D" parent="TwistPivot" unique_id=28971009]
-
-[node name="FirstPersonCam" type="Camera3D" parent="TwistPivot/PitchPivot" unique_id=1015633174]
-transform = Transform3D(1, 0, 0, 0, 1, -2.9802322e-08, 0, 2.9802322e-08, 1, 0, -0.040551305, 0.09229313)
 
 [editable path="Player"]
