@@ -1,5 +1,8 @@
 [gd_scene format=3 uid="uid://cunnc7w2cwt0y"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8v3g1"]
+albedo_color = Color(0.45922637, 0.32206327, 0.024084147, 1)
+
 [node name="map" type="Node3D" unique_id=908056964]
 
 [node name="house" type="CSGCombiner3D" parent="." unique_id=2137260089]
@@ -143,3 +146,4 @@ size = Vector3(0.3, 3.7010498, 1.8386192)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.096699, 0.5570923, 12.105625)
 use_collision = true
 size = Vector3(33.926697, 0.2, 44.429688)
+material = SubResource("StandardMaterial3D_8v3g1")
