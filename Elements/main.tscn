@@ -9,6 +9,7 @@
 density = 2.0
 
 [sub_resource type="Environment" id="Environment_b0il4"]
+background_mode = 1
 volumetric_fog_enabled = true
 volumetric_fog_density = 0.001
 
@@ -16,12 +17,6 @@ volumetric_fog_density = 0.001
 
 [node name="Player" parent="." unique_id=187821194 instance=ExtResource("2_42cfe")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 15.082443, 2, 9.686665)
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=38223985]
-transform = Transform3D(0.96592593, 0.044480402, 0.2549683, -0.06698733, 0.9945193, 0.08027731, -0.25000006, -0.094621554, 0.9636115, 0, 8.276175, 12.812405)
-
-[node name="DirectionalLight3D2" type="DirectionalLight3D" parent="." unique_id=402557779]
-transform = Transform3D(1, 0, 0, 0, -0.76780283, 0.64068615, 0, -0.64068615, -0.76780283, 0, 8.916, -6.478182)
 
 [node name="Bamboo" type="Node3D" parent="." unique_id=381597924]
 transform = Transform3D(0.5, 0, 0, 0, 2.9900002, 0, 0, 0, 0.5, -2.7424173, 2, 0)
@@ -43,6 +38,15 @@ material = SubResource("FogMaterial_b0il4")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="Clouds" unique_id=435497615]
 environment = SubResource("Environment_b0il4")
+
+[node name="Lightings" type="Node3D" parent="." unique_id=1790950383]
+
+[node name="OmniLight3D" type="OmniLight3D" parent="Lightings" unique_id=1738485350]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.153713, 6.37946, 9.942416)
+light_energy = 16.0
+light_volumetric_fog_energy = 16.0
+light_specular = 0.0
+omni_range = 3412.38
 
 [connection signal="climbing_started" from="Player" to="TypingUI" method="start_typing_minigame"]
 [connection signal="climbing_stopped" from="Player" to="TypingUI" method="stop_typing_minigame"]
