@@ -10,25 +10,42 @@ average_wpm_label = NodePath("VBoxContainer/AverageWPMLabel")
 accuracy_label = NodePath("VBoxContainer/AccuracyLabel")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=1131188261]
-offset_right = 40.0
-offset_bottom = 40.0
+offset_right = 1151.0
+offset_bottom = 654.0
 color = Color(0, 0, 0, 0.83137256)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1264931146]
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -574.5
+offset_top = -322.5
+offset_right = 574.5
+offset_bottom = 322.5
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="TitleLabel" type="Label" parent="VBoxContainer" unique_id=1980253639]
 layout_mode = 2
 
 [node name="ScoreLabel" type="Label" parent="VBoxContainer" unique_id=1024595781]
 layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="HighestWPMLabel" type="Label" parent="VBoxContainer" unique_id=273449935]
 layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="AverageWPMLabel" type="Label" parent="VBoxContainer" unique_id=648624798]
 layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="AccuracyLabel" type="Label" parent="VBoxContainer" unique_id=1174108935]
 layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
