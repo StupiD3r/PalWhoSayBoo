@@ -8,12 +8,14 @@ extends CharacterBody3D
 @export var JUMP_VELOCITY : float = 4.5
 @export var CLIMB_SPEED : float = 3.0
 
+
 # --- Camera Settings ---
 @export var MOUSE_SENSITIVITY : float = 0.003
 @export var PITCH_MIN : float = -60.0
 @export var PITCH_MAX : float = 60.0
 @export var first_person_cam: Camera3D
 @export var climbing_cam: Camera3D 
+@export var transition_cam: Camera3D # Add this!
 
 # --- State Tracking ---
 var target_climb_y: float = 0.0
@@ -101,8 +103,7 @@ func _physics_process(delta: float) -> void:
 				pitch_pivot.rotation.x = default_pitch_x
 			
 			# Switch back to first-person walking view
-			if first_person_cam:
-				first_person_cam.current = true
+			switch_cameras(climbing_cam, first_person_cam, 0.4) # 0.4 seconds to fly out
 			
 			# EMIT SIGNAL TO HIDE TYPING UI
 			climbing_stopped.emit()
@@ -175,11 +176,15 @@ func start_climbing(pole_position):
 	if pitch_pivot: pitch_pivot.rotation_degrees.x = 15.0 
 	
 	# Activate the dedicated climbing camera!
-	if climbing_cam:
-		climbing_cam.current = true
+	switch_cameras(first_person_cam, climbing_cam, 0.4) # 0.4 seconds to fly in
 
 	if animation_player.has_animation("custom/climbing"):
-		animation_player.play("custom/climbing")
+		# The '0.0' forces it to ignore blend times and cut instantly
+		animation_player.play("custom/climbing", 0.0)
+		
+		# The 'true' forces the 3D skeleton to physically update its pose this exact frame
+		animation_player.seek(0.0, true)
+		
 		animation_player.pause()
 
 	climbing_started.emit()
@@ -208,3 +213,29 @@ func climb_step(height_per_key: float = 0.3, anim_time_per_key: float = 0.15) ->
 		
 	# 4. Automatically pause the animation exactly when the upward sliding stops!
 	climb_tween.tween_callback(animation_player.pause)
+
+# --- CAMERA SWOOP TRANSITION ---
+func switch_cameras(from_cam: Camera3D, to_cam: Camera3D, duration: float = 0.5) -> void:
+	if not transition_cam or not from_cam or not to_cam:
+		if to_cam: to_cam.current = true
+		return
+		
+	# 1. Snap the transition camera to your current exact view
+	transition_cam.global_transform = from_cam.global_transform
+	transition_cam.current = true
+	
+	# 2. Smoothly fly to the new camera's position and rotation
+	var tween = get_tree().create_tween()
+	tween.set_parallel(true)
+	
+	tween.tween_property(transition_cam, "global_position", to_cam.global_position, duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	# Using quaternion ensures the camera rotation blends perfectly without flipping upside down
+	tween.tween_property(transition_cam, "quaternion", to_cam.global_transform.basis.get_rotation_quaternion(), duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	
+	# 3. Hand control over to the actual destination camera when the flight finishes
+	tween.chain().tween_callback(func(): to_cam.current = true)
+	
+
+
+func update_wpm(new_wpm: int) -> void:
+	pass # Replace with function body.

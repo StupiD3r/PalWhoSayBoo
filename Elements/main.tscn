@@ -131,3 +131,5 @@ metadata/_edit_lock_ = true
 [connection signal="climbing_started" from="Player" to="TypingUI" method="start_typing_minigame"]
 [connection signal="climbing_stopped" from="Player" to="TypingUI" method="stop_typing_minigame"]
 [connection signal="score_changed" from="TypingUI" to="HUD" method="update_score"]
+[connection signal="wpm_changed" from="TypingUI" to="Player" method="update_wpm"]
+[connection signal="wpm_changed" from="TypingUI" to="HUD" method="update_wpm"]

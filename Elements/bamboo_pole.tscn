@@ -34,7 +34,7 @@ transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 10.307204, 0)
 shape = SubResource("CylinderShape3D_2ft67")
 
 [node name="Label3D" type="Label3D" parent="InteractionArea" unique_id=1809804469]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.02649784, 0.9017825, 0.8408818)
+transform = Transform3D(3.7517002, 0, 0, 0, 1, 0, 0, 0, 1, -0.02649784, 0.9017825, 0.8408818)
 visible = false
 billboard = 1
 text = "Press E to start climbing"
