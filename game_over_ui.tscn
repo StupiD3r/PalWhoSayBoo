@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://b27vv64uxawct"]
+
+[ext_resource type="Script" uid="uid://drx7wa22axfwu" path="res://game_over_ui.gd" id="1_ji7mg"]
+
+[node name="GameOverUI" type="CanvasLayer" unique_id=677900036 node_paths=PackedStringArray("score_label", "highest_wpm_label", "average_wpm_label", "accuracy_label")]
+script = ExtResource("1_ji7mg")
+score_label = NodePath("VBoxContainer/ScoreLabel")
+highest_wpm_label = NodePath("VBoxContainer/HighestWPMLabel")
+average_wpm_label = NodePath("VBoxContainer/AverageWPMLabel")
+accuracy_label = NodePath("VBoxContainer/AccuracyLabel")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1131188261]
+offset_right = 40.0
+offset_bottom = 40.0
+color = Color(0, 0, 0, 0.83137256)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1264931146]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="TitleLabel" type="Label" parent="VBoxContainer" unique_id=1980253639]
+layout_mode = 2
+
+[node name="ScoreLabel" type="Label" parent="VBoxContainer" unique_id=1024595781]
+layout_mode = 2
+
+[node name="HighestWPMLabel" type="Label" parent="VBoxContainer" unique_id=273449935]
+layout_mode = 2
+
+[node name="AverageWPMLabel" type="Label" parent="VBoxContainer" unique_id=648624798]
+layout_mode = 2
+
+[node name="AccuracyLabel" type="Label" parent="VBoxContainer" unique_id=1174108935]
+layout_mode = 2

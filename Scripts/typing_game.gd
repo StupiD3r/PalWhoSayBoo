@@ -5,7 +5,8 @@ extends Control
 @export var player: CharacterBody3D
 
 signal score_changed(new_score: int)
-signal wpm_changed(new_wpm: int) # --- NEW SIGNAL ---
+signal wpm_changed(new_wpm: int)
+signal game_over_triggered(final_score: int, highest_wpm: int, avg_wpm: int, accuracy: float) # --- NEW ---
 
 var easy_words = ["poste", "barya", "kapit", "dulas", "hawak", "bilis", "talon", "tangkad", "panalo", "punongkahoy"]
 var medium_words = ["kawayan", "grasa", "panatag", "pagsisikap", "premyo", "abot", "taas", "pawis"]
@@ -17,27 +18,31 @@ var typed_text: String = ""
 var is_active: bool = false
 var score: int = 0 
 
-# --- NEW: WPM Tracking Variables ---
+# --- Stat Tracking Variables ---
 var time_elapsed: float = 0.0
-var total_chars_typed: int = 0
+var total_chars_typed: int = 0 # Correct keystrokes
+var total_keystrokes: int = 0  # ALL keystrokes (for accuracy)
+var highest_wpm: int = 0
+var current_wpm: int = 0
 
 func _ready():
 	visible = false
 
-# --- NEW: Continuous WPM Calculation ---
 func _process(delta: float) -> void:
 	if not is_active:
 		return
 		
 	time_elapsed += delta
 	
-	# Wait 1 second before calculating to avoid wild numbers at the very start
 	if time_elapsed > 1.0:
 		var standard_words = total_chars_typed / 5.0
 		var minutes = time_elapsed / 60.0
-		var current_wpm = int(standard_words / minutes)
+		current_wpm = int(standard_words / minutes)
 		
-		# Send the live WPM to the HUD every frame
+		# --- NEW: Track Highest WPM ---
+		if current_wpm > highest_wpm:
+			highest_wpm = current_wpm
+			
 		wpm_changed.emit(current_wpm)
 
 func start_typing_minigame():
@@ -45,11 +50,13 @@ func start_typing_minigame():
 	is_active = true
 	
 	score = 0
-	score_changed.emit(score)
-	
-	# Reset WPM stats on start
 	time_elapsed = 0.0
 	total_chars_typed = 0
+	total_keystrokes = 0
+	highest_wpm = 0
+	current_wpm = 0
+	
+	score_changed.emit(score)
 	wpm_changed.emit(0)
 	
 	current_word = get_random_word()
@@ -59,6 +66,14 @@ func start_typing_minigame():
 	update_ui()
 
 func stop_typing_minigame():
+	# --- NEW: Final Math Calculations ---
+	var accuracy: float = 0.0
+	if total_keystrokes > 0:
+		accuracy = (float(total_chars_typed) / float(total_keystrokes)) * 100.0
+		
+	# Broadcast the final stats to the Game Over screen!
+	game_over_triggered.emit(score, highest_wpm, current_wpm, accuracy)
+
 	visible = false
 	is_active = false
 	typed_text = ""
@@ -77,11 +92,18 @@ func _unhandled_input(event: InputEvent):
 		if event.keycode == KEY_SPACE:
 			return
 
+		# Ignore modifier keys (Shift, Ctrl, etc.) which return 0 unicode
+		if event.unicode == 0:
+			return
+
+		# --- NEW: Track all physical letter strikes for accuracy ---
+		total_keystrokes += 1
+
 		var typed_char = char(event.unicode).to_lower()
 		
 		if current_word.begins_with(typed_text + typed_char):
 			typed_text += typed_char
-			total_chars_typed += 1 # --- NEW: Count successful keystrokes ---
+			total_chars_typed += 1 # Only increments on CORRECT keystrokes
 			update_ui()
 			
 			if player and player.has_method("climb_step"):

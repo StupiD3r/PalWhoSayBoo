@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://cd41qf3inb8km" path="res://Elements/TypingUI.tscn" id="4_42cfe"]
 [ext_resource type="PackedScene" uid="uid://cjqb4dssf6kbj" path="res://UI/HUD.tscn" id="4_i4wgl"]
 [ext_resource type="PackedScene" uid="uid://cunnc7w2cwt0y" path="res://MAP/Main.Map.tscn" id="4_lebuw"]
+[ext_resource type="PackedScene" uid="uid://b27vv64uxawct" path="res://game_over_ui.tscn" id="6_i4wgl"]
 
 [sub_resource type="FogMaterial" id="FogMaterial_b0il4"]
 density = 2.0
@@ -128,8 +129,11 @@ show_checkered = true
 top_level = true
 metadata/_edit_lock_ = true
 
+[node name="GameOverUI" parent="." unique_id=677900036 instance=ExtResource("6_i4wgl")]
+
 [connection signal="climbing_started" from="Player" to="TypingUI" method="start_typing_minigame"]
 [connection signal="climbing_stopped" from="Player" to="TypingUI" method="stop_typing_minigame"]
+[connection signal="game_over_triggered" from="TypingUI" to="GameOverUI" method="show_stats"]
 [connection signal="score_changed" from="TypingUI" to="HUD" method="update_score"]
 [connection signal="wpm_changed" from="TypingUI" to="Player" method="update_wpm"]
 [connection signal="wpm_changed" from="TypingUI" to="HUD" method="update_wpm"]
