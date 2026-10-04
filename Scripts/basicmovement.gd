@@ -2,8 +2,9 @@ extends CharacterBody3D
 
 # --- Movement Settings ---
 @export var SPEED : float = 5.0
-@export var ACCELERATION : float = 10.0
-@export var DECELERATION : float = 10.0
+@export var SPRINT_SPEED : float = 8.0 
+@export var ACCELERATION : float = 50.0
+@export var DECELERATION : float = 50.0
 @export var JUMP_VELOCITY : float = 4.5
 @export var CLIMB_SPEED : float = 3.0
 
@@ -11,14 +12,17 @@ extends CharacterBody3D
 @export var MOUSE_SENSITIVITY : float = 0.003
 @export var PITCH_MIN : float = -60.0
 @export var PITCH_MAX : float = 60.0
-@export var third_person_cam: Camera3D
 @export var first_person_cam: Camera3D
+@export var climbing_cam: Camera3D 
+var target_climb_y: float = 0.0
+var climb_tween: Tween
 
 # --- Node Connections ---
 @export var twist_pivot: Node3D
 @export var pitch_pivot: Node3D
 
-@onready var animation_player: AnimationPlayer = $"Man/AnimationPlayer"
+# Updated to target the new Player child node
+@onready var animation_player: AnimationPlayer = $"Player/AnimationPlayer"
 
 # --- CLIMBING STATE & SIGNALS ---
 var is_climbing = false
@@ -28,8 +32,12 @@ signal climbing_stopped
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	
-	if animation_player and animation_player.has_animation("HumanArmature|Man_Idle"):
-		animation_player.play("HumanArmature|Man_Idle")
+	# Force the correct camera on startup!
+	if first_person_cam:
+		first_person_cam.current = true
+	
+	if animation_player and animation_player.has_animation("custom/idle2"):
+		animation_player.play("custom/idle2")
 
 func _unhandled_input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("ui_cancel"):
@@ -55,6 +63,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			pitch_pivot.rotation.x = clamped_pitch
 
 func _physics_process(delta: float) -> void:
+	# Check if the run button is pressed
+	var current_speed = SPRINT_SPEED if Input.is_action_pressed("run") else SPEED
+	
 	if not twist_pivot or not pitch_pivot:
 		return
 
@@ -76,14 +87,14 @@ func _physics_process(delta: float) -> void:
 			if pitch_pivot:
 				pitch_pivot.rotation.x = 0
 			
-			if third_person_cam:
-				third_person_cam.current = true
+			# Switch back to first-person walking view
+			if first_person_cam:
+				first_person_cam.current = true
 			
 			# EMIT SIGNAL TO HIDE TYPING UI
 			climbing_stopped.emit()
 		
 		move_and_slide()
-		_update_climbing_animations(0.0) # Pause or keep idle climbing frame
 		return
 
 	# --- 2. NORMAL GRAVITY ---
@@ -99,8 +110,9 @@ func _physics_process(delta: float) -> void:
 	var direction := (global_transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	
 	if direction:
-		velocity.x = move_toward(velocity.x, direction.x * SPEED, ACCELERATION * delta)
-		velocity.z = move_toward(velocity.z, direction.z * SPEED, ACCELERATION * delta)
+		# FIXED: Now uses current_speed so the player actually moves faster when running
+		velocity.x = move_toward(velocity.x, direction.x * current_speed, ACCELERATION * delta)
+		velocity.z = move_toward(velocity.z, direction.z * current_speed, ACCELERATION * delta)
 	else:
 		velocity.x = move_toward(velocity.x, 0, DECELERATION * delta)
 		velocity.z = move_toward(velocity.z, 0, DECELERATION * delta)
@@ -114,28 +126,24 @@ func _update_ground_animations() -> void:
 		return
 
 	var horizontal_velocity = Vector2(velocity.x, velocity.z).length()
+	var blend_time = 0.2 # 0.2 seconds of smooth crossfading
 
 	if not is_on_floor():
-		if animation_player.current_animation != "HumanArmature|Man_Jump" and animation_player.has_animation("HumanArmature|Man_Jump"):
-			animation_player.play("HumanArmature|Man_Jump")
+		# PLACEHOLDER: Update "HumanArmature|Man_Jump" when you import a Mixamo Jump animation
+		if animation_player.current_animation != "custom/jumping" and animation_player.has_animation("custom/jumping"):
+			animation_player.play("custom/jumping", blend_time)
 	elif horizontal_velocity > 0.1:
-		if animation_player.current_animation != "HumanArmature|Man_Walk" and animation_player.has_animation("HumanArmature|Man_Walk"):
-			animation_player.play("HumanArmature|Man_Walk")
+		# Check if running while moving
+		if Input.is_action_pressed("run"):
+			if animation_player.current_animation != "custom/running" and animation_player.has_animation("custom/running"):
+				animation_player.play("custom/running", blend_time)
+		else:
+			# Play Walk animation
+			if animation_player.current_animation != "mixamo_com" and animation_player.has_animation("mixamo_com"):
+				animation_player.play("mixamo_com", blend_time)
 	else:
-		if animation_player.current_animation != "HumanArmature|Man_Idle" and animation_player.has_animation("HumanArmature|Man_Idle"):
-			animation_player.play("HumanArmature|Man_Idle")
-
-# --- CLIMBING ANIMATIONS ---
-func _update_climbing_animations(climb_dir: float) -> void:
-	if not animation_player:
-		return
-
-	if climb_dir != 0:
-		if animation_player.current_animation != "HumanArmature|Man_Walk" and animation_player.has_animation("HumanArmature|Man_Walk"):
-			animation_player.play("HumanArmature|Man_Walk")
-	else:
-		if animation_player.is_playing():
-			animation_player.pause()
+		if animation_player.current_animation != "custom/idle2" and animation_player.has_animation("custom/idle2"):
+			animation_player.play("custom/idle2", blend_time)
 
 # --- ATTACH TRIGGER ---
 func start_climbing(pole_position):
@@ -145,15 +153,44 @@ func start_climbing(pole_position):
 	global_position.x = pole_position.x
 	global_position.z = pole_position.z + 0.6
 	
+	target_climb_y = global_position.y # Add this line here!
+	
 	look_at(Vector3(pole_position.x, global_position.y, pole_position.z), Vector3.UP)
 	
-	if twist_pivot:
-		twist_pivot.rotation.y = 0
-	if pitch_pivot:
-		pitch_pivot.rotation.x = 0
+	if twist_pivot: twist_pivot.rotation.y = 0
+	if pitch_pivot: pitch_pivot.rotation_degrees.x = 15.0 
 	
-	if first_person_cam:
-		first_person_cam.current = true
+	# Activate the dedicated climbing camera!
+	if climbing_cam:
+		climbing_cam.current = true
 
-	# Trigger the typing UI!
+	if animation_player.has_animation("custom/climbing"):
+		animation_player.play("custom/climbing")
+		animation_player.pause()
+
 	climbing_started.emit()
+
+# --- MANUAL TYPING MOVEMENT ---
+func climb_step(height_per_key: float = 0.3, anim_time_per_key: float = 0.15) -> void:
+	if not is_climbing or not animation_player:
+		return
+		
+	# 1. Update the absolute target height so you never lose distance if you type fast
+	target_climb_y += height_per_key
+	
+	# 2. Stop the old tween if typing quickly, and smoothly bridge to the new height
+	if climb_tween and climb_tween.is_valid():
+		climb_tween.kill()
+		
+	climb_tween = get_tree().create_tween()
+	climb_tween.tween_property(self, "global_position:y", target_climb_y, 0.15).set_trans(Tween.TRANS_LINEAR)
+	
+	# 3. Let the animation play continuously and naturally
+	if animation_player.assigned_animation != "custom/climbing":
+		animation_player.play("custom/climbing")
+		
+	if not animation_player.is_playing():
+		animation_player.play()
+		
+	# 4. Automatically pause the animation exactly when the upward sliding stops!
+	climb_tween.tween_callback(animation_player.pause)

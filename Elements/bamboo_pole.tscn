@@ -14,7 +14,7 @@ data = PackedVector3Array(-0.5, 11.5345, 0.5, 0.5, 11.5345, 0.5, -0.5, -11.5345,
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_2ft67"]
 height = 21.0
-radius = 3.0
+radius = 7.2993164
 
 [node name="BambooPole" type="StaticBody3D" unique_id=389191382]
 
@@ -34,7 +34,7 @@ transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 10.307204, 0)
 shape = SubResource("CylinderShape3D_2ft67")
 
 [node name="Label3D" type="Label3D" parent="InteractionArea" unique_id=1809804469]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8623686, 2.7880898, 3.1049976)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.02649784, 0.9017825, 0.8408818)
 visible = false
 billboard = 1
 text = "Press E to start climbing"
