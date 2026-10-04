@@ -82,7 +82,7 @@ mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_1mtc8")])
 [node name="Node3D" type="Node3D" unique_id=1181372035]
 
 [node name="Player" parent="." unique_id=187821194 instance=ExtResource("2_42cfe")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 15.082443, 2, 9.686665)
+transform = Transform3D(-2, 0, 1.7484555e-07, 0, 2, 0, -1.7484555e-07, 0, -2, 15.082443, 0.6307163, 9.686665)
 
 [node name="Bamboo" type="Node3D" parent="." unique_id=381597924]
 transform = Transform3D(0.5, 0, 0, 0, 2.9900002, 0, 0, 0, 0.5, -2.7424173, 2, 0)
@@ -137,3 +137,6 @@ metadata/_edit_lock_ = true
 [connection signal="score_changed" from="TypingUI" to="HUD" method="update_score"]
 [connection signal="wpm_changed" from="TypingUI" to="Player" method="update_wpm"]
 [connection signal="wpm_changed" from="TypingUI" to="HUD" method="update_wpm"]
+
+[editable path="Player"]
+[editable path="Player/Player"]

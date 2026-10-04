@@ -90,8 +90,7 @@ func _physics_process(delta: float) -> void:
 		
 		# Spacebar acts as the exit key to dismount from the pole
 		if Input.is_action_just_pressed("jump"):
-			is_climbing = false
-			velocity.y = JUMP_VELOCITY
+			force_dismount(false) # false = regular jump
 			
 			# Align the body to where the camera is looking, then restore default offsets
 			if twist_pivot:
@@ -239,3 +238,26 @@ func switch_cameras(from_cam: Camera3D, to_cam: Camera3D, duration: float = 0.5)
 
 func update_wpm(new_wpm: int) -> void:
 	pass # Replace with function body.
+
+# --- DISMOUNT & FALL LOGIC ---
+func force_dismount(is_failing: bool) -> void:
+	is_climbing = false
+	
+	if is_failing:
+		velocity.y = -2.0 # Push them downward slightly so they immediately fall
+	else:
+		velocity.y = JUMP_VELOCITY # Normal Spacebar jump
+		
+	# Align the body to where the camera is looking
+	if twist_pivot:
+		var look_dir = twist_pivot.global_rotation.y
+		global_rotation.y = look_dir
+		twist_pivot.rotation.y = default_twist_y
+		
+	if pitch_pivot:
+		pitch_pivot.rotation.x = default_pitch_x
+	
+	# Swoop the camera back
+	switch_cameras(climbing_cam, first_person_cam, 0.4)
+	climbing_stopped.emit()
+	

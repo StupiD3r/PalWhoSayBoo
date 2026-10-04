@@ -49,3 +49,9 @@ vertical_alignment = 1
 layout_mode = 2
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="RestartBTN" type="Button" parent="VBoxContainer" unique_id=1731431249]
+layout_mode = 2
+text = "Restart Game"
+
+[connection signal="pressed" from="VBoxContainer/RestartBTN" to="." method="_on_restart_button_pressed"]

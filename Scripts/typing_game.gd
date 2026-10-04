@@ -92,18 +92,17 @@ func _unhandled_input(event: InputEvent):
 		if event.keycode == KEY_SPACE:
 			return
 
-		# Ignore modifier keys (Shift, Ctrl, etc.) which return 0 unicode
 		if event.unicode == 0:
 			return
 
-		# --- NEW: Track all physical letter strikes for accuracy ---
+		# Track ALL keystrokes for real-time accuracy
 		total_keystrokes += 1
 
 		var typed_char = char(event.unicode).to_lower()
 		
 		if current_word.begins_with(typed_text + typed_char):
 			typed_text += typed_char
-			total_chars_typed += 1 # Only increments on CORRECT keystrokes
+			total_chars_typed += 1 # Track correct keystrokes
 			update_ui()
 			
 			if player and player.has_method("climb_step"):
@@ -111,6 +110,21 @@ func _unhandled_input(event: InputEvent):
 			
 			if typed_text == current_word:
 				on_word_completed()
+		
+		# --- REAL-TIME ELIMINATION CHECK ---
+		# Wait until the player has typed 20 letters to give them a brief grace period
+		if total_keystrokes >= 20:
+			var live_accuracy = (float(total_chars_typed) / float(total_keystrokes)) * 100.0
+			
+			if live_accuracy < 95.0:
+				trigger_elimination()
+
+# --- NEW FUNCTION ---
+func trigger_elimination():
+	if player and player.has_method("force_dismount"):
+		player.force_dismount(true) # True triggers the fall logic!
+		
+	stop_typing_minigame()
 
 func update_ui():
 	if current_word_label:

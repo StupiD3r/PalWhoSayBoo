@@ -8,16 +8,22 @@ extends CanvasLayer
 func _ready() -> void:
 	visible = false
 
-# This function receives the final math and displays it
+# Inside game_over_ui.gd:
+
 func show_stats(final_score: int, peak_wpm: int, avg_wpm: int, accuracy: float) -> void:
 	score_label.text = "Total Score: " + str(final_score)
 	highest_wpm_label.text = "Highest WPM: " + str(peak_wpm)
 	average_wpm_label.text = "Average WPM: " + str(avg_wpm)
-	
-	# %.1f formats the decimal to 1 place (e.g., 95.5%)
 	accuracy_label.text = "Accuracy: %.1f%%" % accuracy 
 	
+	# --- NEW: Unlock the mouse so the player can click the button ---
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE 
 	visible = true
+
+# --- NEW: Connect your Button's "pressed" signal to this function! ---
+func _on_restart_button_pressed() -> void:
+	# This instantly reloads the entire level from scratch
+	get_tree().reload_current_scene()
 
 func hide_stats() -> void:
 	visible = false
