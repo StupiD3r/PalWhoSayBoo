@@ -14,6 +14,70 @@ background_mode = 1
 volumetric_fog_enabled = true
 volumetric_fog_density = 0.001
 
+[sub_resource type="Gradient" id="Gradient_lebuw"]
+offsets = PackedFloat32Array(0.2, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_i4wgl"]
+noise_type = 2
+frequency = 0.03
+cellular_jitter = 3.0
+cellular_return_type = 0
+domain_warp_enabled = true
+domain_warp_type = 1
+domain_warp_amplitude = 50.0
+domain_warp_fractal_type = 2
+domain_warp_fractal_lacunarity = 1.5
+domain_warp_fractal_gain = 1.0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_348j7"]
+noise = SubResource("FastNoiseLite_i4wgl")
+color_ramp = SubResource("Gradient_lebuw")
+seamless = true
+
+[sub_resource type="Terrain3DMaterial" id="Terrain3DMaterial_esvik"]
+_shader_parameters = {
+&"bias_distance": null,
+&"blend_sharpness": null,
+&"depth_blur": null,
+&"enable_macro_variation": null,
+&"enable_projection": null,
+&"flat_terrain_normals": null,
+&"macro_variation1": null,
+&"macro_variation2": null,
+&"macro_variation_slope": null,
+&"mipmap_bias": null,
+&"noise1_angle": null,
+&"noise1_offset": null,
+&"noise1_scale": null,
+&"noise2_scale": null,
+&"noise_texture": SubResource("NoiseTexture2D_348j7"),
+&"projection_threshold": null
+}
+world_background = 0
+show_checkered = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lka1g"]
+transparency = 4
+cull_mode = 2
+vertex_color_use_as_albedo = true
+backlight_enabled = true
+backlight = Color(0.5, 0.5, 0.5, 1)
+distance_fade_mode = 1
+distance_fade_min_distance = 128.0
+distance_fade_max_distance = 96.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_1mtc8"]
+generated_type = 1
+height_offset = 0.5
+material_override = SubResource("StandardMaterial3D_lka1g")
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
+
+[sub_resource type="Terrain3DAssets" id="Terrain3DAssets_re7cy"]
+mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_1mtc8")])
+
 [node name="Node3D" type="Node3D" unique_id=1181372035]
 
 [node name="Player" parent="." unique_id=187821194 instance=ExtResource("2_42cfe")]
@@ -30,7 +94,7 @@ player = NodePath("../Player")
 [node name="HUD" parent="." unique_id=1271115555 instance=ExtResource("4_i4wgl")]
 
 [node name="map" parent="." unique_id=908056964 instance=ExtResource("4_lebuw")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 15, 0, 0)
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 15, -1.1907539, 0)
 
 [node name="Clouds" type="Node3D" parent="." unique_id=1668036106]
 
@@ -54,6 +118,15 @@ omni_range = 3412.38
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="Lightings" unique_id=1180911700]
 transform = Transform3D(1, 0, 0, 0, 0.67829335, 0.7347912, 0, -0.7347912, 0.67829335, 0, 36.0135, 22.866962)
 visible = false
+
+[node name="Terrain3D" type="Terrain3D" parent="." unique_id=141768703]
+data_directory = "res://dd"
+material = SubResource("Terrain3DMaterial_esvik")
+assets = SubResource("Terrain3DAssets_re7cy")
+collision_shape_size = 8
+show_checkered = true
+top_level = true
+metadata/_edit_lock_ = true
 
 [connection signal="climbing_started" from="Player" to="TypingUI" method="start_typing_minigame"]
 [connection signal="climbing_stopped" from="Player" to="TypingUI" method="stop_typing_minigame"]
