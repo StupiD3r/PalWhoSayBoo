@@ -14,8 +14,12 @@ extends CharacterBody3D
 @export var PITCH_MAX : float = 60.0
 @export var first_person_cam: Camera3D
 @export var climbing_cam: Camera3D 
+
+# --- State Tracking ---
 var target_climb_y: float = 0.0
 var climb_tween: Tween
+var default_twist_y: float = 0.0
+var default_pitch_x: float = 0.0
 
 # --- Node Connections ---
 @export var twist_pivot: Node3D
@@ -31,6 +35,12 @@ signal climbing_stopped
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	
+	# Save your editor camera rotation so it never flips backwards!
+	if twist_pivot:
+		default_twist_y = twist_pivot.rotation.y
+	if pitch_pivot:
+		default_pitch_x = pitch_pivot.rotation.x
 	
 	# Force the correct camera on startup!
 	if first_person_cam:
@@ -81,11 +91,14 @@ func _physics_process(delta: float) -> void:
 			is_climbing = false
 			velocity.y = JUMP_VELOCITY
 			
-			# Reset camera pivots for normal ground view
+			# Align the body to where the camera is looking, then restore default offsets
 			if twist_pivot:
-				twist_pivot.rotation.y = 0
+				var look_dir = twist_pivot.global_rotation.y
+				global_rotation.y = look_dir
+				twist_pivot.rotation.y = default_twist_y
+				
 			if pitch_pivot:
-				pitch_pivot.rotation.x = 0
+				pitch_pivot.rotation.x = default_pitch_x
 			
 			# Switch back to first-person walking view
 			if first_person_cam:
@@ -153,11 +166,12 @@ func start_climbing(pole_position):
 	global_position.x = pole_position.x
 	global_position.z = pole_position.z + 0.6
 	
-	target_climb_y = global_position.y # Add this line here!
+	target_climb_y = global_position.y # Anchor for smooth climbing
 	
 	look_at(Vector3(pole_position.x, global_position.y, pole_position.z), Vector3.UP)
 	
-	if twist_pivot: twist_pivot.rotation.y = 0
+	# Use the memorized default instead of hardcoding 0
+	if twist_pivot: twist_pivot.rotation.y = default_twist_y
 	if pitch_pivot: pitch_pivot.rotation_degrees.x = 15.0 
 	
 	# Activate the dedicated climbing camera!
