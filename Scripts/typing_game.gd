@@ -116,7 +116,7 @@ func _unhandled_input(event: InputEvent):
 		if total_keystrokes >= 20:
 			var live_accuracy = (float(total_chars_typed) / float(total_keystrokes)) * 100.0
 			
-			if live_accuracy < 95.0:
+			if live_accuracy < 80.0:
 				trigger_elimination()
 
 # --- NEW FUNCTION ---

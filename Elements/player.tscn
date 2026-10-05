@@ -169,7 +169,7 @@ transform = Transform3D(-1, 0, -8.940697e-08, 0, 1, 0, 8.940697e-08, 0, -1, 2.43
 [node name="PitchPivot" type="Node3D" parent="Player/Skeleton3D/BoneAttachment3D2/TwistPivot" unique_id=28971009]
 
 [node name="FirstPersonCam" type="Camera3D" parent="Player/Skeleton3D/BoneAttachment3D2/TwistPivot/PitchPivot" unique_id=1015633174]
-transform = Transform3D(0.9998476, -0.017452404, 0, 0.017452404, 0.9998476, 0, 0, 0, 1, 0, -0.040551305, 0.09229313)
+transform = Transform3D(0.9998476, -0.017452404, 0, 0.017452404, 0.9998476, 0, 0, 0, 1, -0.0024831565, 0.101708636, 0.09229313)
 
 [node name="AnimationPlayer" parent="Player" index="1" unique_id=1265143217]
 libraries/custom = SubResource("AnimationLibrary_twyhr")
