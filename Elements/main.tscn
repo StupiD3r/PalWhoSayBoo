@@ -205,7 +205,18 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.425659, 3.2266846, 0)
 shape = SubResource("BoxShape3D_8b0c2")
 
 [node name="KnockSound" type="AudioStreamPlayer3D" parent="KnockTrigger" unique_id=612688921]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.455801, 2.3983808, -1.311688)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.984425, 2.3983808, -1.311688)
+stream = ExtResource("8_esvik")
+
+[node name="KnockTrigger2" type="Area3D" parent="." unique_id=1562536807]
+script = ExtResource("7_esvik")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="KnockTrigger2" unique_id=1707068317]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.425659, 3.2266846, 18.184097)
+shape = SubResource("BoxShape3D_8b0c2")
+
+[node name="KnockSound" type="AudioStreamPlayer3D" parent="KnockTrigger2" unique_id=2104403519]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.16175, 2.3983808, 6.971068)
 stream = ExtResource("8_esvik")
 
 [connection signal="climbing_started" from="Player" to="TypingUI" method="start_typing_minigame"]
@@ -215,6 +226,7 @@ stream = ExtResource("8_esvik")
 [connection signal="wpm_changed" from="TypingUI" to="Player" method="update_wpm"]
 [connection signal="wpm_changed" from="TypingUI" to="HUD" method="update_wpm"]
 [connection signal="body_entered" from="KnockTrigger" to="KnockTrigger" method="_on_body_entered"]
+[connection signal="body_entered" from="KnockTrigger2" to="KnockTrigger2" method="_on_body_entered"]
 
 [editable path="Player"]
 [editable path="Player/Player"]
