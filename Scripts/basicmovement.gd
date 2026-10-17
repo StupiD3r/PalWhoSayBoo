@@ -12,7 +12,7 @@ extends CharacterBody3D
 # --- Camera Settings ---
 @export var MOUSE_SENSITIVITY : float = 0.003
 @export var PITCH_MIN : float = -60.0
-@export var PITCH_MAX : float = 60.0
+@export var PITCH_MAX : float = 40.0
 @export var first_person_cam: Camera3D
 @export var climbing_cam: Camera3D 
 @export var transition_cam: Camera3D # Add this!

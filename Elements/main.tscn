@@ -87,7 +87,7 @@ size = Vector3(9.501221, 7.453369, 1)
 [node name="Main" type="Node3D" unique_id=1181372035]
 
 [node name="Player" parent="." unique_id=187821194 instance=ExtResource("2_42cfe")]
-transform = Transform3D(-2, 0, 1.7484555e-07, 0, 2, 0, -1.7484555e-07, 0, -2, 15.082443, 0.6307163, 9.686665)
+transform = Transform3D(-2, 0, 1.7484555e-07, 0, 2, 0, -1.7484555e-07, 0, -2, -5.1748886, 0.6307163, -13.726791)
 
 [node name="Skeleton3D" parent="Player/Player" parent_id_path=PackedInt32Array(187821194, 1275803203) index="0" unique_id=524358015]
 bones/0/position = Vector3(0, 1.0089535, 0.025161775)
@@ -177,6 +177,13 @@ environment = SubResource("Environment_b0il4")
 
 [node name="OmniLight3D" type="OmniLight3D" parent="Lightings" unique_id=1738485350]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.153713, 6.37946, 9.942416)
+light_energy = 16.0
+light_volumetric_fog_energy = 16.0
+light_specular = 0.0
+omni_range = 3412.38
+
+[node name="OmniLight3D2" type="OmniLight3D" parent="Lightings" unique_id=502390486]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.039751, 6.439912, -10.082365)
 light_energy = 16.0
 light_volumetric_fog_energy = 16.0
 light_specular = 0.0
