@@ -119,16 +119,26 @@ func _physics_process(delta: float) -> void:
 		velocity.y = JUMP_VELOCITY
 
 	# --- 4. NORMAL WALKING ---
+	# --- 4. NORMAL WALKING ---
 	var input_dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var direction := (global_transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	
 	if direction:
-		# FIXED: Now uses current_speed so the player actually moves faster when running
 		velocity.x = move_toward(velocity.x, direction.x * current_speed, ACCELERATION * delta)
 		velocity.z = move_toward(velocity.z, direction.z * current_speed, ACCELERATION * delta)
+		
+		# --- NEW: Play footstep if on the floor! ---
+		if is_on_floor():
+			$PlayerAudio.play_walk_step()
+		else:
+			$PlayerAudio.stop_walk_step()
+			
 	else:
 		velocity.x = move_toward(velocity.x, 0, DECELERATION * delta)
 		velocity.z = move_toward(velocity.z, 0, DECELERATION * delta)
+		
+		# --- NEW: Stop footstep when standing still! ---
+		$PlayerAudio.stop_walk_step()
 
 	move_and_slide()
 	_update_ground_animations()
@@ -192,6 +202,8 @@ func start_climbing(pole_position):
 func climb_step(height_per_key: float = 0.3, anim_time_per_key: float = 0.15) -> void:
 	if not is_climbing or not animation_player:
 		return
+	# --- NEW: Tell your dedicated Audio Node to do its thing! ---
+	$PlayerAudio.play_climb_step()
 		
 	# 1. Update the absolute target height so you never lose distance if you type fast
 	target_climb_y += height_per_key

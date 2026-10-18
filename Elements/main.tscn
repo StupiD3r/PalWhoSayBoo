@@ -7,7 +7,11 @@
 [ext_resource type="PackedScene" uid="uid://cunnc7w2cwt0y" path="res://MAP/Main.Map.tscn" id="4_lebuw"]
 [ext_resource type="PackedScene" uid="uid://b27vv64uxawct" path="res://game_over_ui.tscn" id="6_i4wgl"]
 [ext_resource type="Script" uid="uid://uf0bxgk3ugi4" path="res://Elements/knock_trigger.gd" id="7_esvik"]
-[ext_resource type="AudioStream" uid="uid://c5ts5dhr5vfbl" path="res://Assets/Audio/Knocking_sfx.mp3" id="8_esvik"]
+[ext_resource type="AudioStream" uid="uid://dswaq3lkgumbl" path="res://Assets/Audio/Knocking_sfx_[cut_1sec].mp3" id="8_esvik"]
+[ext_resource type="PackedScene" uid="uid://c0akkcfvglhu0" path="res://Assets/Materials/radio_vef202.glb" id="9_1dhq1"]
+[ext_resource type="Script" uid="uid://dfuqcbgcxr6ar" path="res://Assets/Materials/radio_vef_202.gd" id="10_105vp"]
+[ext_resource type="AudioStream" uid="uid://btfsy6187w1ys" path="res://Assets/Audio/Provincial Jail _ Ilonggo Song.mp3" id="11_cyw1l"]
+[ext_resource type="PackedScene" uid="uid://7mr6s0ddubxo" path="res://Assets/Materials/mahogany_table.glb" id="12_eg7m7"]
 
 [sub_resource type="FogMaterial" id="FogMaterial_b0il4"]
 density = 2.0
@@ -83,6 +87,9 @@ mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_1mtc8")])
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_8b0c2"]
 size = Vector3(9.501221, 7.453369, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_b0il4"]
+size = Vector3(8.486938, 1, 47.11389)
 
 [node name="Main" type="Node3D" unique_id=1181372035]
 
@@ -226,6 +233,26 @@ shape = SubResource("BoxShape3D_8b0c2")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.16175, 2.3983808, 6.971068)
 stream = ExtResource("8_esvik")
 
+[node name="Materials" type="Node3D" parent="." unique_id=1643197758]
+
+[node name="Radio" parent="Materials" unique_id=1335116479 instance=ExtResource("9_1dhq1")]
+transform = Transform3D(0.22236884, 0, -0.2702815, 0, 0.35, 0, 0.2702815, 0, 0.22236884, 28.12352, 2.437766, -3.1544418)
+
+[node name="RadioTrigger" type="Area3D" parent="Materials/Radio" unique_id=28573063]
+script = ExtResource("10_105vp")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Materials/Radio/RadioTrigger" unique_id=2146749715]
+transform = Transform3D(1, 0, 5.9604645e-08, 0, 1, 0, -5.9604645e-08, 0, 1, -42.02338, 0, 23.056976)
+shape = SubResource("BoxShape3D_b0il4")
+
+[node name="RadioAudio" type="AudioStreamPlayer3D" parent="Materials/Radio/RadioTrigger" unique_id=230264653]
+transform = Transform3D(2.857143, 0, 1.1920929e-07, 0, 2.857143, 0, -1.1920929e-07, 0, 2.857143, 0, 0, 0)
+stream = ExtResource("11_cyw1l")
+max_distance = 27.0
+
+[node name="Table" parent="Materials" unique_id=1534851270 instance=ExtResource("12_eg7m7")]
+transform = Transform3D(0.35, 0, 0, 0, 0.35, 0, 0, 0, 0.35, 26.508787, 0.14102817, -2.6145816)
+
 [connection signal="climbing_started" from="Player" to="TypingUI" method="start_typing_minigame"]
 [connection signal="climbing_stopped" from="Player" to="TypingUI" method="stop_typing_minigame"]
 [connection signal="game_over_triggered" from="TypingUI" to="GameOverUI" method="show_stats"]
@@ -234,6 +261,7 @@ stream = ExtResource("8_esvik")
 [connection signal="wpm_changed" from="TypingUI" to="HUD" method="update_wpm"]
 [connection signal="body_entered" from="KnockTrigger" to="KnockTrigger" method="_on_body_entered"]
 [connection signal="body_entered" from="KnockTrigger2" to="KnockTrigger2" method="_on_body_entered"]
+[connection signal="body_entered" from="Materials/Radio/RadioTrigger" to="Materials/Radio/RadioTrigger" method="_on_body_entered"]
 
 [editable path="Player"]
 [editable path="Player/Player"]
