@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://g8pbjitwms52"]
 
 [ext_resource type="PackedScene" uid="uid://usjvkst7qus0" path="res://Elements/player.tscn" id="2_42cfe"]
+[ext_resource type="Script" uid="uid://c2kbxvqxgdjvv" path="res://Elements/player_camera.gd" id="2_105vp"]
+[ext_resource type="Script" uid="uid://bsqlbsx837ekn" path="res://Elements/player_animator.gd" id="3_cyw1l"]
 [ext_resource type="PackedScene" uid="uid://crd8g2d50ivjx" path="res://Elements/bamboo_pole.tscn" id="3_lebuw"]
 [ext_resource type="PackedScene" uid="uid://cd41qf3inb8km" path="res://Elements/TypingUI.tscn" id="4_42cfe"]
 [ext_resource type="PackedScene" uid="uid://cjqb4dssf6kbj" path="res://UI/HUD.tscn" id="4_i4wgl"]
@@ -93,9 +95,21 @@ size = Vector3(4.249897, 1, 31.34903)
 
 [node name="Main" type="Node3D" unique_id=1181372035]
 
-[node name="Player" parent="." unique_id=187821194 node_paths=PackedStringArray("third_person_cam") instance=ExtResource("2_42cfe")]
+[node name="Player" parent="." unique_id=187821194 instance=ExtResource("2_42cfe")]
 transform = Transform3D(1.2602414, 0, -1.5529944, 0, 2, 0, 1.5529944, 0, 1.2602414, -6.0977273, 0.6307163, -12.406239)
-third_person_cam = NodePath("../IntroCam")
+
+[node name="PlayerCamera" type="Node3D" parent="Player" unique_id=1595408504 node_paths=PackedStringArray("twist_pivot", "pitch_pivot", "first_person_cam", "climbing_cam", "transition_cam", "third_person_cam")]
+script = ExtResource("2_105vp")
+twist_pivot = NodePath("../Player/Skeleton3D/BoneAttachment3D2/TwistPivot")
+pitch_pivot = NodePath("../Player/Skeleton3D/BoneAttachment3D2/TwistPivot/PitchPivot")
+first_person_cam = NodePath("../Player/Skeleton3D/BoneAttachment3D2/TwistPivot/PitchPivot/FirstPersonCam")
+climbing_cam = NodePath("../Player/Skeleton3D/BoneAttachment3D/ClimbingCam")
+transition_cam = NodePath("../TransitionCam")
+third_person_cam = NodePath("../../IntroCam")
+
+[node name="PlayerAnimator" type="Node3D" parent="Player" unique_id=178312808 node_paths=PackedStringArray("animation_player")]
+script = ExtResource("3_cyw1l")
+animation_player = NodePath("../Player/AnimationPlayer")
 
 [node name="Bamboo" type="Node3D" parent="." unique_id=381597924]
 transform = Transform3D(0.5, 0, 0, 0, 2.9900002, 0, 0, 0, 0.5, -2.7424173, 2, 0)
