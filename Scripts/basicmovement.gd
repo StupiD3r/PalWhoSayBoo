@@ -16,12 +16,14 @@ extends CharacterBody3D
 @export var first_person_cam: Camera3D
 @export var climbing_cam: Camera3D 
 @export var transition_cam: Camera3D # Add this!
+@export var third_person_cam: Camera3D # --- NEW ---
 
 # --- State Tracking ---
 var target_climb_y: float = 0.0
 var climb_tween: Tween
 var default_twist_y: float = 0.0
 var default_pitch_x: float = 0.0
+var is_getting_up: bool = true # Add this!
 
 # --- Node Connections ---
 @export var twist_pivot: Node3D
@@ -38,18 +40,44 @@ signal climbing_stopped
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	
-	# Save your editor camera rotation so it never flips backwards!
 	if twist_pivot:
 		default_twist_y = twist_pivot.rotation.y
 	if pitch_pivot:
 		default_pitch_x = pitch_pivot.rotation.x
 	
-	# Force the correct camera on startup!
-	if first_person_cam:
+	# Start in 3rd person!
+	if third_person_cam:
+		third_person_cam.current = true
+	elif first_person_cam:
 		first_person_cam.current = true
 	
+	if animation_player and animation_player.has_animation("custom/gettingup"):
+		var anim = animation_player.get_animation("custom/gettingup")
+		anim.loop_mode = Animation.LOOP_NONE 
+		
+		# Play the animation
+		animation_player.play("custom/gettingup")
+		
+		# Calculate transition timing: start swoop 1 second before animation finishes
+		var swoop_duration = 1.0
+		var wait_time = max(0.1, anim.length - swoop_duration)
+		
+		# Wait for the animation to almost finish
+		await get_tree().create_timer(wait_time).timeout
+		
+		# Trigger the transition camera to fly into the player's head
+		if third_person_cam and first_person_cam:
+			switch_cameras(third_person_cam, first_person_cam, swoop_duration)
+			# Wait for the swoop to finish
+			await get_tree().create_timer(swoop_duration).timeout
+		else:
+			await animation_player.animation_finished
+			
+	# Unlock movement and blend into idle once the camera is inside the head
+	is_getting_up = false
+	
 	if animation_player and animation_player.has_animation("custom/idle2"):
-		animation_player.play("custom/idle2")
+		animation_player.play("custom/idle2", 0.5)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("ui_cancel"):
@@ -75,6 +103,11 @@ func _unhandled_input(event: InputEvent) -> void:
 			pitch_pivot.rotation.x = clamped_pitch
 
 func _physics_process(delta: float) -> void:
+	if is_getting_up:
+		if not is_on_floor():
+			velocity += get_gravity() * delta
+		move_and_slide()
+		return # Stop reading the rest of the movement code!
 	# Check if the run button is pressed
 	var current_speed = SPRINT_SPEED if Input.is_action_pressed("run") else SPEED
 	
@@ -145,7 +178,7 @@ func _physics_process(delta: float) -> void:
 
 # --- GROUND/AIR ANIMATIONS ---
 func _update_ground_animations() -> void:
-	if not animation_player:
+	if not animation_player or is_getting_up:
 		return
 
 	var horizontal_velocity = Vector2(velocity.x, velocity.z).length()
