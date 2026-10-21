@@ -43,16 +43,38 @@ func reset_pivots(character_body: CharacterBody3D) -> void:
 	if pitch_pivot:
 		pitch_pivot.rotation.x = default_pitch_x
 
-func switch_cameras(from_cam: Camera3D, to_cam: Camera3D, duration: float = 0.5) -> void:
+func switch_cameras(from_cam: Camera3D, to_cam: Camera3D, duration: float = 0.8, player_mesh: Node3D = null) -> void:
 	if not transition_cam or not from_cam or not to_cam:
 		if to_cam: to_cam.current = true
+		if player_mesh: player_mesh.visible = false
 		return
 		
+	# 1. Lock transition camera to starting position AND rotation
+	var start_pos = from_cam.global_position
 	transition_cam.global_transform = from_cam.global_transform
 	transition_cam.current = true
 	
-	var tween = create_tween().set_parallel(true)
-	tween.tween_property(transition_cam, "global_position", to_cam.global_position, duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	tween.tween_property(transition_cam, "quaternion", to_cam.global_transform.basis.get_rotation_quaternion(), duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	# Distance threshold (meters) before snapping into FPV view
+	var transition_distance_limit: float = 0.4
 	
-	tween.chain().tween_callback(func(): to_cam.current = true)
+	var tween = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	
+	tween.tween_method(func(weight: float):
+		var target_pos = to_cam.global_position
+		
+		# 2. Push straight forward toward the target position without turning
+		transition_cam.global_position = start_pos.lerp(target_pos, weight)
+		
+		# 3. Check distance limit to the player's head
+		var dist_to_head = transition_cam.global_position.distance_to(target_pos)
+		
+		# Hide mesh right before crossing into skull space
+		if player_mesh and dist_to_head <= transition_distance_limit:
+			player_mesh.visible = false
+	, 0.0, 1.0, duration)
+	
+	# 4. Snap view directly to FPV at the end of the move
+	tween.chain().tween_callback(func(): 
+		if player_mesh: player_mesh.visible = false
+		to_cam.current = true
+	)

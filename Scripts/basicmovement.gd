@@ -34,7 +34,8 @@ func _ready() -> void:
 		await get_tree().create_timer(wait_time).timeout
 		
 		if camera_ctrl.third_person_cam and camera_ctrl.first_person_cam:
-			camera_ctrl.switch_cameras(camera_ctrl.third_person_cam, camera_ctrl.first_person_cam, swoop_duration)
+			# --- UPDATED: Pass $Player as the 4th argument ---
+			camera_ctrl.switch_cameras(camera_ctrl.third_person_cam, camera_ctrl.first_person_cam, swoop_duration, $Player)
 			await get_tree().create_timer(swoop_duration).timeout
 			
 	is_getting_up = false
