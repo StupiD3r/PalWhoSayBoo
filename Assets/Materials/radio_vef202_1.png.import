@@ -2,14 +2,11 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cgvnfe3gsjo8c"
+uid="uid://dmus6dkqwh6qg"
 path.s3tc="res://.godot/imported/radio_vef202_1.png-ce3314c15bf8e3bb2c826716a0421a11.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
-}
-generator_parameters={
-"md5": "f323df1398aaadfa1983ddb70455a4e7"
 }
 
 [deps]

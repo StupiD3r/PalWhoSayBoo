@@ -75,6 +75,6 @@ func switch_cameras(from_cam: Camera3D, to_cam: Camera3D, duration: float = 0.8,
 	
 	# 4. Snap view directly to FPV at the end of the move
 	tween.chain().tween_callback(func(): 
-		if player_mesh: player_mesh.visible = false
+		if player_mesh: player_mesh.visible = true
 		to_cam.current = true
 	)

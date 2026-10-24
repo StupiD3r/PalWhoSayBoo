@@ -6,7 +6,7 @@ extends Control
 
 signal score_changed(new_score: int)
 signal wpm_changed(new_wpm: int)
-signal game_over_triggered(final_score: int, highest_wpm: int, avg_wpm: int, accuracy: float) # --- NEW ---
+signal game_over_triggered(final_score: int, highest_wpm: int, avg_wpm: int, accuracy: float)
 
 var easy_words = ["poste", "barya", "kapit", "dulas", "hawak", "bilis", "talon", "tangkad", "panalo", "punongkahoy"]
 var medium_words = ["kawayan", "grasa", "panatag", "pagsisikap", "premyo", "abot", "taas", "pawis"]
@@ -25,6 +25,10 @@ var total_keystrokes: int = 0  # ALL keystrokes (for accuracy)
 var highest_wpm: int = 0
 var current_wpm: int = 0
 
+# --- Juice Tween References ---
+var pop_tween: Tween
+var shake_tween: Tween
+
 func _ready():
 	visible = false
 
@@ -39,7 +43,6 @@ func _process(delta: float) -> void:
 		var minutes = time_elapsed / 60.0
 		current_wpm = int(standard_words / minutes)
 		
-		# --- NEW: Track Highest WPM ---
 		if current_wpm > highest_wpm:
 			highest_wpm = current_wpm
 			
@@ -66,12 +69,10 @@ func start_typing_minigame():
 	update_ui()
 
 func stop_typing_minigame():
-	# --- NEW: Final Math Calculations ---
 	var accuracy: float = 0.0
 	if total_keystrokes > 0:
 		accuracy = (float(total_chars_typed) / float(total_keystrokes)) * 100.0
 		
-	# Broadcast the final stats to the Game Over screen!
 	game_over_triggered.emit(score, highest_wpm, current_wpm, accuracy)
 
 	visible = false
@@ -95,34 +96,43 @@ func _unhandled_input(event: InputEvent):
 		if event.unicode == 0:
 			return
 
-		# Track ALL keystrokes for real-time accuracy
 		total_keystrokes += 1
-
 		var typed_char = char(event.unicode).to_lower()
 		
+		# --- CORRECT KEYSTROKE ---
 		if current_word.begins_with(typed_text + typed_char):
 			typed_text += typed_char
-			total_chars_typed += 1 # Track correct keystrokes
+			total_chars_typed += 1
 			update_ui()
 			
+			# Trigger player climb step + pass current WPM for audio pitch scaling
 			if player and player.has_method("climb_step"):
-				player.climb_step() 
+				player.climb_step(current_wpm)
+			
+			# Trigger UI label pop juice
+			animate_correct_type()
 			
 			if typed_text == current_word:
 				on_word_completed()
+				
+		# --- MISTYPE / ERROR ---
+		else:
+			# Trigger player camera jitter & error juice
+			if player and player.has_method("on_typing_error"):
+				player.on_typing_error()
+				
+			# Trigger UI label error flash & shake
+			animate_error_type()
 		
 		# --- REAL-TIME ELIMINATION CHECK ---
-		# Wait until the player has typed 20 letters to give them a brief grace period
 		if total_keystrokes >= 20:
 			var live_accuracy = (float(total_chars_typed) / float(total_keystrokes)) * 100.0
-			
 			if live_accuracy < 80.0:
 				trigger_elimination()
 
-# --- NEW FUNCTION ---
 func trigger_elimination():
 	if player and player.has_method("force_dismount"):
-		player.force_dismount(true) # True triggers the fall logic!
+		player.force_dismount(true)
 		
 	stop_typing_minigame()
 
@@ -143,3 +153,37 @@ func on_word_completed():
 	
 	typed_text = ""
 	update_ui()
+
+# --- UI JUICE ANIMATIONS ---
+
+func animate_correct_type():
+	if not current_word_label: return
+	
+	current_word_label.pivot_offset = current_word_label.size / 2.0
+	
+	if pop_tween and pop_tween.is_valid():
+		pop_tween.kill()
+		
+	pop_tween = create_tween()
+	current_word_label.scale = Vector2(1.15, 1.15)
+	pop_tween.tween_property(current_word_label, "scale", Vector2(1.0, 1.0), 0.1)\
+		.set_trans(Tween.TRANS_CUBIC)\
+		.set_ease(Tween.EASE_OUT)
+
+func animate_error_type():
+	if not current_word_label: return
+	
+	if shake_tween and shake_tween.is_valid():
+		shake_tween.kill()
+		
+	shake_tween = create_tween().set_parallel(true)
+	
+	# Flash label red briefly
+	current_word_label.modulate = Color.RED
+	shake_tween.tween_property(current_word_label, "modulate", Color.WHITE, 0.2)
+	
+	# Horizontal jitter shake
+	var orig_x = current_word_label.position.x
+	current_word_label.position.x = orig_x + 8.0
+	shake_tween.tween_property(current_word_label, "position:x", orig_x, 0.15)\
+		.set_trans(Tween.TRANS_SPRING)

@@ -2,14 +2,11 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://duwl0rf21i7yl"
+uid="uid://dwdpkysuwqhld"
 path.s3tc="res://.godot/imported/mahogany_table_3.png-d8f0a4b705ed9f167e1e9f2592e81238.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
-}
-generator_parameters={
-"md5": "682cce5e4cb6f0f0265a1b9ac4b8a7df"
 }
 
 [deps]

@@ -98,6 +98,10 @@ func _physics_process(delta: float) -> void:
 func start_climbing(pole_position: Vector3) -> void:
 	is_climbing = true
 	velocity = Vector3.ZERO
+	
+	# 1. Unhide player mesh so character is visible on the pole!
+	$Player.visible = true
+	
 	global_position.x = pole_position.x
 	global_position.z = pole_position.z + 0.6
 	target_climb_y = global_position.y
@@ -107,6 +111,7 @@ func start_climbing(pole_position: Vector3) -> void:
 	if camera_ctrl.twist_pivot: camera_ctrl.twist_pivot.rotation.y = camera_ctrl.default_twist_y
 	if camera_ctrl.pitch_pivot: camera_ctrl.pitch_pivot.rotation_degrees.x = 15.0
 	
+	# 2. Smoothly swoop from FPV into the third-person climbing angle
 	camera_ctrl.switch_cameras(camera_ctrl.first_person_cam, camera_ctrl.climbing_cam, 0.4)
 	animator.prepare_climb()
 	climbing_started.emit()

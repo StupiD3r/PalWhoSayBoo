@@ -2,24 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ipd3xjskspie"
-path.s3tc="res://.godot/imported/seamless_trash_material_3.png-74e9885d18fddef31239475a66d44e88.s3tc.ctex"
+uid="uid://byldrd8v4kue6"
+path="res://.godot/imported/seamless_trash_material_3.png-74e9885d18fddef31239475a66d44e88.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
-}
-generator_parameters={
-"md5": "3064c8abdb555818fc2e16d2f3c0fd53"
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://Assets/Materials/seamless_trash_material_3.png"
-dest_files=["res://.godot/imported/seamless_trash_material_3.png-74e9885d18fddef31239475a66d44e88.s3tc.ctex"]
+dest_files=["res://.godot/imported/seamless_trash_material_3.png-74e9885d18fddef31239475a66d44e88.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -27,7 +23,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=true
+mipmaps/generate=false
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""
@@ -41,4 +37,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=0
+detect_3d/compress_to=1
