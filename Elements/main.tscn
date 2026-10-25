@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://cunnc7w2cwt0y" path="res://MAP/Main.Map.tscn" id="4_lebuw"]
 [ext_resource type="PackedScene" uid="uid://b27vv64uxawct" path="res://game_over_ui.tscn" id="6_i4wgl"]
 [ext_resource type="Script" uid="uid://uf0bxgk3ugi4" path="res://Elements/knock_trigger.gd" id="7_esvik"]
+[ext_resource type="Script" uid="uid://ca8kmicgvvs6u" path="res://Elements/world_environment.gd" id="8_5c214"]
 [ext_resource type="AudioStream" uid="uid://dswaq3lkgumbl" path="res://Assets/Audio/Knocking_sfx_[cut_1sec].mp3" id="8_esvik"]
 [ext_resource type="PackedScene" uid="uid://c0akkcfvglhu0" path="res://Assets/Materials/radio_vef202.glb" id="9_1dhq1"]
 [ext_resource type="Script" uid="uid://dfuqcbgcxr6ar" path="res://Assets/Materials/radio_vef_202.gd" id="10_105vp"]
@@ -16,11 +17,15 @@
 [ext_resource type="PackedScene" uid="uid://7mr6s0ddubxo" path="res://Assets/Materials/mahogany_table.glb" id="12_eg7m7"]
 [ext_resource type="PackedScene" uid="uid://dmiyrys6lehvx" path="res://Assets/Materials/trees_low_poly.glb" id="15_eg7m7"]
 
-[sub_resource type="FogMaterial" id="FogMaterial_b0il4"]
-density = 2.0
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_xumym"]
+
+[sub_resource type="Sky" id="Sky_u6sa0"]
+sky_material = SubResource("ProceduralSkyMaterial_xumym")
 
 [sub_resource type="Environment" id="Environment_b0il4"]
-background_mode = 1
+background_mode = 2
+sky = SubResource("Sky_u6sa0")
+tonemap_mode = 3
 volumetric_fog_enabled = true
 volumetric_fog_density = 0.001
 
@@ -127,13 +132,14 @@ transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 15, -1.1907539, 0)
 
 [node name="Clouds" type="Node3D" parent="." unique_id=1668036106]
 
-[node name="FogVolume" type="FogVolume" parent="Clouds" unique_id=2088199161]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 30, 12.5)
-size = Vector3(250, 20, 250)
-material = SubResource("FogMaterial_b0il4")
-
 [node name="WorldEnvironment" type="WorldEnvironment" parent="Clouds" unique_id=435497615]
 environment = SubResource("Environment_b0il4")
+script = ExtResource("8_5c214")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Clouds" unique_id=1973022576]
+transform = Transform3D(0.8660254, 0.35355338, -0.35355338, 0, 0.70710677, 0.70710677, 0.5, -0.6123724, 0.6123724, 0, 0, 0)
+light_energy = 1.2
+shadow_enabled = true
 
 [node name="Lightings" type="Node3D" parent="." unique_id=1790950383]
 
