@@ -2,8 +2,9 @@
 
 [ext_resource type="FontFile" uid="uid://8tyqvpfpqvvr" path="res://UI/HororDramaDemoRegular.ttf" id="1_06t4h"]
 [ext_resource type="Script" uid="uid://dhavuodofhpyy" path="res://Scripts/main_menu.gd" id="1_7vrkn"]
-[ext_resource type="AudioStream" uid="uid://dkylmmxvpv830" path="res://Assets/Audio/horror-bass-ambiance-sound-effect-sfx-bgm-for-videos-films-copyrightfree_PbxbNN3Z.mp3" id="3_d8nwk"]
-[ext_resource type="PackedScene" uid="uid://ckp7ra37sbpte" path="res://fade_transition.tscn" id="4_4cwpn"]
+[ext_resource type="AudioStream" uid="uid://ch7t30sbgsvf3" path="res://soul_serenity_sounds-typing-sound-04-229864.mp3" id="3_d8nwk"]
+[ext_resource type="AudioStream" uid="uid://dy8ph1y0r2y3g" path="res://soul_serenity_sounds-typing-sound-03-229862.mp3" id="4_4cwpn"]
+[ext_resource type="AudioStream" uid="uid://dkylmmxvpv830" path="res://Assets/Audio/horror-bass-ambiance-sound-effect-sfx-bgm-for-videos-films-copyrightfree_PbxbNN3Z.mp3" id="5_f40uw"]
 
 [node name="Main_menu" type="Control" unique_id=1425458090]
 layout_mode = 3
@@ -21,6 +22,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 color = Color(0, 0, 0, 1)
 
 [node name="PAL" type="Label" parent="." unique_id=782521758]
@@ -51,7 +53,7 @@ theme_override_fonts/font = ExtResource("1_06t4h")
 theme_override_font_sizes/font_size = 23
 text = "BY PHOBICPHILIA"
 
-[node name="Button" type="Button" parent="." unique_id=1977444737]
+[node name="StartButton" type="Button" parent="." unique_id=1977444737]
 layout_mode = 0
 offset_left = 639.0
 offset_top = 323.0
@@ -60,14 +62,13 @@ offset_bottom = 392.0
 theme_override_font_sizes/font_size = 30
 text = "PLAY"
 
-[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=257586691]
+[node name="HoverSound" type="AudioStreamPlayer" parent="." unique_id=1640396112]
 stream = ExtResource("3_d8nwk")
-autoplay = true
+volume_db = -12.0
 
-[node name="Node2D" parent="." unique_id=551938567 instance=ExtResource("4_4cwpn")]
-visible = false
-layout_mode = 0
+[node name="ClickSound" type="AudioStreamPlayer" parent="." unique_id=1497184523]
+stream = ExtResource("4_4cwpn")
+volume_db = -10.0
 
-[node name="fade_timer" type="Timer" parent="Node2D" unique_id=1877802895]
-
-[connection signal="pressed" from="Button" to="." method="play"]
+[node name="BGM" type="AudioStreamPlayer" parent="." unique_id=51515649]
+stream = ExtResource("5_f40uw")

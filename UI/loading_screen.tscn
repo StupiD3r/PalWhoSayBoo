@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://b7j7gh6y6u0db"]
+
+[ext_resource type="Script" uid="uid://bijfipxfhi45y" path="res://Scripts/loading_screen.gd" id="1_1j043"]
+[ext_resource type="AudioStream" uid="uid://ch7t30sbgsvf3" path="res://soul_serenity_sounds-typing-sound-04-229864.mp3" id="2_pnnle"]
+
+[node name="LoadingScreen" type="Control" unique_id=1223641552]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_1j043")
+
+[node name="BackgroundMusic" type="AudioStreamPlayer" parent="." unique_id=286605827]
+
+[node name="TypingSound" type="AudioStreamPlayer" parent="." unique_id=1070483936]
+stream = ExtResource("2_pnnle")
+volume_db = -10.0
