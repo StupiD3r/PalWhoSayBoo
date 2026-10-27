@@ -104,13 +104,14 @@ mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_u0vyg")])
 texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_gtcpc"), SubResource("Terrain3DTextureAsset_m237u")])
 
 [node name="map" type="Node3D" unique_id=908056964]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.38636637, 0)
 
 [node name="house" parent="." unique_id=943127515 instance=ExtResource("1_05x6t")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3411131, 0)
 
 [node name="world_ground" type="Node3D" parent="." unique_id=856825940]
 
 [node name="Terrain3D" type="Terrain3D" parent="world_ground" unique_id=970390552]
+data_directory = "res://MAP"
 material = SubResource("Terrain3DMaterial_nf7qy")
 assets = SubResource("Terrain3DAssets_yg57s")
 top_level = true
