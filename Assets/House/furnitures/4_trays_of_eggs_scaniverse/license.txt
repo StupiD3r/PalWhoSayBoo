@@ -1,0 +1,11 @@
+Model Information:
+* title:	4 Trays of Eggs (Scaniverse)
+* source:	https://sketchfab.com/3d-models/4-trays-of-eggs-scaniverse-8ebff8f620a340418304e50a67c39a77
+* author:	JFN (https://sketchfab.com/db4)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "4 Trays of Eggs (Scaniverse)" (https://sketchfab.com/3d-models/4-trays-of-eggs-scaniverse-8ebff8f620a340418304e50a67c39a77) by JFN (https://sketchfab.com/db4) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

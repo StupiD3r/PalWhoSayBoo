@@ -1,0 +1,11 @@
+Model Information:
+* title:	Medieval Old Wooden Bench
+* source:	https://sketchfab.com/3d-models/medieval-old-wooden-bench-76017263f0ea4d46915c0f48edc04923
+* author:	MaX3Dd (https://sketchfab.com/MaX3Dd)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Medieval Old Wooden Bench" (https://sketchfab.com/3d-models/medieval-old-wooden-bench-76017263f0ea4d46915c0f48edc04923) by MaX3Dd (https://sketchfab.com/MaX3Dd) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

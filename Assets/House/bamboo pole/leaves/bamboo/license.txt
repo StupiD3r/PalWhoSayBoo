@@ -1,0 +1,11 @@
+Model Information:
+* title:	Bamboo
+* source:	https://sketchfab.com/3d-models/bamboo-b2e6f889630e4ab593376a151836a3e1
+* author:	arthur (https://sketchfab.com/Arthur_mf)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Bamboo" (https://sketchfab.com/3d-models/bamboo-b2e6f889630e4ab593376a151836a3e1) by arthur (https://sketchfab.com/Arthur_mf) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://qb7q1jgdvj57" path="res://Assets/House/walls/Wicker011A_2K-JPG/Wicker011A_2K-JPG_Color.jpg" id="2_drchr"]
 [ext_resource type="Texture2D" uid="uid://eqxdem83klmy" path="res://Assets/House/roof/thatch_roof_angled_2k.blend/textures/thatch_roof_angled_diff_2k.jpg" id="3_drchr"]
 [ext_resource type="Texture2D" uid="uid://c4yy58gkiofe4" path="res://Assets/House/window frame/Bamboo001B_2K-JPG/Bamboo001B_2K-JPG_Color.jpg" id="4_l45jp"]
+[ext_resource type="PackedScene" uid="uid://dc8fhvjxwps7y" path="res://Assets/House/furnitures/bamboo_bench/scene.gltf" id="5_nv74t"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l45jp"]
 albedo_texture = ExtResource("1_ixl3c")
@@ -163,6 +164,9 @@ albedo_texture = ExtResource("4_l45jp")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ryxxs"]
 albedo_texture = ExtResource("4_l45jp")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_rtkds"]
+size = Vector3(1.0175781, 1.7218018, 2.5893555)
 
 [node name="house" type="CSGCombiner3D" unique_id=943127515]
 use_collision = true
@@ -519,3 +523,14 @@ material = SubResource("StandardMaterial3D_0dptw")
 transform = Transform3D(2.6226832e-08, 1, 8.742278e-09, 7.642742e-16, 4.371139e-08, -0.2, -0.2, 1.3113416e-07, 3.821371e-16, 0.17937684, 2.1325397, 9.593086)
 height = 4.0600586
 material = SubResource("StandardMaterial3D_ryxxs")
+
+[node name="Bench" parent="." unique_id=1365803754 instance=ExtResource("5_nv74t")]
+transform = Transform3D(-6.556708e-08, 0, -1.5, 0, 1.5, 0, 1.5, 0, -6.556708e-08, 2.497975, 0.557, 8.751)
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Bench" unique_id=533281135]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Bench/StaticBody3D" unique_id=320356699]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0087890625, 0.36090085, -0.018310547)
+shape = SubResource("BoxShape3D_rtkds")
+
+[editable path="Bench"]

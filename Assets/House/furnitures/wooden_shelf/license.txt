@@ -1,0 +1,11 @@
+Model Information:
+* title:	Wooden Shelf
+* source:	https://sketchfab.com/3d-models/wooden-shelf-67e718a0fc904487a9f735892d9834d3
+* author:	Vilson Pistori (https://sketchfab.com/vilsonpistori)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Wooden Shelf" (https://sketchfab.com/3d-models/wooden-shelf-67e718a0fc904487a9f735892d9834d3) by Vilson Pistori (https://sketchfab.com/vilsonpistori) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

@@ -1,0 +1,11 @@
+Model Information:
+* title:	Electric desk fan
+* source:	https://sketchfab.com/3d-models/electric-desk-fan-879a32a914cf4f848477819965871d87
+* author:	UrbanFoxGamer (https://sketchfab.com/UrbanFoxGamer)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Electric desk fan" (https://sketchfab.com/3d-models/electric-desk-fan-879a32a914cf4f848477819965871d87) by UrbanFoxGamer (https://sketchfab.com/UrbanFoxGamer) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

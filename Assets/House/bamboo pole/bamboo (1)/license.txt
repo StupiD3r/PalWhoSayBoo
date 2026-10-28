@@ -1,0 +1,11 @@
+Model Information:
+* title:	Bamboo
+* source:	https://sketchfab.com/3d-models/bamboo-0efc022837db43beb4c757155f004ec6
+* author:	riysstech (https://sketchfab.com/riysstech)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Bamboo" (https://sketchfab.com/3d-models/bamboo-0efc022837db43beb4c757155f004ec6) by riysstech (https://sketchfab.com/riysstech) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
