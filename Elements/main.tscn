@@ -104,6 +104,10 @@ size = Vector3(4.249897, 1, 31.34903)
 [node name="Player" parent="." unique_id=187821194 instance=ExtResource("2_42cfe")]
 transform = Transform3D(1.2602414, 0, -1.5529944, 0, 2, 0, 1.5529944, 0, 1.2602414, -6.0977273, 0.6307163, -12.406239)
 
+[node name="WalkSound" parent="Player/PlayerAudio" parent_id_path=PackedInt32Array(187821194, 1509206385) index="0" unique_id=1673833116]
+volume_db = -14.0
+max_polyphony = 2
+
 [node name="PlayerCamera" type="Node3D" parent="Player" unique_id=1595408504 node_paths=PackedStringArray("twist_pivot", "pitch_pivot", "first_person_cam", "climbing_cam", "transition_cam", "third_person_cam")]
 script = ExtResource("2_105vp")
 twist_pivot = NodePath("../Player/Skeleton3D/BoneAttachment3D2/TwistPivot")
@@ -214,37 +218,37 @@ transform = Transform3D(0.6454924, -0.01960414, -0.7635151, 0.07456083, 0.996513
 [node name="Sketchfab_Scene" parent="Background" unique_id=747690283 instance=ExtResource("15_eg7m7")]
 transform = Transform3D(0.012909847, 0.0014912167, 0.015202373, -0.00039208273, 0.01993026, -0.0016220236, -0.015270301, 0.0007489745, 0.012894065, 18.698769, -5.9055924, 59.935745)
 
-[node name="tree6" parent="Background/Sketchfab_Scene/Sketchfab_model/1ab532bcfaa2432191aec41592077bb5_fbx/RootNode" parent_id_path=PackedInt32Array(747690283, 307805535) index="1" unique_id=283387175]
+[node name="tree6" parent="Background/Sketchfab_Scene/Sketchfab_model/1ab532bcfaa2432191aec41592077bb5_fbx/RootNode" parent_id_path=PackedInt32Array(747690283, 1092281598) index="1" unique_id=464243678]
 visible = false
 
 [node name="Sketchfab_Scene3" parent="Background" unique_id=1402369040 instance=ExtResource("15_eg7m7")]
 transform = Transform3D(0.006454923, 0.0007456085, 0.0076011857, -0.00019604134, 0.00996513, -0.00081101217, -0.007635151, 0.0003744874, 0.0064470326, 26.429655, -6.441548, 58.80529)
 
-[node name="tree6" parent="Background/Sketchfab_Scene3/Sketchfab_model/1ab532bcfaa2432191aec41592077bb5_fbx/RootNode" parent_id_path=PackedInt32Array(1402369040, 307805535) index="1" unique_id=283387175]
+[node name="tree6" parent="Background/Sketchfab_Scene3/Sketchfab_model/1ab532bcfaa2432191aec41592077bb5_fbx/RootNode" parent_id_path=PackedInt32Array(1402369040, 1092281598) index="1" unique_id=464243678]
 visible = false
 
 [node name="Sketchfab_Scene2" parent="Background" unique_id=509287950 instance=ExtResource("15_eg7m7")]
 transform = Transform3D(0.012909847, 0.0014912167, 0.015202373, -0.00039208273, 0.01993026, -0.0016220236, -0.015270301, 0.0007489745, 0.012894065, 26.1092, -6.1306534, 51.170387)
 
-[node name="tree6" parent="Background/Sketchfab_Scene2/Sketchfab_model/1ab532bcfaa2432191aec41592077bb5_fbx/RootNode" parent_id_path=PackedInt32Array(509287950, 307805535) index="1" unique_id=283387175]
+[node name="tree6" parent="Background/Sketchfab_Scene2/Sketchfab_model/1ab532bcfaa2432191aec41592077bb5_fbx/RootNode" parent_id_path=PackedInt32Array(509287950, 1092281598) index="1" unique_id=464243678]
 visible = false
 
 [node name="Sketchfab_Scene4" parent="Background" unique_id=520193946 instance=ExtResource("15_eg7m7")]
 transform = Transform3D(0.012909847, 0.0014912171, 0.015202378, -0.00039208267, 0.01993026, -0.0016220239, -0.015270301, 0.00074897474, 0.012894066, 5.8849297, -5.3666453, 71.10684)
 
-[node name="tree6" parent="Background/Sketchfab_Scene4/Sketchfab_model/1ab532bcfaa2432191aec41592077bb5_fbx/RootNode" parent_id_path=PackedInt32Array(520193946, 307805535) index="1" unique_id=283387175]
+[node name="tree6" parent="Background/Sketchfab_Scene4/Sketchfab_model/1ab532bcfaa2432191aec41592077bb5_fbx/RootNode" parent_id_path=PackedInt32Array(520193946, 1092281598) index="1" unique_id=464243678]
 visible = false
 
 [node name="Sketchfab_Scene5" parent="Background" unique_id=501285041 instance=ExtResource("15_eg7m7")]
 transform = Transform3D(0.006454923, 0.0007456087, 0.007601186, -0.00019604132, 0.00996513, -0.00081101194, -0.007635151, 0.00037448754, 0.006447033, 13.615818, -5.9026003, 69.97638)
 
-[node name="tree6" parent="Background/Sketchfab_Scene5/Sketchfab_model/1ab532bcfaa2432191aec41592077bb5_fbx/RootNode" parent_id_path=PackedInt32Array(501285041, 307805535) index="1" unique_id=283387175]
+[node name="tree6" parent="Background/Sketchfab_Scene5/Sketchfab_model/1ab532bcfaa2432191aec41592077bb5_fbx/RootNode" parent_id_path=PackedInt32Array(501285041, 1092281598) index="1" unique_id=464243678]
 visible = false
 
 [node name="Sketchfab_Scene6" parent="Background" unique_id=1141024367 instance=ExtResource("15_eg7m7")]
 transform = Transform3D(0.012909847, 0.0014912171, 0.015202378, -0.00039208267, 0.01993026, -0.0016220239, -0.015270301, 0.00074897474, 0.012894066, 13.295361, -5.591706, 62.34147)
 
-[node name="tree6" parent="Background/Sketchfab_Scene6/Sketchfab_model/1ab532bcfaa2432191aec41592077bb5_fbx/RootNode" parent_id_path=PackedInt32Array(1141024367, 307805535) index="1" unique_id=283387175]
+[node name="tree6" parent="Background/Sketchfab_Scene6/Sketchfab_model/1ab532bcfaa2432191aec41592077bb5_fbx/RootNode" parent_id_path=PackedInt32Array(1141024367, 1092281598) index="1" unique_id=464243678]
 visible = false
 
 [connection signal="climbing_started" from="Player" to="TypingUI" method="start_typing_minigame"]

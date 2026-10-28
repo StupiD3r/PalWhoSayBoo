@@ -16,7 +16,23 @@ func _ready() -> void:
 
 	start_button.pressed.connect(_start_pressed)
 	start_button.mouse_entered.connect(_play_hover_sound)
+	for button in [
+		start_button,
+		
+	]:
+		button.add_theme_constant_override("shadow_offset_x", 0)
+		button.add_theme_constant_override("shadow_offset_y", 0)
+		button.add_theme_constant_override("shadow_outline_size", 8)
+		button.add_theme_color_override(
+			"font_shadow_color", Color(1, 1, 1, 0)
+		)
 
+		button.mouse_entered.connect(
+			_set_button_glow.bind(button, true)
+		)
+		button.mouse_exited.connect(
+			_set_button_glow.bind(button, false)
+		)
 
 func _create_dialogs() -> void:
 	# Settings window.
@@ -74,3 +90,13 @@ func _start_pressed() -> void:
 	overlay.add_child(intro)
 func _play_hover_sound() -> void:
 	hover_sound.play()
+	
+func _set_button_glow(button: Button, enabled: bool) -> void:
+	var glow_color := Color(1, 1, 1, 0)
+
+	if enabled:
+		glow_color = Color(1, 1, 1, 0.35)
+
+	button.add_theme_color_override(
+		"font_shadow_color", glow_color
+	)

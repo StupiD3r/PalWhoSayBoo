@@ -11,7 +11,7 @@ func play_climb_step() -> void:
 # --- NEW: Ground footsteps ---
 func play_walk_step() -> void:
 	if walk_sound and not walk_sound.playing:
-		walk_sound.pitch_scale = randf_range(0.9, 1.1)
+		walk_sound.pitch_scale = randf_range(0.95, 1.05)
 		walk_sound.play()
 
 func stop_walk_step() -> void:

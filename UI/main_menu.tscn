@@ -6,6 +6,16 @@
 [ext_resource type="AudioStream" uid="uid://dy8ph1y0r2y3g" path="res://soul_serenity_sounds-typing-sound-03-229862.mp3" id="4_4cwpn"]
 [ext_resource type="AudioStream" uid="uid://dkylmmxvpv830" path="res://Assets/Audio/horror-bass-ambiance-sound-effect-sfx-bgm-for-videos-films-copyrightfree_PbxbNN3Z.mp3" id="5_f40uw"]
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_swubu"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_t5pow"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ujvg7"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4p0ss"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_aicxv"]
+
 [node name="Main_menu" type="Control" unique_id=1425458090]
 layout_mode = 3
 anchors_preset = 15
@@ -30,10 +40,10 @@ layout_mode = 1
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-offset_left = 123.0
-offset_top = -22.0
-offset_right = 513.0
-offset_bottom = 95.0
+offset_left = 125.0
+offset_top = -84.0
+offset_right = 515.0
+offset_bottom = 33.0
 grow_vertical = 2
 theme_override_fonts/font = ExtResource("1_06t4h")
 theme_override_font_sizes/font_size = 67
@@ -44,10 +54,10 @@ layout_mode = 1
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-offset_left = 328.0
-offset_top = 70.0
-offset_right = 497.0
-offset_bottom = 111.0
+offset_left = 339.0
+offset_top = 6.0
+offset_right = 508.0
+offset_bottom = 47.0
 grow_vertical = 2
 theme_override_fonts/font = ExtResource("1_06t4h")
 theme_override_font_sizes/font_size = 23
@@ -55,11 +65,18 @@ text = "BY PHOBICPHILIA"
 
 [node name="StartButton" type="Button" parent="." unique_id=1977444737]
 layout_mode = 0
-offset_left = 639.0
-offset_top = 323.0
-offset_right = 915.0
-offset_bottom = 392.0
-theme_override_font_sizes/font_size = 30
+offset_left = 677.0
+offset_top = 268.0
+offset_right = 910.0
+offset_bottom = 322.0
+theme_override_colors/font_color = Color(0.26293206, 0.2629327, 0.2629322, 1)
+theme_override_colors/font_pressed_color = Color(0.4390491, 0.43904912, 0.43904912, 1)
+theme_override_font_sizes/font_size = 53
+theme_override_styles/normal = SubResource("StyleBoxEmpty_swubu")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_t5pow")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_ujvg7")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_4p0ss")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_aicxv")
 text = "PLAY"
 
 [node name="HoverSound" type="AudioStreamPlayer" parent="." unique_id=1640396112]

@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://c25lc4bt781l7"]
+
+[ext_resource type="Script" uid="uid://b477gc828smyd" path="res://Scripts/logo_screen.gd" id="1_101sn"]
+[ext_resource type="Texture2D" uid="uid://51002b0kokhi" path="res://UI/ph.png" id="2_atsnd"]
+
+[node name="LogoScreen" type="Control" unique_id=1213150819]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_101sn")
+logo_texture = ExtResource("2_atsnd")
+main_menu_scene = "uid://b4kv2o18ar86j"
