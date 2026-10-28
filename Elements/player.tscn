@@ -194,6 +194,9 @@ bones/63/rotation = Quaternion(0.32987922, 0.0345913, -0.012096686, 0.94331163)
 bones/64/position = Vector3(1.4847884e-10, 0.06943097, -1.6511803e-10)
 bones/64/rotation = Quaternion(6.938894e-18, 1.3010426e-18, 1.7347235e-17, 1)
 
+[node name="Ch23_Suit" parent="Player/Skeleton3D" index="2" unique_id=620486275]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0034780744, 0, 5.0961662e-05)
+
 [node name="BoneAttachment3D" type="BoneAttachment3D" parent="Player/Skeleton3D" index="8" unique_id=1942551199]
 transform = Transform3D(0.9951041, 0.034713183, 0.0925358, -0.05665105, 0.9675492, 0.24625036, -0.080984816, -0.250287, 0.9647787, 0.012665408, 1.3416644, -0.045175303)
 bone_name = "mixamorig_Spine2"
@@ -210,12 +213,12 @@ spot_range = 10.0
 spot_angle = 39.164017
 
 [node name="BoneAttachment3D2" type="BoneAttachment3D" parent="Player/Skeleton3D" index="9" unique_id=547129197]
-transform = Transform3D(0.995211, 0.048736144, 0.08473386, -0.063226454, 0.9820395, 0.17776655, -0.07454834, -0.18227266, 0.98041797, 0.017660601, 1.4808939, -0.08119134)
-bone_name = "mixamorig_Neck"
-bone_idx = 4
+transform = Transform3D(0.996265, 0.02288298, 0.083261505, -0.024328247, 0.9995697, 0.016385093, -0.08285074, -0.018349502, 0.996393, 0.0015661626, 1.0099901, 0.004719237)
+bone_name = "mixamorig_Hips"
+bone_idx = 0
 
 [node name="TwistPivot" type="Node3D" parent="Player/Skeleton3D/BoneAttachment3D2" unique_id=74649789]
-transform = Transform3D(-1, 0, -8.940697e-08, 0, 1, 0, 8.940697e-08, 0, -1, 2.434708e-08, 0.123506546, 0.28512698)
+transform = Transform3D(-1, 0, -8.940697e-08, 0, 1, 0, 8.940697e-08, 0, -1, 2.4230665e-08, 0.6233003, 0.28512698)
 
 [node name="PitchPivot" type="Node3D" parent="Player/Skeleton3D/BoneAttachment3D2/TwistPivot" unique_id=28971009]
 

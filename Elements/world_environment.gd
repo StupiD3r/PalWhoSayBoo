@@ -13,7 +13,7 @@ func _ready() -> void:
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
 	env.ambient_light_sky_contribution = 1.0
 	
-	# 3. Tonemapping for rich daylight contrast
-	env.tonemap_mode = Environment.TONE_MAP_ACES
+	# 3. Tonemapping (Fixed enum constant)
+	env.tonemap_mode = Environment.TONE_MAPPER_ACES
 	
-	environment = env
+	environment = env   
