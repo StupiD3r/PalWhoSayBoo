@@ -217,13 +217,13 @@ transform = Transform3D(0.996265, 0.02288298, 0.083261505, -0.024328247, 0.99956
 bone_name = "mixamorig_Hips"
 bone_idx = 0
 
-[node name="TwistPivot" type="Node3D" parent="Player/Skeleton3D/BoneAttachment3D2" unique_id=74649789]
-transform = Transform3D(-1, 0, -8.940697e-08, 0, 1, 0, 8.940697e-08, 0, -1, 2.4230665e-08, 0.6233003, 0.28512698)
+[node name="TwistPivot" type="Node3D" parent="Player/Skeleton3D" index="10" unique_id=74649789]
+transform = Transform3D(-1, 1.3731772e-09, 8.741199e-08, 0, 0.99987656, -0.015707318, -8.742278e-08, -0.015707316, -0.9998766, 0.039569255, 1.637694, 0.27738053)
 
-[node name="PitchPivot" type="Node3D" parent="Player/Skeleton3D/BoneAttachment3D2/TwistPivot" unique_id=28971009]
+[node name="PitchPivot" type="Node3D" parent="Player/Skeleton3D/TwistPivot" unique_id=28971009]
 
-[node name="FirstPersonCam" type="Camera3D" parent="Player/Skeleton3D/BoneAttachment3D2/TwistPivot/PitchPivot" unique_id=1015633174]
-transform = Transform3D(0.9998476, -0.017452404, 0, 0.017452404, 0.9998476, 0, 0, 0, 1, 0.0013733275, 0.023322113, 0.041294694)
+[node name="FirstPersonCam" type="Camera3D" parent="Player/Skeleton3D/TwistPivot/PitchPivot" unique_id=1015633174]
+transform = Transform3D(0.9998476, -0.017452404, 0, 0.017452404, 0.9998476, 0, 0, 0, 1, 0, 0.023, 0.041)
 
 [node name="AnimationPlayer" parent="Player" index="1" unique_id=1265143217]
 libraries/custom = SubResource("AnimationLibrary_twyhr")

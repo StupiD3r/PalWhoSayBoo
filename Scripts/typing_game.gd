@@ -1,4 +1,4 @@
-extends Control
+extends CanvasLayer
 
 @export var next_word_label: RichTextLabel
 @export var current_word_label: RichTextLabel
@@ -107,7 +107,7 @@ func _unhandled_input(event: InputEvent):
 			
 			# Trigger player climb step + pass current WPM for audio pitch scaling
 			if player and player.has_method("climb_step"):
-				player.climb_step(current_wpm)
+				player.climb_step()
 			
 			# Trigger UI label pop juice
 			animate_correct_type()
@@ -138,11 +138,11 @@ func trigger_elimination():
 
 func update_ui():
 	if current_word_label:
-		current_word_label.text = "[center][color=green]" + typed_text + "[/color]" + current_word.substr(typed_text.length()) + "[/center]"
-		
-	if next_word_label:
-		next_word_label.text = "[center][color=gray]" + next_word + "[/color][/center]"
+		current_word_label.text = "[center]\n[color=green]" + typed_text.to_upper() + "[/color]" + current_word.substr(typed_text.length()).to_upper() + "[/center]"
 
+	if next_word_label:
+		next_word_label.text = "[center]\n[color=gray]" + next_word.to_upper() + "[/color][/center]"
+		
 func on_word_completed():
 	var points_earned = current_word.length() * 10
 	score += points_earned
@@ -171,19 +171,14 @@ func animate_correct_type():
 		.set_ease(Tween.EASE_OUT)
 
 func animate_error_type():
-	if not current_word_label: return
-	
+	if not current_word_label:
+		return
+
 	if shake_tween and shake_tween.is_valid():
 		shake_tween.kill()
-		
-	shake_tween = create_tween().set_parallel(true)
-	
-	# Flash label red briefly
+
 	current_word_label.modulate = Color.RED
-	shake_tween.tween_property(current_word_label, "modulate", Color.WHITE, 0.2)
-	
-	# Horizontal jitter shake
-	var orig_x = current_word_label.position.x
-	current_word_label.position.x = orig_x + 8.0
-	shake_tween.tween_property(current_word_label, "position:x", orig_x, 0.15)\
-		.set_trans(Tween.TRANS_SPRING)
+	shake_tween = create_tween()
+	shake_tween.tween_property(
+		current_word_label, "modulate", Color.WHITE, 0.2
+	)
