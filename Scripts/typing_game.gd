@@ -69,17 +69,21 @@ func start_typing_minigame():
 	update_ui()
 
 func stop_typing_minigame():
+	if not is_active:
+		return
+
+	# End the session before emitting signals so repeated calls do nothing.
+	is_active = false
 	var accuracy: float = 0.0
 	if total_keystrokes > 0:
 		accuracy = (float(total_chars_typed) / float(total_keystrokes)) * 100.0
-		
-	game_over_triggered.emit(score, highest_wpm, current_wpm, accuracy)
 
 	visible = false
-	is_active = false
 	typed_text = ""
 	if next_word_label: next_word_label.text = ""
 	if current_word_label: current_word_label.text = ""
+
+	game_over_triggered.emit(score, highest_wpm, current_wpm, accuracy)
 
 func get_random_word() -> String:
 	var all_words = easy_words + medium_words + hard_words

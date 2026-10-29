@@ -395,6 +395,7 @@ transform = Transform3D(3, 0, 0, -2.2351742e-08, 2.9999993, -2.2351742e-08, 1.19
 
 [connection signal="climbing_started" from="Player" to="TypingUI" method="start_typing_minigame"]
 [connection signal="climbing_stopped" from="Player" to="TypingUI" method="stop_typing_minigame"]
+[connection signal="game_over_triggered" from="TypingUI" to="GameOverUI" method="show_stats"]
 [connection signal="body_entered" from="KnockTrigger" to="KnockTrigger" method="_on_body_entered"]
 [connection signal="body_entered" from="Materials/Radio/RadioTrigger" to="Materials/Radio/RadioTrigger" method="_on_body_entered"]
 
