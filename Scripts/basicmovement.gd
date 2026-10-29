@@ -11,6 +11,7 @@ extends CharacterBody3D
 # --- State Tracking ---
 var is_getting_up: bool = true
 var is_climbing: bool = false
+var typing_uses_space: bool = false
 var target_climb_y: float = 0.0
 var max_climb_y: float = INF
 var min_climb_y: float = 0.0
@@ -66,7 +67,7 @@ func _physics_process(delta: float) -> void:
 
 	if is_climbing:
 		velocity = Vector3.ZERO
-		if Input.is_action_just_pressed("jump"):
+		if Input.is_action_just_pressed("jump") and not typing_uses_space:
 			force_dismount(false)
 		else:
 			# Decay the target, then smoothly follow it without competing tweens.
@@ -78,7 +79,7 @@ func _physics_process(delta: float) -> void:
 	# Gravity & Jump
 	if not is_on_floor():
 		velocity += get_gravity() * delta
-	elif Input.is_action_just_pressed("jump"):
+	elif Input.is_action_just_pressed("jump") and not typing_uses_space:
 		velocity.y = JUMP_VELOCITY
 
 	# Locomotion
@@ -141,6 +142,7 @@ func climb_step(height_per_key: float = 0.3, anim_time_per_key: float = 0.15) ->
 	climb_tween.tween_callback(animator.pause)
 
 func force_dismount(is_failing: bool) -> void:
+	typing_uses_space = false
 	if climb_tween and climb_tween.is_valid():
 		climb_tween.kill()
 	is_climbing = false
