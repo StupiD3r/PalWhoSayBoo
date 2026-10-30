@@ -19,6 +19,10 @@ extends CanvasLayer
 @export var sentence_minimum_seconds: float = 25.0
 @export var challenge_seconds_per_character: float = 0.65
 
+@export_group("Feedback")
+@export var juice_enabled: bool = true
+@export_range(0.0, 1.0) var juice_strength: float = 0.7
+
 signal score_changed(new_score: int)
 signal wpm_changed(new_wpm: int)
 signal game_over_triggered(final_score: int, highest_wpm: int, avg_wpm: int, accuracy: float)
@@ -37,6 +41,76 @@ class QueuedWord:
 	var fill: ColorRect
 	var error_flash: float = 0.0
 	var challenge_kind: String = ""
+	var type_pop: float = 0.0
+	var miss_pop: float = 0.0
+
+# Effects live outside the word layout so they cannot push the queue around.
+class FeedbackOverlay:
+	extends Control
+	var sparks: Array[Dictionary] = []
+	var effects: Array[Control] = []
+	var motions: Array[Tween] = []
+
+	func _process(delta: float) -> void:
+		var had_sparks := not sparks.is_empty()
+		for index in range(sparks.size() - 1, -1, -1):
+			var spark: Dictionary = sparks[index]
+			spark["age"] += delta
+			if spark["age"] >= spark["life"]:
+				sparks.remove_at(index)
+				continue
+			spark["position"] += spark["velocity"] * delta
+			spark["velocity"] += Vector2(0.0, 100.0) * delta
+		if had_sparks:
+			queue_redraw()
+
+	func _draw() -> void:
+		for spark in sparks:
+			var fraction: float = 1.0 - spark["age"] / spark["life"]
+			var tint: Color = spark["color"]
+			tint.a *= fraction
+			draw_circle(spark["position"], spark["radius"] * fraction, tint)
+
+	func burst(origin: Vector2, tint: Color, amount: int) -> void:
+		for index in range(amount):
+			if sparks.size() >= 80:
+				break
+			var angle := randf_range(-PI, 0.0)
+			sparks.append({"position": origin, "velocity": Vector2(cos(angle), sin(angle)) * randf_range(35.0, 95.0), "age": 0.0, "life": randf_range(0.3, 0.55), "color": tint, "radius": randf_range(1.5, 3.0)})
+
+	func float_text(message: String, origin: Vector2, tint: Color, font: Font, large: bool = false) -> void:
+		var popup := Label.new()
+		popup.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		popup.text = message
+		popup.add_theme_font_override("font", font)
+		popup.add_theme_font_size_override("font_size", 22 if large else 18)
+		popup.add_theme_color_override("font_color", tint)
+		popup.add_theme_color_override("font_outline_color", Color(0.02, 0.03, 0.05, 0.8))
+		popup.add_theme_constant_override("outline_size", 3)
+		add_child(popup)
+		popup.position = origin - popup.get_minimum_size() * Vector2(0.5, 0.0)
+		effects.append(popup)
+		var motion := create_tween().set_parallel(true)
+		motions.append(motion)
+		motion.tween_property(popup, "position:y", popup.position.y - 30.0, 0.65).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		motion.tween_property(popup, "modulate:a", 0.0, 0.35).set_delay(0.3)
+		motion.chain().tween_callback(func():
+			effects.erase(popup)
+			motions.erase(motion)
+			popup.queue_free()
+		)
+
+	func clear_effects() -> void:
+		for motion in motions:
+			if motion.is_valid():
+				motion.kill()
+		motions.clear()
+		for effect in effects:
+			if is_instance_valid(effect):
+				effect.queue_free()
+		effects.clear()
+		sparks.clear()
+		queue_redraw()
 
 var easy_words = ["poste", "barya", "kapit", "dulas", "hawak", "bilis", "talon", "tangkad", "panalo", "punongkahoy"]
 var medium_words = ["kawayan", "grasa", "panatag", "pagsisikap", "premyo", "abot", "taas", "pawis"]
@@ -63,6 +137,9 @@ var challenge_active: bool = false
 var challenge_pending: bool = false
 var completed_regular_words: int = 0
 var words_until_challenge: int = 0
+var feedback: FeedbackOverlay
+var typing_streak: int = 0
+var streak_label: RichTextLabel
 var challenge_sentences: Array[String] = [
 	"Iniibig ko ang Pilipinas, aking lupang sinilangan",
 	"I am a Filipino and i am for peace",
@@ -92,11 +169,23 @@ func _ready() -> void:
 	preview_label.add_theme_font_size_override("normal_font_size", 18)
 	preview_label.modulate = Color(0.75, 0.85, 1.0)
 	queue_root.add_child(preview_label)
+	streak_label = RichTextLabel.new()
+	streak_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	streak_label.bbcode_enabled = true
+	streak_label.scroll_active = false
+	streak_label.add_theme_font_override("normal_font", word_font)
+	streak_label.add_theme_font_size_override("normal_font_size", 14)
+	queue_root.add_child(streak_label)
+	_update_streak_ui()
 	queue_row = HBoxContainer.new()
 	queue_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	queue_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	queue_row.add_theme_constant_override("separation", 12)
 	queue_root.add_child(queue_row)
+	feedback = FeedbackOverlay.new()
+	feedback.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	queue_root.add_child(feedback)
+	feedback.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	get_viewport().size_changed.connect(_layout_queue)
 	_layout_queue()
 
@@ -130,9 +219,14 @@ func _process(delta: float) -> void:
 		var entry := word_queue[index]
 		entry.age += delta
 		entry.error_flash = maxf(0.0, entry.error_flash - delta)
-		if entry.age >= timer_grace_seconds + entry.duration:
+		entry.type_pop = maxf(0.0, entry.type_pop - delta * 8.0)
+		entry.miss_pop = maxf(0.0, entry.miss_pop - delta * 6.0)
+		var grace := timer_grace_seconds if not entry.challenge_kind.is_empty() else 0.0
+		if entry.age >= grace + entry.duration:
 			var expired_text := entry.text
 			var was_challenge := not entry.challenge_kind.is_empty()
+			_play_expiration_feedback(entry)
+			_set_typing_streak(0)
 			_remove_word(index)
 			word_expired.emit(expired_text)
 			if not is_active:
@@ -179,6 +273,7 @@ func start_typing_minigame() -> void:
 	completed_regular_words = 0
 	_schedule_challenge()
 	_set_space_typing(false)
+	_set_typing_streak(0)
 	score_changed.emit(0)
 	wpm_changed.emit(0)
 	_spawn_word()
@@ -189,6 +284,7 @@ func stop_typing_minigame() -> void:
 	if not is_active:
 		return
 	is_active = false
+	_set_typing_streak(0)
 	challenge_active = false
 	challenge_pending = false
 	_set_space_typing(false)
@@ -246,6 +342,8 @@ func _layout_queue() -> void:
 	var available_width := maxf(120.0, get_viewport().get_visible_rect().size.x - 48.0)
 	preview_label.position = Vector2(24.0, 0.0)
 	preview_label.size = Vector2(available_width, 80.0)
+	streak_label.position = Vector2(available_width - 156.0, 4.0)
+	streak_label.size = Vector2(180.0, 72.0)
 	queue_row.position = Vector2(24.0, 70.0)
 	queue_row.size = Vector2(available_width, 200.0)
 	var capacity := get_queue_capacity()
@@ -279,12 +377,18 @@ func _refresh_cards() -> void:
 		entry.visual.size.y = entry.track.position.y + 16.0
 		entry.visual.pivot_offset = entry.visual.size * 0.5
 		entry.card.custom_minimum_size.y = entry.visual.size.y + 8.0
-		var lifetime := maxf(0.01, timer_grace_seconds + entry.duration)
+		var grace := timer_grace_seconds if not entry.challenge_kind.is_empty() else 0.0
+		var lifetime := maxf(0.01, grace + entry.duration)
 		var progress := clampf(entry.age / lifetime, 0.0, 1.0)
 		entry.visual.scale = Vector2.ONE * lerpf(0.85, 1.08, progress)
-		var remaining := clampf(1.0 - maxf(0.0, entry.age - timer_grace_seconds) / maxf(entry.duration, 0.01), 0.0, 1.0)
+		var strength := juice_strength if juice_enabled else 0.0
+		entry.visual.scale *= 1.0 + entry.type_pop * 0.045 * strength
+		# Shake only the label locally; its base position never changes.
+		entry.label.position.x = 12.0 + sin(entry.miss_pop * 28.0) * entry.miss_pop * 3.0 * strength
+		entry.visual.modulate.a = lerpf(0.2, 1.0, clampf(entry.age / 0.18, 0.0, 1.0)) if juice_enabled else 1.0
+		var remaining := clampf(1.0 - maxf(0.0, entry.age - grace) / maxf(entry.duration, 0.01), 0.0, 1.0)
 		entry.fill.size = Vector2(entry.track.size.x * remaining, 4.0)
-		if entry.age < timer_grace_seconds:
+		if entry.age < grace:
 			entry.fill.color = Color(0.55, 0.75, 1.0)
 		elif remaining > 0.5:
 			entry.fill.color = Color(0.4, 0.95, 0.6)
@@ -292,7 +396,10 @@ func _refresh_cards() -> void:
 			entry.fill.color = Color(1.0, 0.8, 0.25)
 		else:
 			entry.fill.color = Color(1.0, 0.25, 0.3)
-		entry.visual.modulate = Color(1.0, 0.3, 0.3) if entry.error_flash > 0.0 else Color(1.0, 1.0, 1.0, 1.0 if index == 0 else 0.65)
+		var urgency := (0.75 + 0.25 * sin(entry.age * 12.0)) if juice_enabled and remaining <= 0.25 else 1.0
+		entry.fill.modulate.a = urgency
+		var reveal := entry.visual.modulate.a
+		entry.visual.modulate = Color(1.0, 0.3, 0.3, reveal) if entry.error_flash > 0.0 else Color(1.0, 1.0, 1.0, reveal * (1.0 if index == 0 else 0.65))
 
 func update_ui() -> void:
 	current_word = word_queue[0].text.replace("\n", " ").to_lower() if not word_queue.is_empty() else ""
@@ -320,6 +427,8 @@ func _remove_word(index: int) -> void:
 	update_ui()
 
 func _clear_queue() -> void:
+	if is_instance_valid(feedback):
+		feedback.clear_effects()
 	for entry in word_queue:
 		queue_row.remove_child(entry.card)
 		entry.card.queue_free()
@@ -342,6 +451,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	total_keystrokes += 1
 	var typed_char := char(event.unicode).to_lower()
 	if current_word.begins_with(typed_text + typed_char):
+		_set_typing_streak(typing_streak + 1)
+		word_queue[0].type_pop = 1.0
 		typed_text += typed_char
 		total_chars_typed += 1
 		update_ui()
@@ -350,19 +461,27 @@ func _unhandled_input(event: InputEvent) -> void:
 		if typed_text == current_word:
 			on_word_completed()
 	else:
+		_set_typing_streak(0)
 		if player and player.has_method("on_typing_error"):
 			player.on_typing_error()
 		word_queue[0].error_flash = 0.2
+		word_queue[0].miss_pop = 1.0
 		_refresh_cards()
 	if total_keystrokes >= 20 and float(total_chars_typed) / total_keystrokes < 0.8:
 		trigger_elimination()
 
 func on_word_completed() -> void:
 	var was_challenge := challenge_active
-	score += current_word.length() * 10
+	var points := current_word.length() * 10
+	_play_completion_feedback(word_queue[0], points)
+	score += points
 	score_changed.emit(score)
 	_remove_word(0)
 	if was_challenge:
+		if player:
+			var audio := player.get_node_or_null("PlayerAudio")
+			if audio and audio.has_method("play_sentence_complete"):
+				audio.play_sentence_complete()
 		_finish_challenge()
 		return
 	completed_regular_words += 1
@@ -390,6 +509,8 @@ func _begin_challenge() -> void:
 	var text: String = challenge_sentences.pick_random()
 	var duration := maxf(sentence_minimum_seconds, text.length() * challenge_seconds_per_character)
 	_spawn_word(text, duration, "SENTENCE")
+	if juice_enabled:
+		feedback.float_text("READY", Vector2(get_viewport().get_visible_rect().size.x * 0.5, 210.0), Color(1.0, 0.8, 0.35), word_font, true)
 
 func _finish_challenge() -> void:
 	challenge_active = false
@@ -406,3 +527,42 @@ func trigger_elimination() -> void:
 	if player and player.has_method("force_dismount"):
 		player.force_dismount(true)
 	stop_typing_minigame()
+
+func _feedback_origin(entry: QueuedWord) -> Vector2:
+	var point := entry.track.global_position + entry.track.size * Vector2(0.5, 0.0) * entry.visual.scale
+	return feedback.get_global_transform().affine_inverse() * point
+
+func _play_completion_feedback(entry: QueuedWord, points: int) -> void:
+	if not juice_enabled:
+		return
+	var origin := _feedback_origin(entry)
+	var tint := Color(1.0, 0.8, 0.35) if not entry.challenge_kind.is_empty() else Color(0.5, 1.0, 0.7)
+	feedback.burst(origin, tint, int(lerpf(6.0, 16.0, juice_strength)))
+	feedback.float_text("+" + str(points), origin + Vector2(0.0, 12.0), tint, word_font)
+
+func _play_expiration_feedback(entry: QueuedWord) -> void:
+	if not juice_enabled:
+		return
+	var origin := _feedback_origin(entry)
+	feedback.burst(origin, Color(1.0, 0.35, 0.3), 5)
+	feedback.float_text("TIME UP", origin, Color(1.0, 0.45, 0.4), word_font)
+
+func _set_typing_streak(value: int) -> void:
+	typing_streak = maxi(0, value)
+	# Set pitch before climb_step() plays the existing keystroke sound.
+	if player:
+		var audio := player.get_node_or_null("PlayerAudio")
+		if audio and audio.has_method("set_typing_streak"):
+			audio.set_typing_streak(typing_streak)
+		if typing_streak > 0 and typing_streak % 10 == 0 and audio and audio.has_method("play_combo"):
+			audio.play_combo(typing_streak)
+	_update_streak_ui()
+	if juice_enabled and typing_streak > 0 and typing_streak % 10 == 0:
+		var origin := Vector2(get_viewport().get_visible_rect().size.x - 110.0, 82.0)
+		feedback.float_text(str(typing_streak) + " STREAK", origin, Color(1.0, 0.85, 0.4), word_font)
+
+func _update_streak_ui() -> void:
+	if not is_instance_valid(streak_label):
+		return
+	streak_label.visible = typing_streak >= 5
+	streak_label.text = "[right]\n[color=#ffda66]STREAK " + str(typing_streak) + "[/color][/right]"

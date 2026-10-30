@@ -67,12 +67,9 @@ func _physics_process(delta: float) -> void:
 
 	if is_climbing:
 		velocity = Vector3.ZERO
-		if Input.is_action_just_pressed("jump") and not typing_uses_space:
-			force_dismount(false)
-		else:
-			# Decay the target, then smoothly follow it without competing tweens.
-			target_climb_y = maxf(min_climb_y, target_climb_y - slide_speed * delta)
-			global_position.y = clampf(lerpf(global_position.y, target_climb_y, 1.0 - exp(-20.0 * delta)), min_climb_y, max_climb_y)
+		# Space never dismounts; slide and typing control the climb.
+		target_climb_y = maxf(min_climb_y, target_climb_y - slide_speed * delta)
+		global_position.y = clampf(lerpf(global_position.y, target_climb_y, 1.0 - exp(-20.0 * delta)), min_climb_y, max_climb_y)
 		move_and_slide()
 		return
 
