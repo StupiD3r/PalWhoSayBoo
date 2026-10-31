@@ -9,7 +9,6 @@ extends CharacterBody3D
 @export_range(0.0, 3.0, 0.05) var slide_speed: float = 0.35
 
 # --- State Tracking ---
-var is_getting_up: bool = true
 var is_climbing: bool = false
 var typing_uses_space: bool = false
 var target_climb_y: float = 0.0
@@ -28,22 +27,11 @@ signal climbing_stopped
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	
-	# Getting up sequence timing & camera transition
-	is_getting_up = true
-	var anim_length = animator.play_getting_up()
-	if anim_length > 0.0:
-		var swoop_duration = 1.0
-		var wait_time = max(0.1, anim_length - swoop_duration)
-		await get_tree().create_timer(wait_time).timeout
-		
-		if camera_ctrl.third_person_cam and camera_ctrl.first_person_cam:
-			# --- UPDATED: Pass $Player as the 4th argument ---
-			camera_ctrl.switch_cameras(camera_ctrl.third_person_cam, camera_ctrl.first_person_cam, swoop_duration, $Player)
-			await get_tree().create_timer(swoop_duration).timeout
-			
-	is_getting_up = false
+	# Start standing in first person, with no introductory movement lock.
 	animator.play_idle()
+	if camera_ctrl.first_person_cam:
+		camera_ctrl.first_person_cam.make_current()
+		$Player.visible = false
 
 func _unhandled_input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("ui_cancel"):
@@ -52,18 +40,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		else:
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 			
-	if is_getting_up:
-		return
 		
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		camera_ctrl.handle_mouse_look(event, is_climbing, self)
 
 func _physics_process(delta: float) -> void:
-	if is_getting_up:
-		if not is_on_floor():
-			velocity += get_gravity() * delta
-		move_and_slide()
-		return
 
 	if is_climbing:
 		velocity = Vector3.ZERO

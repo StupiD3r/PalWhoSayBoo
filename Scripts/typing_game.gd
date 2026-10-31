@@ -22,6 +22,8 @@ extends CanvasLayer
 @export_group("Feedback")
 @export var juice_enabled: bool = true
 @export_range(0.0, 1.0) var juice_strength: float = 0.7
+@export var wpm_indicator_threshold: int = 30
+@export var wpm_heartbeat_seconds: float = 0.45
 
 signal score_changed(new_score: int)
 signal wpm_changed(new_wpm: int)
@@ -140,6 +142,11 @@ var words_until_challenge: int = 0
 var feedback: FeedbackOverlay
 var typing_streak: int = 0
 var streak_label: RichTextLabel
+var wpm_indicator: RichTextLabel
+var wpm_indicator_opacity: float = 0.0
+var wpm_heartbeat_clock: float = 1.0
+var previous_indicator_wpm: int = 0
+var wpm_base_scale: float = 1.0
 var challenge_sentences: Array[String] = [
 	"Iniibig ko ang Pilipinas, aking lupang sinilangan",
 	"I am a Filipino and i am for peace",
@@ -177,6 +184,15 @@ func _ready() -> void:
 	streak_label.add_theme_font_size_override("normal_font_size", 14)
 	queue_root.add_child(streak_label)
 	_update_streak_ui()
+	wpm_indicator = RichTextLabel.new()
+	wpm_indicator.name = "BreathingWPM"
+	wpm_indicator.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	wpm_indicator.bbcode_enabled = true
+	wpm_indicator.scroll_active = false
+	wpm_indicator.add_theme_font_override("normal_font", word_font)
+	wpm_indicator.add_theme_font_size_override("normal_font_size", 22)
+	wpm_indicator.hide()
+	queue_root.add_child(wpm_indicator)
 	queue_row = HBoxContainer.new()
 	queue_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	queue_row.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -213,6 +229,7 @@ func _process(delta: float) -> void:
 		current_wpm = int((total_chars_typed / 5.0) / (time_elapsed / 60.0))
 		highest_wpm = maxi(highest_wpm, current_wpm)
 		wpm_changed.emit(current_wpm)
+	_update_wpm_indicator(delta)
 
 	# Every card ages independently, including words waiting behind the first.
 	for index in range(word_queue.size() - 1, -1, -1):
@@ -267,6 +284,7 @@ func start_typing_minigame() -> void:
 	total_keystrokes = 0
 	highest_wpm = 0
 	current_wpm = 0
+	_reset_wpm_indicator()
 	typed_text = ""
 	challenge_active = false
 	challenge_pending = false
@@ -284,6 +302,7 @@ func stop_typing_minigame() -> void:
 	if not is_active:
 		return
 	is_active = false
+	_reset_wpm_indicator()
 	_set_typing_streak(0)
 	challenge_active = false
 	challenge_pending = false
@@ -344,6 +363,9 @@ func _layout_queue() -> void:
 	preview_label.size = Vector2(available_width, 80.0)
 	streak_label.position = Vector2(available_width - 156.0, 4.0)
 	streak_label.size = Vector2(180.0, 72.0)
+	wpm_indicator.size = Vector2(260.0, 100.0)
+	wpm_indicator.position = Vector2((get_viewport().get_visible_rect().size.x - 260.0) * 0.5, maxf(240.0, get_viewport().get_visible_rect().size.y - 130.0))
+	wpm_indicator.pivot_offset = wpm_indicator.size * 0.5
 	queue_row.position = Vector2(24.0, 70.0)
 	queue_row.size = Vector2(available_width, 200.0)
 	var capacity := get_queue_capacity()
@@ -484,6 +506,10 @@ func on_word_completed() -> void:
 				audio.play_sentence_complete()
 		_finish_challenge()
 		return
+	if player:
+		var audio := player.get_node_or_null("PlayerAudio")
+		if audio and audio.has_method("play_word_complete"):
+			audio.play_word_complete()
 	completed_regular_words += 1
 	if completed_regular_words >= words_until_challenge:
 		challenge_pending = true
@@ -566,3 +592,44 @@ func _update_streak_ui() -> void:
 		return
 	streak_label.visible = typing_streak >= 5
 	streak_label.text = "[right]\n[color=#ffda66]STREAK " + str(typing_streak) + "[/color][/right]"
+
+func _update_wpm_indicator(delta: float) -> void:
+	var target := 1.0 if is_active and current_wpm >= wpm_indicator_threshold else 0.0
+	wpm_indicator_opacity = move_toward(wpm_indicator_opacity, target, delta * 5.0)
+	wpm_indicator.visible = wpm_indicator_opacity > 0.0
+	if not wpm_indicator.visible:
+		wpm_heartbeat_clock = 1.0
+		previous_indicator_wpm = current_wpm
+		wpm_base_scale = 1.0
+		return
+	if current_wpm > previous_indicator_wpm:
+		wpm_heartbeat_clock = 0.0
+	elif current_wpm < previous_indicator_wpm:
+		wpm_heartbeat_clock = 1.0
+	previous_indicator_wpm = current_wpm
+	wpm_heartbeat_clock += delta / maxf(0.2, wpm_heartbeat_seconds)
+	var strength := juice_strength if juice_enabled else 0.0
+	var speed_growth := clampf(float(current_wpm - wpm_indicator_threshold) / 90.0, 0.0, 1.0)
+	var target_scale := 1.0 + speed_growth * 0.4 * strength
+	# Larger sustained WPM means a larger resting indicator; losses ease down.
+	var response := 9.0 if target_scale > wpm_base_scale else 2.0
+	wpm_base_scale = lerpf(wpm_base_scale, target_scale, 1.0 - exp(-response * delta))
+	if strength == 0.0:
+		wpm_base_scale = 1.0
+	# A strong beat followed by a smaller second beat, then a clean settle.
+	var pulse := 0.0
+	if wpm_heartbeat_clock < 1.0:
+		pulse = exp(-pow((wpm_heartbeat_clock - 0.18) / 0.13, 2.0)) * 0.32
+		pulse += exp(-pow((wpm_heartbeat_clock - 0.52) / 0.17, 2.0)) * 0.14
+	wpm_indicator.scale = Vector2.ONE * (wpm_base_scale + pulse * strength)
+	wpm_indicator.modulate = Color(0.65 + pulse * strength * 0.35, 1.0, 0.82, wpm_indicator_opacity)
+	wpm_indicator.text = "[center]\n" + str(current_wpm) + " WPM[/center]"
+
+func _reset_wpm_indicator() -> void:
+	wpm_indicator_opacity = 0.0
+	wpm_heartbeat_clock = 1.0
+	previous_indicator_wpm = 0
+	wpm_base_scale = 1.0
+	if is_instance_valid(wpm_indicator):
+		wpm_indicator.hide()
+		wpm_indicator.scale = Vector2.ONE

@@ -7,9 +7,12 @@ var typing_streak: int = 0
 
 @export var combo_sounds_enabled: bool = true
 @export_range(-40.0, 0.0) var combo_volume_db: float = -15.0
+@export var word_complete_enabled: bool = true
+@export_range(-40.0, 0.0) var word_complete_volume_db: float = -16.0
 
 var combo_sound: AudioStreamPlayer
 var sentence_sound: AudioStreamPlayer
+var word_complete_sound: AudioStreamPlayer
 
 func _ready() -> void:
 	combo_sound = AudioStreamPlayer.new()
@@ -20,6 +23,17 @@ func _ready() -> void:
 	sentence_sound.name = "SentenceSound"
 	sentence_sound.stream = preload("res://Assets/Audio/combo/sentence_three_note.wav")
 	add_child(sentence_sound)
+	word_complete_sound = AudioStreamPlayer.new()
+	word_complete_sound.name = "WordCompleteSound"
+	word_complete_sound.stream = preload("res://Assets/Audio/combo/word_complete.wav")
+	add_child(word_complete_sound)
+
+func play_word_complete() -> void:
+	if not word_complete_enabled:
+		return
+	word_complete_sound.volume_db = word_complete_volume_db
+	word_complete_sound.pitch_scale = randf_range(0.97, 1.03)
+	word_complete_sound.play()
 
 func play_combo(streak: int) -> void:
 	if not combo_sounds_enabled or streak < 10 or streak % 10 != 0:
