@@ -178,6 +178,7 @@ var words_until_challenge: int = 0
 var feedback: FeedbackOverlay
 var typing_streak: int = 0
 var streak_label: RichTextLabel
+var streak_pop_clock: float = 1.0
 var missed_word_count: int = 0
 var miss_elimination_percent: int = 5
 var miss_rng := RandomNumberGenerator.new()
@@ -221,7 +222,7 @@ func _ready() -> void:
 	streak_label.bbcode_enabled = true
 	streak_label.scroll_active = false
 	streak_label.add_theme_font_override("normal_font", word_font)
-	streak_label.add_theme_font_size_override("normal_font_size", 14)
+	streak_label.add_theme_font_size_override("normal_font_size", 24)
 	queue_root.add_child(streak_label)
 	_update_streak_ui()
 	wpm_indicator = RichTextLabel.new()
@@ -270,6 +271,7 @@ func _process(delta: float) -> void:
 		highest_wpm = maxi(highest_wpm, current_wpm)
 		wpm_changed.emit(current_wpm)
 	_update_wpm_indicator(delta)
+	_update_streak_animation(delta)
 
 	# Every card ages independently, including words waiting behind the first.
 	for index in range(word_queue.size() - 1, -1, -1):
@@ -406,10 +408,12 @@ func _layout_queue() -> void:
 	var available_width := maxf(120.0, get_viewport().get_visible_rect().size.x - 48.0)
 	preview_label.position = Vector2(24.0, 0.0)
 	preview_label.size = Vector2(available_width, 80.0)
-	streak_label.position = Vector2(available_width - 156.0, 4.0)
-	streak_label.size = Vector2(180.0, 72.0)
-	wpm_indicator.size = Vector2(260.0, 100.0)
-	wpm_indicator.position = Vector2((get_viewport().get_visible_rect().size.x - 260.0) * 0.5, maxf(240.0, get_viewport().get_visible_rect().size.y - 130.0))
+	var viewport_size := get_viewport().get_visible_rect().size
+	streak_label.size = Vector2(300.0, 100.0)
+	streak_label.position = Vector2((viewport_size.x - 300.0) * 0.5, maxf(240.0, viewport_size.y - 130.0))
+	streak_label.pivot_offset = streak_label.size * 0.5
+	wpm_indicator.size = Vector2(180.0, 90.0)
+	wpm_indicator.position = Vector2(viewport_size.x - 204.0, 0.0)
 	wpm_indicator.pivot_offset = wpm_indicator.size * 0.5
 	queue_row.position = Vector2(24.0, 70.0)
 	queue_row.size = Vector2(available_width, 200.0)
@@ -641,6 +645,11 @@ func _play_expiration_feedback(entry: QueuedWord) -> void:
 	feedback.float_text("TIME UP", origin, Color(1.0, 0.45, 0.4), word_font)
 
 func _set_typing_streak(value: int) -> void:
+	if value > typing_streak:
+		streak_pop_clock = 0.0
+	elif value == 0:
+		streak_pop_clock = 1.0
+		streak_label.scale = Vector2.ONE
 	typing_streak = maxi(0, value)
 	# Set pitch before climb_step() plays the existing keystroke sound.
 	if player:
@@ -651,17 +660,23 @@ func _set_typing_streak(value: int) -> void:
 			audio.play_combo(typing_streak)
 	_update_streak_ui()
 	if juice_enabled and typing_streak > 0 and typing_streak % 10 == 0:
-		var origin := Vector2(get_viewport().get_visible_rect().size.x - 110.0, 82.0)
+		var origin := streak_label.position + Vector2(streak_label.size.x * 0.5, -8.0)
 		feedback.float_text(str(typing_streak) + " STREAK", origin, Color(1.0, 0.85, 0.4), word_font)
 
 func _update_streak_ui() -> void:
 	if not is_instance_valid(streak_label):
 		return
-	streak_label.visible = typing_streak >= 5
-	streak_label.text = "[right]\n[color=#ffda66]STREAK " + str(typing_streak) + "[/color][/right]"
+	streak_label.visible = is_active
+	streak_label.text = "[center]\n[color=#ffda66]STREAK " + str(typing_streak) + "[/color][/center]"
+
+func _update_streak_animation(delta: float) -> void:
+	streak_pop_clock = minf(1.0, streak_pop_clock + delta / 0.28)
+	var strength := juice_strength if juice_enabled else 0.0
+	var pop := sin(PI * streak_pop_clock)
+	streak_label.scale = Vector2.ONE * (1.0 + pop * 0.4 * strength)
 
 func _update_wpm_indicator(delta: float) -> void:
-	var target := 1.0 if is_active and current_wpm >= wpm_indicator_threshold else 0.0
+	var target := 1.0 if is_active else 0.0
 	wpm_indicator_opacity = move_toward(wpm_indicator_opacity, target, delta * 5.0)
 	wpm_indicator.visible = wpm_indicator_opacity > 0.0
 	if not wpm_indicator.visible:
@@ -675,7 +690,7 @@ func _update_wpm_indicator(delta: float) -> void:
 		wpm_heartbeat_clock = 1.0
 	previous_indicator_wpm = current_wpm
 	wpm_heartbeat_clock += delta / maxf(0.2, wpm_heartbeat_seconds)
-	var strength := juice_strength if juice_enabled else 0.0
+	var strength := juice_strength if juice_enabled and current_wpm >= wpm_indicator_threshold else 0.0
 	var speed_growth := clampf(float(current_wpm - wpm_indicator_threshold) / 90.0, 0.0, 1.0)
 	var target_scale := 1.0 + speed_growth * 0.4 * strength
 	# Larger sustained WPM means a larger resting indicator; losses ease down.

@@ -4,12 +4,14 @@
 [ext_resource type="PackedScene" uid="uid://ccn6oihw0kr3v" path="res://Assets/chara/Player.fbx" id="2_2ft67"]
 [ext_resource type="Animation" uid="uid://dvtpnjvok52qg" path="res://Assets/chara/Animation/idle.anim" id="3_1pq33"]
 [ext_resource type="Animation" uid="uid://c4p3vag3yayjy" path="res://Assets/chara/Animation/climbing.anim" id="4_qskvw"]
-[ext_resource type="Animation" uid="uid://b5n3ejgdh6ckc" path="res://Assets/chara/Animation/idle2.anim" id="4_twyhr"]
+[ext_resource type="Animation" uid="uid://bj253vy6p50vs" path="res://Assets/chara/Animation/idle2.anim" id="4_twyhr"]
 [ext_resource type="Animation" uid="uid://nilgjl5w1s2s" path="res://Assets/chara/Animation/running.anim" id="5_8a7a3"]
 [ext_resource type="Animation" uid="uid://c6a8ecbdwo1t2" path="res://Assets/chara/Animation/jumping.anim" id="5_esno4"]
 [ext_resource type="Animation" uid="uid://qfrlwoq1kifs" path="res://Assets/chara/Animation/gettingup.anim" id="6_4p8qe"]
 [ext_resource type="Script" uid="uid://c6j1gw8wpamxx" path="res://Elements/player_audio.gd" id="9_lrb5e"]
 [ext_resource type="AudioStream" uid="uid://bfhyd1klgdbwq" path="res://Assets/Audio/wood walk_[cut_2sec].mp3" id="10_4p8qe"]
+[ext_resource type="Script" uid="uid://c2kbxvqxgdjvv" path="res://Elements/player_camera.gd" id="11_8it4a"]
+[ext_resource type="Script" uid="uid://bsqlbsx837ekn" path="res://Elements/player_animator.gd" id="12_re1uu"]
 
 [sub_resource type="GDScript" id="GDScript_lrb5e"]
 script/source = "extends Camera3D
@@ -76,13 +78,15 @@ _data = {
 radius = 0.30908203
 height = 2.074463
 
-[node name="Player" type="CharacterBody3D" unique_id=187821194 groups=["Player"]]
+[node name="Player" type="CharacterBody3D" unique_id=2095757216 groups=["Player"]]
+transform = Transform3D(-8.742278e-08, 0, 2, 0, 2, 0, -2, 0, -8.742278e-08, 0, 0, 0)
+collision_layer = 459007
 script = ExtResource("1_2ft67")
 
-[node name="Player" parent="." unique_id=1275803203 instance=ExtResource("2_2ft67")]
+[node name="Player" parent="." unique_id=54074114 instance=ExtResource("2_2ft67")]
 transform = Transform3D(-1, 0, 8.940697e-08, 0, 1, 0, -8.940697e-08, 0, -1, 0, 0, 0)
 
-[node name="Skeleton3D" parent="Player" index="0" unique_id=817699980]
+[node name="Skeleton3D" parent="Player" index="0" unique_id=524358015]
 bones/0/position = Vector3(0.0015661626, 1.0099901, 0.004719237)
 bones/0/rotation = Quaternion(-0.008692099, 0.041568473, -0.011814292, 0.9990281)
 bones/1/rotation = Quaternion(-0.04932367, -0.0011052589, -0.014387803, 0.9986786)
@@ -194,45 +198,52 @@ bones/63/rotation = Quaternion(0.32987922, 0.0345913, -0.012096686, 0.94331163)
 bones/64/position = Vector3(1.4847884e-10, 0.06943097, -1.6511803e-10)
 bones/64/rotation = Quaternion(6.938894e-18, 1.3010426e-18, 1.7347235e-17, 1)
 
-[node name="Ch23_Suit" parent="Player/Skeleton3D" index="2" unique_id=265984868]
+[node name="Ch23_Suit" parent="Player/Skeleton3D" index="2" unique_id=620486275]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0034780744, 0, 5.0961662e-05)
 
-[node name="BoneAttachment3D" type="BoneAttachment3D" parent="Player/Skeleton3D" index="8" unique_id=1942551199]
+[node name="BoneAttachment3D" type="BoneAttachment3D" parent="Player/Skeleton3D" index="8" unique_id=1476776945]
 transform = Transform3D(0.9951041, 0.034713183, 0.0925358, -0.05665105, 0.9675492, 0.24625036, -0.080984816, -0.250287, 0.9647787, 0.012665408, 1.3416644, -0.045175303)
 bone_name = "mixamorig_Spine2"
 bone_idx = 3
 
-[node name="ClimbingCam" type="Camera3D" parent="Player/Skeleton3D/BoneAttachment3D" unique_id=1457146733]
+[node name="ClimbingCam" type="Camera3D" parent="Player/Skeleton3D/BoneAttachment3D" unique_id=1626180860]
 transform = Transform3D(-1, -7.327544e-08, -4.817662e-08, -9.920953e-10, 0.5587883, -0.8293103, 8.768861e-08, -0.8293103, -0.5587883, -0.0029783875, -0.24021049, -0.6116085)
 script = SubResource("GDScript_lrb5e")
 
-[node name="BoneAttachment3D2" type="BoneAttachment3D" parent="Player/Skeleton3D" index="9" unique_id=547129197]
-transform = Transform3D(0.996265, 0.02288298, 0.083261505, -0.024328247, 0.9995697, 0.016385093, -0.08285074, -0.018349502, 0.996393, 0.0015661626, 1.0099901, 0.004719237)
-bone_name = "mixamorig_Hips"
-bone_idx = 0
+[node name="TwistPivot" type="Node3D" parent="Player/Skeleton3D" index="9" unique_id=1232703836]
+transform = Transform3D(-1, 0, 8.7422755e-08, 0, 0.9999999, 0, -8.7422784e-08, 0, -0.9999997, -8.682948e-09, 1.695893, 0.20511815)
 
-[node name="TwistPivot" type="Node3D" parent="Player/Skeleton3D/BoneAttachment3D2" unique_id=74649789]
-transform = Transform3D(-0.9969589, -0.06357317, 0.045071512, -0.041506585, -0.056324087, -0.9975494, 0.06595599, -0.99638647, 0.053514123, -0.0728561, 0.19677863, -1.5063654)
+[node name="PitchPivot" type="Node3D" parent="Player/Skeleton3D/TwistPivot" unique_id=1249188579]
 
-[node name="PitchPivot" type="Node3D" parent="Player/Skeleton3D/BoneAttachment3D2/TwistPivot" unique_id=28971009]
+[node name="FirstPersonCam" type="Camera3D" parent="Player/Skeleton3D/TwistPivot/PitchPivot" unique_id=1068682399]
+transform = Transform3D(0.50000006, 0, 0, 0, 0.50000006, 0, 0, 0, 0.50000024, 0, 0, 0)
+cull_mask = 524287
 
-[node name="FirstPersonCam" type="Camera3D" parent="Player/Skeleton3D/BoneAttachment3D2/TwistPivot/PitchPivot" unique_id=1015633174]
-transform = Transform3D(0.9998476, -0.017452404, 0, 0.017452404, 0.9998476, 0, 0, 0, 1, 0, 0.023, 0.041)
-
-[node name="AnimationPlayer" parent="Player" index="1" unique_id=945549751]
+[node name="AnimationPlayer" parent="Player" index="1" unique_id=1265143217]
 libraries/custom = SubResource("AnimationLibrary_twyhr")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=764926982]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=504990806]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8243408, 0)
 shape = SubResource("CapsuleShape3D_b0il4")
 
-[node name="TransitionCam" type="Camera3D" parent="." unique_id=206058704]
+[node name="TransitionCam" type="Camera3D" parent="." unique_id=1051616091]
 
-[node name="PlayerAudio" type="Node" parent="." unique_id=1509206385]
+[node name="PlayerAudio" type="Node" parent="." unique_id=1980367898]
 script = ExtResource("9_lrb5e")
 
-[node name="WalkSound" type="AudioStreamPlayer" parent="PlayerAudio" unique_id=1673833116]
+[node name="WalkSound" type="AudioStreamPlayer" parent="PlayerAudio" unique_id=1226558308]
 stream = ExtResource("10_4p8qe")
+volume_db = -14.0
+max_polyphony = 2
 script = ExtResource("9_lrb5e")
+
+[node name="PlayerCamera" type="Node3D" parent="." unique_id=1680190493 node_paths=PackedStringArray("climbing_cam", "transition_cam")]
+script = ExtResource("11_8it4a")
+climbing_cam = NodePath("../Player/Skeleton3D/BoneAttachment3D/ClimbingCam")
+transition_cam = NodePath("../TransitionCam")
+
+[node name="PlayerAnimator" type="Node3D" parent="." unique_id=1418713789 node_paths=PackedStringArray("animation_player")]
+script = ExtResource("12_re1uu")
+animation_player = NodePath("../Player/AnimationPlayer")
 
 [editable path="Player"]

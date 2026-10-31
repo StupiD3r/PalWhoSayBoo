@@ -25,7 +25,7 @@ func _begin_cutscene() -> void:
 	# This matches your latest player hierarchy.
 	if gameplay_camera == null and player != null:
 		gameplay_camera = player.get_node_or_null(
-			"Player/Skeleton3D/BoneAttachment3D2/TwistPivot/PitchPivot/FirstPersonCam"
+		"Player/Skeleton3D/TwistPivot/PitchPivot/FirstPersonCam"
 		) as Camera3D
 
 	if player == null or gameplay_camera == null:

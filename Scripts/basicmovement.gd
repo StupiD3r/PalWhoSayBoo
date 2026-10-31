@@ -2,7 +2,7 @@ extends CharacterBody3D
 
 # --- Movement Settings ---
 @export var SPEED : float = 5.0
-@export var SPRINT_SPEED : float = 8.0 
+@export var SPRINT_SPEED : float = 18.0 
 @export var ACCELERATION : float = 50.0
 @export var DECELERATION : float = 50.0
 @export var JUMP_VELOCITY : float = 4.5
