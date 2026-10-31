@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://co6m3n0frxsuu"]
+
+[ext_resource type="PackedScene" uid="uid://7mr6s0ddubxo" path="res://Assets/Materials/mahogany_table.glb" id="1_x4x43"]
+[ext_resource type="PackedScene" uid="uid://c0akkcfvglhu0" path="res://Assets/Materials/radio_vef202.glb" id="2_nw3yk"]
+[ext_resource type="Script" uid="uid://dfuqcbgcxr6ar" path="res://Assets/Materials/radio_vef_202.gd" id="3_jl8df"]
+[ext_resource type="AudioStream" uid="uid://btfsy6187w1ys" path="res://Assets/Audio/Provincial Jail _ Ilonggo Song.mp3" id="4_q80l2"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_b0il4"]
+size = Vector3(4.249897, 1, 31.34903)
+
+[node name="Materials" type="Node3D" unique_id=1771283708]
+
+[node name="Table" parent="." unique_id=91770079 instance=ExtResource("1_x4x43")]
+transform = Transform3D(0.35, 0, 0, 0, 0.35, 0, 0, 0, 0.35, 25.295937, -0.9193169, 8.020088)
+
+[node name="Radio" parent="Table" unique_id=1159258444 instance=ExtResource("2_nw3yk")]
+transform = Transform3D(0.63533956, 0, -0.77223283, 0, 1, 0, 0.77223283, 0, 0.63533956, 4.6135254, 6.463843, -0.32985687)
+
+[node name="RadioTrigger" type="Area3D" parent="Table/Radio" unique_id=647754067]
+script = ExtResource("3_jl8df")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Table/Radio/RadioTrigger" unique_id=601480085]
+transform = Transform3D(0.68366784, 0, -0.72979325, 0, 1, 0, 0.72979325, 0, 0.68366784, -33.581005, 0, 38.60253)
+shape = SubResource("BoxShape3D_b0il4")
+
+[node name="RadioAudio" type="AudioStreamPlayer3D" parent="Table/Radio/RadioTrigger" unique_id=1440571904]
+transform = Transform3D(2.857143, 0, 1.1920929e-07, 0, 2.857143, 0, -1.1920929e-07, 0, 2.857143, 0, 0, 0)
+stream = ExtResource("4_q80l2")
+max_db = 0.5
+max_distance = 27.0
+
+[connection signal="body_entered" from="Table/Radio/RadioTrigger" to="Table/Radio/RadioTrigger" method="_on_body_entered"]

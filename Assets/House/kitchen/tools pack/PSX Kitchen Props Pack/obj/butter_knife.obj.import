@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://cw8y52r76y28i"
+path="res://.godot/imported/butter_knife.obj-f9d0bb98c8dbf976a2c5895ae7374981.mesh"
+
+[deps]
+
+files=["res://.godot/imported/butter_knife.obj-f9d0bb98c8dbf976a2c5895ae7374981.mesh"]
+
+source_file="res://Assets/House/kitchen/tools pack/PSX Kitchen Props Pack/obj/butter_knife.obj"
+dest_files=["res://.godot/imported/butter_knife.obj-f9d0bb98c8dbf976a2c5895ae7374981.mesh", "res://.godot/imported/butter_knife.obj-f9d0bb98c8dbf976a2c5895ae7374981.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false
