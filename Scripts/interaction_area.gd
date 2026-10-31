@@ -27,6 +27,8 @@ func _input(event):
 		# ONLY attach when not climbing. Pressing 'E' during climb does NOTHING now!
 		if not player_node.is_climbing:
 			player_node.start_climbing(global_position, get_climb_height_limit())
+			# The attaching key must not also reach the new typing session.
+			get_viewport().set_input_as_handled()
 			if prompt_label:
 				prompt_label.visible = false
 

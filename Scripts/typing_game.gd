@@ -19,6 +19,10 @@ extends CanvasLayer
 @export var sentence_minimum_seconds: float = 25.0
 @export var challenge_seconds_per_character: float = 0.65
 
+@export_group("Missed Word Risk")
+@export_range(1, 95) var initial_miss_elimination_percent: int = 5
+@export_range(1, 20) var miss_risk_increase_percent: int = 2
+
 @export_group("Feedback")
 @export var juice_enabled: bool = true
 @export_range(0.0, 1.0) var juice_strength: float = 0.7
@@ -114,6 +118,38 @@ class FeedbackOverlay:
 		sparks.clear()
 		queue_redraw()
 
+	func pop_completed_word(source: RichTextLabel, full_text: String, start: int, end: int, font: Font, strength: float) -> void:
+		var ghost := source.duplicate() as RichTextLabel
+		ghost.name = "CompletedWordPop"
+		ghost.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		ghost.modulate = Color.WHITE
+		ghost.set_meta("completed_text", full_text.substr(start, end - start))
+		# Transparent surrounding text preserves the sentence's exact layout.
+		ghost.text = "[center]\n[color=#00000000]" + full_text.left(start).to_upper() + "[/color][color=#80f5a0]" + full_text.substr(start, end - start).to_upper() + "[/color][color=#00000000]" + full_text.substr(end).to_upper() + "[/color][/center]"
+		add_child(ghost)
+		ghost.size = source.size
+		var font_size := source.get_theme_font_size("normal_font_size")
+		var parsed := "\n" + full_text.to_upper()
+		var line := source.get_character_line(start + 1)
+		var line_range := source.get_line_range(line)
+		var prefix := parsed.substr(line_range.x, maxi(0, start + 1 - line_range.x))
+		var prefix_width := font.get_string_size(prefix, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+		var word_width := font.get_string_size(full_text.substr(start, end - start).to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+		ghost.pivot_offset = Vector2((source.size.x - source.get_line_width(line)) * 0.5 + prefix_width + word_width * 0.5, source.get_line_offset(line) + source.get_line_height(line) * 0.5)
+		var origin := get_global_transform().affine_inverse() * source.global_position
+		ghost.scale = source.get_global_transform().get_scale() / get_global_transform().get_scale()
+		ghost.position = origin + ghost.pivot_offset * (ghost.scale - Vector2.ONE)
+		effects.append(ghost)
+		var motion := create_tween().set_parallel(true)
+		motions.append(motion)
+		motion.tween_property(ghost, "scale", ghost.scale * (1.0 + 0.4 * strength), 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		motion.tween_property(ghost, "modulate:a", 0.0, 0.28).set_delay(0.1)
+		motion.chain().tween_callback(func():
+			effects.erase(ghost)
+			motions.erase(motion)
+			ghost.queue_free()
+		)
+
 var easy_words = ["poste", "barya", "kapit", "dulas", "hawak", "bilis", "talon", "tangkad", "panalo", "punongkahoy"]
 var medium_words = ["kawayan", "grasa", "panatag", "pagsisikap", "premyo", "abot", "taas", "pawis"]
 var hard_words = ["palosebo", "madulas", "tradisyon", "piyesta", "kampyeon", "pagsubok"]
@@ -142,6 +178,9 @@ var words_until_challenge: int = 0
 var feedback: FeedbackOverlay
 var typing_streak: int = 0
 var streak_label: RichTextLabel
+var missed_word_count: int = 0
+var miss_elimination_percent: int = 5
+var miss_rng := RandomNumberGenerator.new()
 var wpm_indicator: RichTextLabel
 var wpm_indicator_opacity: float = 0.0
 var wpm_heartbeat_clock: float = 1.0
@@ -157,6 +196,7 @@ var challenge_sentences: Array[String] = [
 
 func _ready() -> void:
 	visible = false
+	miss_rng.randomize()
 	word_font = load("res://Assets/font/BARABARA-final.otf") as Font
 	# Keep existing exported references compatible with the saved scene.
 	if current_word_label:
@@ -248,6 +288,9 @@ func _process(delta: float) -> void:
 			word_expired.emit(expired_text)
 			if not is_active:
 				return
+			_apply_missed_word_risk()
+			if not is_active:
+				return
 			if was_challenge:
 				_finish_challenge()
 				return
@@ -284,6 +327,8 @@ func start_typing_minigame() -> void:
 	total_keystrokes = 0
 	highest_wpm = 0
 	current_wpm = 0
+	missed_word_count = 0
+	miss_elimination_percent = clampi(initial_miss_elimination_percent, 1, 95)
 	_reset_wpm_indicator()
 	typed_text = ""
 	challenge_active = false
@@ -478,6 +523,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		typed_text += typed_char
 		total_chars_typed += 1
 		update_ui()
+		if challenge_active and typed_char != " ":
+			var end := typed_text.length()
+			if end == current_word.length() or current_word.substr(end, 1) == " ":
+				var start := current_word.left(end).rfind(" ") + 1
+				_play_completed_word_pop(word_queue[0], start, end)
 		if player and player.has_method("climb_step"):
 			player.climb_step()
 		if typed_text == current_word:
@@ -494,6 +544,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func on_word_completed() -> void:
 	var was_challenge := challenge_active
+	if not was_challenge:
+		_play_completed_word_pop(word_queue[0], 0, current_word.length())
 	var points := current_word.length() * 10
 	_play_completion_feedback(word_queue[0], points)
 	score += points
@@ -554,9 +606,24 @@ func trigger_elimination() -> void:
 		player.force_dismount(true)
 	stop_typing_minigame()
 
+func _apply_missed_word_risk() -> void:
+	# Roll the current chance first; the increase applies to the next miss.
+	var chance := miss_elimination_percent
+	missed_word_count += 1
+	miss_elimination_percent = mini(95, chance + miss_risk_increase_percent)
+	if _roll_miss_elimination(chance):
+		trigger_elimination()
+
+func _roll_miss_elimination(chance_percent: int) -> bool:
+	return miss_rng.randi_range(1, 100) <= chance_percent
+
 func _feedback_origin(entry: QueuedWord) -> Vector2:
 	var point := entry.track.global_position + entry.track.size * Vector2(0.5, 0.0) * entry.visual.scale
 	return feedback.get_global_transform().affine_inverse() * point
+
+func _play_completed_word_pop(entry: QueuedWord, start: int, end: int) -> void:
+	if juice_enabled and juice_strength > 0.0:
+		feedback.pop_completed_word(entry.label, entry.text, start, end, word_font, juice_strength)
 
 func _play_completion_feedback(entry: QueuedWord, points: int) -> void:
 	if not juice_enabled:
