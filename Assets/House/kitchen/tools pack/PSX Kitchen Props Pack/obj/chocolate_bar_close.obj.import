@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://dwo5x0q0f237l"
+path="res://.godot/imported/chocolate_bar_close.obj-0fe9b75bff82dfa1d74c6d5fa4e0af63.mesh"
+
+[deps]
+
+files=["res://.godot/imported/chocolate_bar_close.obj-0fe9b75bff82dfa1d74c6d5fa4e0af63.mesh"]
+
+source_file="res://Assets/House/kitchen/tools pack/PSX Kitchen Props Pack/obj/chocolate_bar_close.obj"
+dest_files=["res://.godot/imported/chocolate_bar_close.obj-0fe9b75bff82dfa1d74c6d5fa4e0af63.mesh", "res://.godot/imported/chocolate_bar_close.obj-0fe9b75bff82dfa1d74c6d5fa4e0af63.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false
