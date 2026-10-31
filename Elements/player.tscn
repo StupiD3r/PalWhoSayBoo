@@ -235,7 +235,6 @@ script = ExtResource("9_lrb5e")
 stream = ExtResource("10_4p8qe")
 volume_db = -14.0
 max_polyphony = 2
-script = ExtResource("9_lrb5e")
 
 [node name="PlayerCamera" type="Node3D" parent="." unique_id=1680190493 node_paths=PackedStringArray("climbing_cam", "transition_cam")]
 script = ExtResource("11_8it4a")

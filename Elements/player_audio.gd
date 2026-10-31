@@ -1,9 +1,12 @@
 extends Node
 
-@onready var step_sound: AudioStreamPlayer = $StepSound
+@onready var step_sound: AudioStreamPlayer = get_node_or_null("StepSound") as AudioStreamPlayer
 @onready var walk_sound: AudioStreamPlayer = $WalkSound # --- NEW ---
 
 var typing_streak: int = 0
+
+@export var typing_sounds_enabled: bool = true
+@export_range(-40.0, 0.0) var typing_volume_db: float = -18.0
 
 @export var combo_sounds_enabled: bool = true
 @export_range(-40.0, 0.0) var combo_volume_db: float = -15.0
@@ -15,6 +18,13 @@ var sentence_sound: AudioStreamPlayer
 var word_complete_sound: AudioStreamPlayer
 
 func _ready() -> void:
+	if step_sound == null:
+		step_sound = AudioStreamPlayer.new()
+		step_sound.name = "StepSound"
+		add_child(step_sound)
+	step_sound.stream = preload("res://Assets/Audio/soul_serenity_sounds-typing-sound-03-229862.mp3")
+	step_sound.max_polyphony = 3
+	step_sound.volume_db = typing_volume_db
 	combo_sound = AudioStreamPlayer.new()
 	combo_sound.name = "ComboSound"
 	combo_sound.stream = preload("res://Assets/Audio/combo/combo_click_chime.wav")
@@ -61,7 +71,8 @@ func get_climb_pitch() -> float:
 	return clampf(lerpf(0.96, 1.3, progress) + randf_range(-0.015, 0.015), 0.94, 1.3)
 
 func play_climb_step() -> void:
-	if step_sound:
+	if typing_sounds_enabled and step_sound:
+		step_sound.volume_db = typing_volume_db
 		step_sound.pitch_scale = get_climb_pitch()
 		step_sound.play()
 
