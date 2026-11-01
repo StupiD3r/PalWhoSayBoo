@@ -16,6 +16,13 @@ var typing_streak: int = 0
 var combo_sound: AudioStreamPlayer
 var sentence_sound: AudioStreamPlayer
 var word_complete_sound: AudioStreamPlayer
+@export var punishment_sounds_enabled: bool = true
+@export_range(-40.0, 0.0) var mistake_volume_db: float = -18.0
+@export_range(-40.0, 0.0) var monster_warning_volume_db: float = -24.0
+@export_range(-40.0, 0.0) var miss_swipe_volume_db: float = -16.0
+var mistake_sound: AudioStreamPlayer
+var monster_warning_sound: AudioStreamPlayer
+var miss_swipe_sound: AudioStreamPlayer
 
 func _ready() -> void:
 	if step_sound == null:
@@ -37,6 +44,33 @@ func _ready() -> void:
 	word_complete_sound.name = "WordCompleteSound"
 	word_complete_sound.stream = preload("res://Assets/Audio/combo/word_complete.wav")
 	add_child(word_complete_sound)
+	mistake_sound = _punishment_player("MistakeScrape", preload("res://Assets/Audio/combo/typing_error_scrape.wav"))
+	mistake_sound.max_polyphony = 2
+	monster_warning_sound = _punishment_player("MonsterWarning", preload("res://Assets/Audio/combo/monster_warning.wav"))
+	miss_swipe_sound = _punishment_player("MissSwipe", preload("res://Assets/Audio/combo/miss_swipe_breath.wav"))
+
+func _punishment_player(sound_name: String, stream: AudioStream) -> AudioStreamPlayer:
+	var sound := AudioStreamPlayer.new()
+	sound.name = sound_name
+	sound.stream = stream
+	sound.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(sound)
+	return sound
+
+func play_typing_mistake(repeated: bool) -> void:
+	if not punishment_sounds_enabled:
+		return
+	mistake_sound.volume_db = mistake_volume_db
+	mistake_sound.pitch_scale = randf_range(0.95, 1.05)
+	mistake_sound.play()
+	if repeated and not monster_warning_sound.playing:
+		monster_warning_sound.volume_db = monster_warning_volume_db
+		monster_warning_sound.play()
+
+func play_miss_swipe() -> void:
+	if punishment_sounds_enabled:
+		miss_swipe_sound.volume_db = miss_swipe_volume_db
+		miss_swipe_sound.play()
 
 func play_word_complete() -> void:
 	if not word_complete_enabled:

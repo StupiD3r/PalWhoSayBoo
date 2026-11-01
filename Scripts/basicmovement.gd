@@ -7,6 +7,8 @@ extends CharacterBody3D
 @export var DECELERATION : float = 50.0
 @export var JUMP_VELOCITY : float = 4.5
 @export_range(0.0, 3.0, 0.05) var slide_speed: float = 0.35
+@export_range(0.0, 1.0, 0.05) var typo_slip_distance: float = 0.15
+@export_range(0.0, 2.0, 0.05) var repeated_typo_slip_distance: float = 0.30
 
 # --- State Tracking ---
 var is_climbing: bool = false
@@ -15,6 +17,7 @@ var target_climb_y: float = 0.0
 var max_climb_y: float = INF
 var min_climb_y: float = 0.0
 var climb_tween: Tween
+var consecutive_typing_errors: int = 0
 
 # --- Signals ---
 signal climbing_started
@@ -83,6 +86,7 @@ func _physics_process(delta: float) -> void:
 # --- CLIMBING LOGIC ---
 func start_climbing(pole_position: Vector3, height_limit: float = INF) -> void:
 	is_climbing = true
+	consecutive_typing_errors = 0
 	velocity = Vector3.ZERO
 	
 	# 1. Unhide player mesh so character is visible on the pole!
@@ -106,6 +110,7 @@ func start_climbing(pole_position: Vector3, height_limit: float = INF) -> void:
 
 func climb_step(height_per_key: float = 0.3, anim_time_per_key: float = 0.15) -> void:
 	if not is_climbing: return
+	consecutive_typing_errors = 0
 	
 	audio_ctrl.play_climb_step()
 	target_climb_y = minf(target_climb_y + height_per_key, max_climb_y)
@@ -120,6 +125,7 @@ func climb_step(height_per_key: float = 0.3, anim_time_per_key: float = 0.15) ->
 	climb_tween.tween_callback(animator.pause)
 
 func force_dismount(is_failing: bool) -> void:
+	consecutive_typing_errors = 0
 	typing_uses_space = false
 	if climb_tween and climb_tween.is_valid():
 		climb_tween.kill()
@@ -129,3 +135,15 @@ func force_dismount(is_failing: bool) -> void:
 	camera_ctrl.reset_pivots(self)
 	camera_ctrl.switch_cameras(camera_ctrl.climbing_cam, camera_ctrl.first_person_cam, 0.4)
 	climbing_stopped.emit()
+
+func on_typing_error() -> void:
+	if not is_climbing:
+		return
+	consecutive_typing_errors += 1
+	var repeated := consecutive_typing_errors % 3 == 0
+	var distance := repeated_typo_slip_distance if repeated else typo_slip_distance
+	# Move both the actual height and its target so queued steps cannot erase the slip.
+	global_position.y = maxf(min_climb_y, global_position.y - distance)
+	target_climb_y = maxf(min_climb_y, target_climb_y - distance)
+	if audio_ctrl and audio_ctrl.has_method("play_typing_mistake"):
+		audio_ctrl.play_typing_mistake(repeated)

@@ -1,5 +1,7 @@
 extends CanvasLayer
 
+const MissScratch = preload("res://Scripts/miss_scratch_effect.gd")
+
 @export var next_word_label: RichTextLabel
 @export var current_word_label: RichTextLabel
 @export var player: CharacterBody3D
@@ -178,6 +180,7 @@ var words_until_challenge: int = 0
 var feedback: FeedbackOverlay
 var typing_streak: int = 0
 var streak_label: RichTextLabel
+var scratch_effect: CanvasLayer
 var streak_pop_clock: float = 1.0
 var missed_word_count: int = 0
 var miss_elimination_percent: int = 5
@@ -245,6 +248,9 @@ func _ready() -> void:
 	feedback.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	get_viewport().size_changed.connect(_layout_queue)
 	_layout_queue()
+	scratch_effect = MissScratch.new()
+	# A sibling layer can finish a fatal swipe after the typing UI is hidden.
+	get_parent().add_child.call_deferred(scratch_effect)
 
 func get_phase() -> int:
 	return int(time_elapsed / maxf(phase_seconds, 1.0))
@@ -320,6 +326,8 @@ func _process(delta: float) -> void:
 	_refresh_cards()
 
 func start_typing_minigame() -> void:
+	if is_instance_valid(scratch_effect):
+		scratch_effect.reset_effect()
 	_clear_queue()
 	visible = true
 	is_active = true
@@ -641,9 +649,18 @@ func _play_completion_feedback(entry: QueuedWord, points: int) -> void:
 func _play_expiration_feedback(entry: QueuedWord) -> void:
 	if not juice_enabled:
 		return
+	if is_instance_valid(scratch_effect) and scratch_effect.play_strike(juice_strength):
+		if player:
+			var audio := player.get_node_or_null("PlayerAudio")
+			if audio and audio.has_method("play_miss_swipe"):
+				audio.play_miss_swipe()
 	var origin := _feedback_origin(entry)
 	feedback.burst(origin, Color(1.0, 0.35, 0.3), 5)
 	feedback.float_text("TIME UP", origin, Color(1.0, 0.45, 0.4), word_font)
+
+func _exit_tree() -> void:
+	if is_instance_valid(scratch_effect) and not scratch_effect.is_queued_for_deletion():
+		scratch_effect.queue_free()
 
 func _set_typing_streak(value: int) -> void:
 	if value > typing_streak:
