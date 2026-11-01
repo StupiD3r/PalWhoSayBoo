@@ -1,5 +1,7 @@
 extends Node3D
 
+const RetryWake = preload("res://Scripts/retry_wake_sequence.gd")
+
 @export var player: CharacterBody3D
 @export var gameplay_camera: Camera3D
 
@@ -16,6 +18,9 @@ func _ready() -> void:
 
 
 func _begin_cutscene() -> void:
+	var is_retry := bool(Engine.get_meta(RetryWake.RETRY_META, false))
+	if Engine.has_meta(RetryWake.RETRY_META):
+		Engine.remove_meta(RetryWake.RETRY_META)
 	# Find your existing player if it wasn't assigned.
 	if player == null:
 		player = get_parent().get_node_or_null(
@@ -32,6 +37,18 @@ func _begin_cutscene() -> void:
 		push_error(
 			"Assign Player and Gameplay Camera on OpeningCutscene."
 		)
+		return
+
+	if is_retry:
+		# Keep the initial AnimationPlayer sequence unchanged; retries use FPV.
+		previous_process_mode = player.process_mode
+		player.process_mode = Node.PROCESS_MODE_DISABLED
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		animation_player.stop()
+		var retry := RetryWake.new()
+		retry.name = "RetryWake"
+		add_child(retry)
+		retry.play(player, gameplay_camera, cutscene_camera, get_node_or_null("BlinkLayer/Eyelids") as Control, _on_animation_finished.bind(&"intro"))
 		return
 
 	if not animation_player.has_animation("intro"):

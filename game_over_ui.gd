@@ -225,7 +225,14 @@ func _unlock_player() -> void:
 func _on_restart_button_pressed() -> void:
 	if awaiting_name:
 		return
-	get_tree().reload_current_scene()
+	restart_button.disabled = true
+	Engine.set_meta("pal_who_say_boo_retry_wake", true)
+	var error := get_tree().reload_current_scene()
+	if error != OK:
+		Engine.remove_meta("pal_who_say_boo_retry_wake")
+		restart_button.disabled = false
+		status_label.text = "Could not restart the game. Please try again."
+		status_label.show()
 
 func hide_stats() -> void:
 	visible = false
