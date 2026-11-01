@@ -20,6 +20,7 @@ var pending_accuracy: float = 0.0
 var pending_correct_characters: int = 0
 var leaderboard_view: CanvasLayer
 var record_label: Label
+var failure_label: Label
 var name_form: VBoxContainer
 var name_prompt: Label
 var name_input: LineEdit
@@ -75,6 +76,13 @@ func _build_results_ui() -> void:
 	record_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.4))
 	results_column.add_child(record_label)
 	results_column.move_child(record_label, 1)
+	failure_label = Label.new()
+	failure_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	failure_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	failure_label.add_theme_font_size_override("font_size", 18)
+	failure_label.add_theme_color_override("font_color", Color(1.0, 0.55, 0.5))
+	results_column.add_child(failure_label)
+	results_column.move_child(failure_label, 1)
 	name_form = VBoxContainer.new()
 	name_form.add_theme_constant_override("separation", 8)
 	results_column.add_child(name_form)
@@ -131,6 +139,11 @@ func show_stats(final_score: int, peak_wpm: int, avg_wpm: int, accuracy: float) 
 	pending_accuracy = accuracy
 	pending_correct_characters = 0
 	var typing := get_parent().get_node_or_null("TypingUI")
+	failure_label.text = "Your run has ended."
+	if typing and typing.get("failure_reason") is String:
+		var reason: String = typing.get("failure_reason")
+		if not reason.is_empty():
+			failure_label.text = reason
 	if typing and typing.get("total_chars_typed") is int:
 		pending_correct_characters = typing.get("total_chars_typed")
 	awaiting_name = true

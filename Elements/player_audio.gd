@@ -23,6 +23,8 @@ var word_complete_sound: AudioStreamPlayer
 var mistake_sound: AudioStreamPlayer
 var monster_warning_sound: AudioStreamPlayer
 var miss_swipe_sound: AudioStreamPlayer
+var landing_sound: AudioStreamPlayer
+@export_range(-40.0, 0.0) var landing_volume_db: float = -16.0
 
 func _ready() -> void:
 	if step_sound == null:
@@ -48,6 +50,42 @@ func _ready() -> void:
 	mistake_sound.max_polyphony = 2
 	monster_warning_sound = _punishment_player("MonsterWarning", preload("res://Assets/Audio/combo/monster_warning.wav"))
 	miss_swipe_sound = _punishment_player("MissSwipe", preload("res://Assets/Audio/combo/miss_swipe_breath.wav"))
+	landing_sound = AudioStreamPlayer.new()
+	landing_sound.name = "LandingImpact"
+	landing_sound.stream = _make_landing_impact()
+	add_child(landing_sound)
+
+func _make_landing_impact() -> AudioStreamWAV:
+	# A short low thud with a soft shoe scuff; generated once on startup.
+	var sample_rate := 22050
+	var samples := int(sample_rate * 0.26)
+	var data := PackedByteArray()
+	data.resize(samples * 2)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 4817
+	var filtered_noise := 0.0
+	for index in range(samples):
+		var time := float(index) / sample_rate
+		filtered_noise = lerpf(filtered_noise, rng.randf_range(-1.0, 1.0), 0.22)
+		var attack := minf(time / 0.005, 1.0)
+		var thud := sin(TAU * (70.0 * time - 65.0 * time * time)) * exp(-22.0 * time)
+		var scuff := filtered_noise * exp(-30.0 * time) * 0.65
+		var value := clampf((thud * 0.6 + scuff) * attack, -1.0, 1.0)
+		data.encode_s16(index * 2, int(value * 32767.0))
+	var stream := AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = sample_rate
+	stream.data = data
+	return stream
+
+func play_landing(fall_speed: float) -> void:
+	if fall_speed < 2.5:
+		return
+	var strength := clampf(inverse_lerp(2.5, 12.0, fall_speed), 0.0, 1.0)
+	stop_walk_step()
+	landing_sound.volume_db = landing_volume_db + lerpf(-6.0, 0.0, strength)
+	landing_sound.pitch_scale = lerpf(1.08, 0.85, strength)
+	landing_sound.play()
 
 func _punishment_player(sound_name: String, stream: AudioStream) -> AudioStreamPlayer:
 	var sound := AudioStreamPlayer.new()

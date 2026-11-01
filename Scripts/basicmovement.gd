@@ -58,6 +58,7 @@ func _physics_process(delta: float) -> void:
 		return
 
 	# Gravity & Jump
+	var was_grounded := is_on_floor()
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 	elif Input.is_action_just_pressed("jump") and not typing_uses_space:
@@ -78,7 +79,11 @@ func _physics_process(delta: float) -> void:
 		velocity.z = move_toward(velocity.z, 0, DECELERATION * delta)
 		audio_ctrl.stop_walk_step()
 
+	var fall_speed := maxf(0.0, -velocity.y)
 	move_and_slide()
+	if not was_grounded and is_on_floor() and fall_speed >= 2.5:
+		if camera_ctrl.play_landing(fall_speed):
+			audio_ctrl.play_landing(fall_speed)
 	
 	var horizontal_speed = Vector2(velocity.x, velocity.z).length()
 	animator.update_ground_animation(horizontal_speed, is_on_floor(), Input.is_action_pressed("run"))

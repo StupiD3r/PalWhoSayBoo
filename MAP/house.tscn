@@ -1015,7 +1015,7 @@ transform = Transform3D(0.63533956, 0, -0.77223283, 0, 1, 0, 0.77223283, 0, 0.63
 script = ExtResource("21_ddvw4")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Radio and Table at room 2/Table/Radio/RadioTrigger" unique_id=601480085]
-transform = Transform3D(0.68366784, 0, -0.72979325, 0, 1, 0, 0.72979325, 0, 0.68366784, -33.581005, 0, 38.60253)
+transform = Transform3D(0.7883169, 0, -0.61526954, 0, 1, 0, 0.61526954, 0, 0.7883169, -29.666573, 0, 41.823055)
 shape = SubResource("BoxShape3D_b0il4")
 
 [node name="RadioAudio" type="AudioStreamPlayer3D" parent="Radio and Table at room 2/Table/Radio/RadioTrigger" unique_id=1440571904]

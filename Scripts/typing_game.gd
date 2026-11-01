@@ -160,6 +160,7 @@ var current_word: String = ""
 var next_word: String = ""
 var typed_text: String = ""
 var is_active: bool = false
+var failure_reason: String = ""
 var score: int = 0
 var time_elapsed: float = 0.0
 var total_chars_typed: int = 0
@@ -297,7 +298,7 @@ func _process(delta: float) -> void:
 			word_expired.emit(expired_text)
 			if not is_active:
 				return
-			_apply_missed_word_risk()
+			_apply_missed_word_risk("sentence" if was_challenge else "word")
 			if not is_active:
 				return
 			if was_challenge:
@@ -331,6 +332,7 @@ func start_typing_minigame() -> void:
 	_clear_queue()
 	visible = true
 	is_active = true
+	failure_reason = ""
 	score = 0
 	time_elapsed = 0.0
 	spawn_elapsed = 0.0
@@ -553,7 +555,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		word_queue[0].miss_pop = 1.0
 		_refresh_cards()
 	if total_keystrokes >= 20 and float(total_chars_typed) / total_keystrokes < 0.8:
-		trigger_elimination()
+		trigger_elimination("Accuracy too low.\nYour typing accuracy fell below 80%.")
 
 func on_word_completed() -> void:
 	var was_challenge := challenge_active
@@ -612,20 +614,22 @@ func _finish_challenge() -> void:
 	spawn_elapsed = 0.0
 	_spawn_word()
 
-func trigger_elimination() -> void:
+func trigger_elimination(reason: String = "Your run has ended.") -> void:
 	if not is_active:
 		return
+	# Dismount emits climbing_stopped immediately, so set this before it does.
+	failure_reason = reason
 	if player and player.has_method("force_dismount"):
 		player.force_dismount(true)
 	stop_typing_minigame()
 
-func _apply_missed_word_risk() -> void:
+func _apply_missed_word_risk(expired_kind: String = "word") -> void:
 	# Roll the current chance first; the increase applies to the next miss.
 	var chance := miss_elimination_percent
 	missed_word_count += 1
 	miss_elimination_percent = mini(95, chance + miss_risk_increase_percent)
 	if _roll_miss_elimination(chance):
-		trigger_elimination()
+		trigger_elimination("The monster caught you.\nA " + expired_kind + " timed out. Catch chance: " + str(chance) + "%.")
 
 func _roll_miss_elimination(chance_percent: int) -> bool:
 	return miss_rng.randi_range(1, 100) <= chance_percent
