@@ -1,5 +1,8 @@
 extends CanvasLayer
 
+const LeaderboardStore = preload("res://Scripts/leaderboard_store.gd")
+const LeaderboardView = preload("res://Scripts/leaderboard_view.gd")
+
 @export var score_label: Label
 @export var highest_wpm_label: Label
 @export var average_wpm_label: Label
@@ -11,6 +14,11 @@ var best_player: String = ""
 var last_player_name: String = ""
 var pending_score: int = 0
 var awaiting_name: bool = false
+var pending_peak_wpm: int = 0
+var pending_average_wpm: int = 0
+var pending_accuracy: float = 0.0
+var pending_correct_characters: int = 0
+var leaderboard_view: CanvasLayer
 var record_label: Label
 var name_form: VBoxContainer
 var name_prompt: Label
@@ -98,6 +106,11 @@ func _build_results_ui() -> void:
 	status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	results_column.add_child(status_label)
+	var records_button := Button.new()
+	records_button.text = "Leaderboards / Last 20 Attempts"
+	records_button.custom_minimum_size.y = 44.0
+	records_button.pressed.connect(_open_leaderboards)
+	results_column.add_child(records_button)
 	results_column.move_child(restart_button, results_column.get_child_count() - 1)
 	restart_button.text = "Play Again"
 	restart_button.custom_minimum_size.y = 44.0
@@ -113,6 +126,13 @@ func show_stats(final_score: int, peak_wpm: int, avg_wpm: int, accuracy: float) 
 	_load_record()
 	_update_record_label()
 	pending_score = maxi(0, final_score)
+	pending_peak_wpm = peak_wpm
+	pending_average_wpm = avg_wpm
+	pending_accuracy = accuracy
+	pending_correct_characters = 0
+	var typing := get_parent().get_node_or_null("TypingUI")
+	if typing and typing.get("total_chars_typed") is int:
+		pending_correct_characters = typing.get("total_chars_typed")
 	awaiting_name = true
 	name_prompt.text = "NEW HIGH SCORE! Enter your name." if best_player.is_empty() or pending_score > best_score else "Enter your name for this run."
 	name_input.text = last_player_name
@@ -155,11 +175,9 @@ func _save_player_name() -> void:
 	# Re-read before saving so an existing higher record is never replaced.
 	_load_record()
 	var new_record := best_player.is_empty() or pending_score > best_score
-	var config := ConfigFile.new()
-	config.set_value("record", "score", pending_score if new_record else best_score)
-	config.set_value("record", "name", entered_name if new_record else best_player)
-	config.set_value("player", "last_name", entered_name)
-	if config.save(record_path) != OK:
+	var store := LeaderboardStore.new()
+	store.save_path = record_path
+	if store.record_attempt(entered_name, pending_score, pending_peak_wpm, pending_average_wpm, pending_accuracy, pending_correct_characters) != OK:
 		status_label.text = "Could not save the record. Try again, or choose Skip."
 		status_label.show()
 		return
@@ -175,9 +193,12 @@ func _save_player_name() -> void:
 func _skip_name() -> void:
 	if not awaiting_name:
 		return
+	var store := LeaderboardStore.new()
+	store.save_path = record_path
+	var error := store.record_attempt("", pending_score, pending_peak_wpm, pending_average_wpm, pending_accuracy, pending_correct_characters, false)
 	awaiting_name = false
 	name_form.hide()
-	status_label.text = "Name skipped. The saved record is unchanged."
+	status_label.text = "Attempt recorded as Anonymous. Ranked records are unchanged." if error == OK else "Could not save this attempt. Ranked records are unchanged."
 	status_label.show()
 	restart_button.disabled = false
 	restart_button.grab_focus()
@@ -209,3 +230,17 @@ func _on_restart_button_pressed() -> void:
 func hide_stats() -> void:
 	visible = false
 	_unlock_player()
+
+func _open_leaderboards() -> void:
+	if is_instance_valid(leaderboard_view):
+		return
+	leaderboard_view = LeaderboardView.new()
+	leaderboard_view.record_path = record_path
+	leaderboard_view.closed.connect(func():
+		leaderboard_view = null
+		if awaiting_name:
+			name_input.grab_focus.call_deferred()
+		else:
+			restart_button.grab_focus.call_deferred()
+	)
+	add_child(leaderboard_view)

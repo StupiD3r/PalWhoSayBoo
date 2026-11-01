@@ -268,7 +268,8 @@ func _process(delta: float) -> void:
 		spawn_elapsed = get_spawn_interval()
 	if time_elapsed > 1.0:
 		current_wpm = int((total_chars_typed / 5.0) / (time_elapsed / 60.0))
-		highest_wpm = maxi(highest_wpm, current_wpm)
+		if total_chars_typed >= 20:
+			highest_wpm = maxi(highest_wpm, current_wpm)
 		wpm_changed.emit(current_wpm)
 	_update_wpm_indicator(delta)
 	_update_streak_animation(delta)

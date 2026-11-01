@@ -39,6 +39,8 @@
 [ext_resource type="Texture2D" uid="uid://gergjstlf78a" path="res://Assets/Terrain/Ground/Ground078_2K-PNG/Ground078_2K-jpeg_Color.jpg" id="terrain_dirt"]
 [ext_resource type="Texture2D" uid="uid://du575in7dk1om" path="res://Assets/Terrain/Ground/Ground037_2K-PNG/Ground037_2K-Jpeg_Color.jpg" id="terrain_grass"]
 
+[ext_resource type="PackedScene" path="res://Elements/leaderboard_board.tscn" id="99_leaderboard"]
+
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4ppty"]
 sky_top_color = Color(0.4, 0.52156866, 0.6509804, 1)
 sky_horizon_color = Color(0.84705883, 0.76862746, 0.6666667, 1)
@@ -3184,6 +3186,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 104.91339, 0, 42.554314)
 
 [node name="PointC" type="Marker3D" parent="NPCPatrolPoints" unique_id=633487895]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 127.07738, 0, 42.554314)
+
+[node name="LeaderboardBoard" parent="." instance=ExtResource("99_leaderboard")]
 
 [connection signal="climbing_started" from="Player" to="TypingUI" method="start_typing_minigame"]
 [connection signal="climbing_stopped" from="Player" to="TypingUI" method="stop_typing_minigame"]
