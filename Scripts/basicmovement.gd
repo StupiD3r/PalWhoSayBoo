@@ -50,6 +50,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _physics_process(delta: float) -> void:
 
 	if is_climbing:
+		audio_ctrl.stop_walk_step()
 		velocity = Vector3.ZERO
 		# Space never dismounts; slide and typing control the climb.
 		target_climb_y = maxf(min_climb_y, target_climb_y - slide_speed * delta)
@@ -72,8 +73,6 @@ func _physics_process(delta: float) -> void:
 	if direction:
 		velocity.x = move_toward(velocity.x, direction.x * current_speed, ACCELERATION * delta)
 		velocity.z = move_toward(velocity.z, direction.z * current_speed, ACCELERATION * delta)
-		if is_on_floor(): audio_ctrl.play_walk_step()
-		else: audio_ctrl.stop_walk_step()
 	else:
 		velocity.x = move_toward(velocity.x, 0, DECELERATION * delta)
 		velocity.z = move_toward(velocity.z, 0, DECELERATION * delta)
@@ -86,10 +85,16 @@ func _physics_process(delta: float) -> void:
 			audio_ctrl.play_landing(fall_speed)
 	
 	var horizontal_speed = Vector2(velocity.x, velocity.z).length()
+	if is_on_floor() and direction != Vector3.ZERO and horizontal_speed > 0.15:
+		audio_ctrl.play_walk_step(Input.is_action_pressed("run") and horizontal_speed > SPEED * 1.1)
+	else:
+		audio_ctrl.stop_walk_step()
 	animator.update_ground_animation(horizontal_speed, is_on_floor(), Input.is_action_pressed("run"))
 
 # --- CLIMBING LOGIC ---
 func start_climbing(pole_position: Vector3, height_limit: float = INF) -> void:
+	audio_ctrl.stop_walk_step()
+	audio_ctrl.start_climb_voice()
 	is_climbing = true
 	consecutive_typing_errors = 0
 	velocity = Vector3.ZERO
@@ -130,6 +135,7 @@ func climb_step(height_per_key: float = 0.3, anim_time_per_key: float = 0.15) ->
 	climb_tween.tween_callback(animator.pause)
 
 func force_dismount(is_failing: bool) -> void:
+	audio_ctrl.stop_climb_voice()
 	consecutive_typing_errors = 0
 	typing_uses_space = false
 	if climb_tween and climb_tween.is_valid():

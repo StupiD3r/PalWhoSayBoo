@@ -2,8 +2,20 @@ extends Node
 
 @onready var step_sound: AudioStreamPlayer = get_node_or_null("StepSound") as AudioStreamPlayer
 @onready var walk_sound: AudioStreamPlayer = $WalkSound # --- NEW ---
+var walking_stream: AudioStreamOggVorbis = preload("res://Assets/Audio/walking.ogg")
+var running_stream: AudioStreamOggVorbis = preload("res://Assets/Audio/running.ogg")
+@export_range(-40.0, 0.0) var footstep_volume_db: float = -12.0
 
 var typing_streak: int = 0
+@export_range(-40.0, 0.0) var climb_voice_volume_db: float = -16.0
+var climb_voice: AudioStreamPlayer
+var grunt_stream: AudioStreamOggVorbis = preload("res://Assets/Audio/grunt.ogg")
+var exhaust_stream: AudioStreamOggVorbis = preload("res://Assets/Audio/exhaust.ogg")
+var climb_active: bool = false
+var climb_effort_steps: int = 0
+var climb_voice_cooldown: float = 0.0
+var time_since_climb_step: float = 0.0
+var breath_pending: bool = false
 
 @export var typing_sounds_enabled: bool = true
 @export_range(-40.0, 0.0) var typing_volume_db: float = -18.0
@@ -27,6 +39,17 @@ var landing_sound: AudioStreamPlayer
 @export_range(-40.0, 0.0) var landing_volume_db: float = -16.0
 
 func _ready() -> void:
+	climb_voice = AudioStreamPlayer.new()
+	climb_voice.name = "ClimbVoice"
+	climb_voice.volume_db = climb_voice_volume_db
+	add_child(climb_voice)
+	walking_stream = walking_stream.duplicate() as AudioStreamOggVorbis
+	running_stream = running_stream.duplicate() as AudioStreamOggVorbis
+	walking_stream.loop = true
+	running_stream.loop = true
+	walk_sound.stop()
+	walk_sound.stream = walking_stream
+	walk_sound.volume_db = footstep_volume_db
 	if step_sound == null:
 		step_sound = AudioStreamPlayer.new()
 		step_sound.name = "StepSound"
@@ -54,6 +77,34 @@ func _ready() -> void:
 	landing_sound.name = "LandingImpact"
 	landing_sound.stream = _make_landing_impact()
 	add_child(landing_sound)
+
+func start_climb_voice() -> void:
+	stop_climb_voice()
+	climb_active = true
+
+func stop_climb_voice() -> void:
+	climb_active = false
+	climb_effort_steps = 0
+	climb_voice_cooldown = 0.0
+	time_since_climb_step = 0.0
+	breath_pending = false
+	if is_instance_valid(climb_voice):
+		climb_voice.stop()
+
+func _process(delta: float) -> void:
+	if not climb_active:
+		return
+	climb_voice_cooldown = maxf(0.0, climb_voice_cooldown - delta)
+	time_since_climb_step += delta
+	if breath_pending and time_since_climb_step >= 0.9 and climb_voice_cooldown <= 0.0 and not climb_voice.playing:
+		_play_climb_voice(exhaust_stream)
+		breath_pending = false
+
+func _play_climb_voice(stream: AudioStream) -> void:
+	climb_voice.stream = stream
+	climb_voice.pitch_scale = randf_range(0.97, 1.03)
+	climb_voice.play()
+	climb_voice_cooldown = maxf(2.5, stream.get_length() + 0.8)
 
 func _make_landing_impact() -> AudioStreamWAV:
 	# A short low thud with a soft shoe scuff; generated once on startup.
@@ -143,15 +194,31 @@ func get_climb_pitch() -> float:
 	return clampf(lerpf(0.96, 1.3, progress) + randf_range(-0.015, 0.015), 0.94, 1.3)
 
 func play_climb_step() -> void:
+	if climb_active:
+		time_since_climb_step = 0.0
+		climb_effort_steps += 1
+		if climb_effort_steps >= 8:
+			breath_pending = true
+		if climb_voice_cooldown <= 0.0 and not climb_voice.playing:
+			# Alternate effort and breath during sustained climbing too.
+			var use_breath := breath_pending and climb_voice.stream == grunt_stream
+			_play_climb_voice(exhaust_stream if use_breath else grunt_stream)
+			if use_breath:
+				breath_pending = false
+				climb_effort_steps = 0
 	if typing_sounds_enabled and step_sound:
 		step_sound.volume_db = typing_volume_db
 		step_sound.pitch_scale = get_climb_pitch()
 		step_sound.play()
 
-# --- NEW: Ground footsteps ---
-func play_walk_step() -> void:
-	if walk_sound and not walk_sound.playing:
-		walk_sound.pitch_scale = randf_range(0.95, 1.05)
+# One player keeps the walking and running loops from overlapping.
+func play_walk_step(sprinting: bool = false) -> void:
+	var stream := running_stream if sprinting else walking_stream
+	if walk_sound.stream != stream:
+		walk_sound.stop()
+		walk_sound.stream = stream
+	if not walk_sound.playing:
+		walk_sound.pitch_scale = 1.0
 		walk_sound.play()
 
 func stop_walk_step() -> void:
