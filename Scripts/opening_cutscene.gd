@@ -4,6 +4,7 @@ const RetryWake = preload("res://Scripts/retry_wake_sequence.gd")
 
 @export var player: CharacterBody3D
 @export var gameplay_camera: Camera3D
+@export_range(-40.0, 0.0) var ambient_volume_db: float = -22.0
 
 @onready var cutscene_camera: Camera3D = $CutsceneCamera
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
@@ -13,8 +14,28 @@ var finished := false
 
 
 func _ready() -> void:
+	_start_ambient_music()
 	# Start after the other scene nodes finish their setup.
 	call_deferred("_begin_cutscene")
+
+
+func _start_ambient_music() -> void:
+	var scene := get_parent()
+	if scene.has_node("WakeAmbientMusic"):
+		return
+	var music := AudioStreamPlayer.new()
+	music.name = "WakeAmbientMusic"
+	var stream := preload("res://Assets/Audio/ambient bgm free.mp3").duplicate() as AudioStreamMP3
+	stream.loop = true
+	music.stream = stream
+	music.volume_db = -50.0
+	# Keep the ambience after this temporary intro node is removed.
+	scene.add_child.call_deferred(music)
+	music.ready.connect(func():
+		music.play()
+		var fade := music.create_tween()
+		fade.tween_property(music, "volume_db", ambient_volume_db, 1.5)
+	, CONNECT_ONE_SHOT)
 
 
 func _begin_cutscene() -> void:
