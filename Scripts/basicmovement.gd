@@ -81,8 +81,7 @@ func _physics_process(delta: float) -> void:
 	var fall_speed := maxf(0.0, -velocity.y)
 	move_and_slide()
 	if not was_grounded and is_on_floor() and fall_speed >= 2.5:
-		if camera_ctrl.play_landing(fall_speed):
-			audio_ctrl.play_landing(fall_speed)
+		camera_ctrl.play_landing(fall_speed)
 	
 	var horizontal_speed = Vector2(velocity.x, velocity.z).length()
 	if is_on_floor() and direction != Vector3.ZERO and horizontal_speed > 0.15:

@@ -6,7 +6,7 @@ extends Area3D
 @export var look_duration: float = 2.0
 @export var return_duration: float = 0.65
 @export_range(0.0, 30.0) var focus_zoom_degrees: float = 10.0
-@export_range(-40.0, 0.0) var scare_volume_db: float = -18.0
+@export_range(-40.0, 0.0) var scare_volume_db: float = -12.0
 @export_range(0.0, 3.0) var scare_jolt_degrees: float = 1.2
 
 var has_played: bool = false
@@ -28,8 +28,8 @@ var radio_duck: Tween
 func _ready() -> void:
 	radio_volume_db = radio_audio.volume_db
 	static_sound = AudioStreamPlayer.new()
-	static_sound.name = "RadioScareStatic"
-	static_sound.stream = _make_static_burst()
+	static_sound.name = "RadioScareStinger"
+	static_sound.stream = preload("res://Assets/Audio/stinger.mp3")
 	add_child(static_sound)
 	if not body_entered.is_connected(_on_body_entered):
 		body_entered.connect(_on_body_entered)
@@ -107,37 +107,13 @@ func _apply_scare_kick() -> void:
 func _play_scare_sound() -> void:
 	static_sound.volume_db = scare_volume_db
 	static_sound.play()
-	# Let the crackle hit first, then bring the existing radio music forward.
+	# Let the stinger hit first, then bring the existing radio music forward.
 	if radio_duck != null and radio_duck.is_valid():
 		radio_duck.kill()
 	radio_audio.volume_db = radio_volume_db - 12.0
 	radio_duck = create_tween()
 	radio_duck.tween_interval(0.12)
 	radio_duck.tween_property(radio_audio, "volume_db", radio_volume_db, 0.55)
-
-
-func _make_static_burst() -> AudioStreamWAV:
-	var rate := 22050
-	var count := int(rate * 0.32)
-	var bytes := PackedByteArray()
-	bytes.resize(count * 2)
-	var rng := RandomNumberGenerator.new()
-	rng.seed = 90210
-	var low_noise := 0.0
-	for index in range(count):
-		var time := float(index) / rate
-		var noise := rng.randf_range(-1.0, 1.0)
-		low_noise = lerpf(low_noise, noise, 0.18)
-		var envelope := minf(time / 0.003, 1.0) * exp(-15.0 * time) * (1.0 - smoothstep(0.25, 0.32, time))
-		var chatter := 0.65 + 0.35 * sin(TAU * 43.0 * time)
-		var crackle := (noise - low_noise) * chatter * 0.5
-		var thump := sin(TAU * (85.0 * time - 80.0 * time * time)) * 0.4
-		bytes.encode_s16(index * 2, int(clampf((crackle + thump) * envelope, -1.0, 1.0) * 32767.0))
-	var stream := AudioStreamWAV.new()
-	stream.format = AudioStreamWAV.FORMAT_16_BITS
-	stream.mix_rate = rate
-	stream.data = bytes
-	return stream
 
 
 func _begin_focus(body: Node3D, camera: Camera3D) -> void:
