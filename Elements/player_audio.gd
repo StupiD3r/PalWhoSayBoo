@@ -16,6 +16,20 @@ var climb_effort_steps: int = 0
 var climb_voice_cooldown: float = 0.0
 var time_since_climb_step: float = 0.0
 var breath_pending: bool = false
+@export_range(-40.0, 0.0) var wind_low_volume_db: float = -30.0
+@export_range(-40.0, 0.0) var wind_high_volume_db: float = -20.0
+@export_range(-40.0, 0.0) var bamboo_volume_db: float = -18.0
+var climb_wind: AudioStreamPlayer
+var bamboo_creak: AudioStreamPlayer
+var creak_streams: Array[AudioStream] = [
+	preload("res://Assets/Audio/bamboo_creak_1.ogg"),
+	preload("res://Assets/Audio/bamboo_creak_2.ogg"),
+	preload("res://Assets/Audio/bamboo_creak_3.ogg"),
+]
+var atmosphere_climbing: bool = false
+var previous_climb_y: float = 0.0
+var creak_cooldown: float = 0.0
+var last_creak_index: int = -1
 
 @export var typing_sounds_enabled: bool = true
 @export_range(-40.0, 0.0) var typing_volume_db: float = -18.0
@@ -39,6 +53,17 @@ var landing_sound: AudioStreamPlayer
 @export_range(-40.0, 0.0) var landing_volume_db: float = -16.0
 
 func _ready() -> void:
+	climb_wind = AudioStreamPlayer.new()
+	climb_wind.name = "ClimbingWind"
+	var wind_stream := preload("res://Assets/Audio/swirling wind.mp3").duplicate() as AudioStreamMP3
+	wind_stream.loop = true
+	climb_wind.stream = wind_stream
+	climb_wind.volume_db = -60.0
+	add_child(climb_wind)
+	bamboo_creak = AudioStreamPlayer.new()
+	bamboo_creak.name = "BambooCreak"
+	bamboo_creak.volume_db = bamboo_volume_db
+	add_child(bamboo_creak)
 	climb_voice = AudioStreamPlayer.new()
 	climb_voice.name = "ClimbVoice"
 	climb_voice.volume_db = climb_voice_volume_db
@@ -100,6 +125,7 @@ func set_climb_resting(resting: bool) -> void:
 		climb_voice_cooldown = 2.5
 
 func _process(delta: float) -> void:
+	_update_climb_atmosphere(delta)
 	if not climb_active:
 		return
 	climb_voice_cooldown = maxf(0.0, climb_voice_cooldown - delta)
@@ -107,6 +133,42 @@ func _process(delta: float) -> void:
 	if breath_pending and time_since_climb_step >= 0.9 and climb_voice_cooldown <= 0.0 and not climb_voice.playing:
 		_play_climb_voice(exhaust_stream)
 		breath_pending = false
+
+func _update_climb_atmosphere(delta: float) -> void:
+	var body := get_parent() as CharacterBody3D
+	var climbing: bool = body != null and body.get("is_climbing") == true
+	var target_volume := -60.0
+	if climbing:
+		var height := body.global_position.y
+		var resting: bool = body.get("climb_resting") == true
+		if not atmosphere_climbing:
+			previous_climb_y = height
+			creak_cooldown = 1.0
+		if not climb_wind.playing:
+			climb_wind.play()
+		var bottom := float(body.get("min_climb_y"))
+		var top := float(body.get("max_climb_y"))
+		var progress := clampf((height - bottom) / maxf(top - bottom, 1.0), 0.0, 1.0) if is_finite(top) else 0.0
+		target_volume = lerpf(wind_low_volume_db, wind_high_volume_db, progress) - (8.0 if resting else 0.0)
+		creak_cooldown = maxf(0.0, creak_cooldown - delta)
+		if resting:
+			bamboo_creak.stop()
+		elif height > previous_climb_y + 0.0005 and creak_cooldown <= 0.0 and not bamboo_creak.playing:
+			var index := randi_range(0, creak_streams.size() - 1)
+			if index == last_creak_index:
+				index = (index + 1) % creak_streams.size()
+			last_creak_index = index
+			bamboo_creak.stream = creak_streams[index]
+			bamboo_creak.pitch_scale = randf_range(0.94, 1.06)
+			bamboo_creak.play()
+			creak_cooldown = randf_range(3.5, 6.0)
+		previous_climb_y = height
+	else:
+		bamboo_creak.stop()
+	atmosphere_climbing = climbing
+	climb_wind.volume_db = lerpf(climb_wind.volume_db, target_volume, 1.0 - exp(-2.5 * delta))
+	if not climbing and climb_wind.volume_db < -59.5:
+		climb_wind.stop()
 
 func _play_climb_voice(stream: AudioStream) -> void:
 	climb_voice.stream = stream

@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://di66vw4i6xm87"
+path="res://.godot/imported/swirling wind.mp3-3ebc4e6c698cda8d55386890c647098b.mp3str"
+
+[deps]
+
+source_file="res://Assets/Audio/swirling wind.mp3"
+dest_files=["res://.godot/imported/swirling wind.mp3-3ebc4e6c698cda8d55386890c647098b.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
