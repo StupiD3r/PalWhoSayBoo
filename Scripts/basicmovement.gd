@@ -12,6 +12,7 @@ extends CharacterBody3D
 
 # --- State Tracking ---
 var is_climbing: bool = false
+var climb_resting: bool = false
 var typing_uses_space: bool = false
 var target_climb_y: float = 0.0
 var max_climb_y: float = INF
@@ -52,6 +53,8 @@ func _physics_process(delta: float) -> void:
 	if is_climbing:
 		audio_ctrl.stop_walk_step()
 		velocity = Vector3.ZERO
+		if climb_resting:
+			return
 		# Space never dismounts; slide and typing control the climb.
 		target_climb_y = maxf(min_climb_y, target_climb_y - slide_speed * delta)
 		global_position.y = clampf(lerpf(global_position.y, target_climb_y, 1.0 - exp(-20.0 * delta)), min_climb_y, max_climb_y)
@@ -92,6 +95,7 @@ func _physics_process(delta: float) -> void:
 
 # --- CLIMBING LOGIC ---
 func start_climbing(pole_position: Vector3, height_limit: float = INF) -> void:
+	climb_resting = false
 	audio_ctrl.stop_walk_step()
 	audio_ctrl.start_climb_voice()
 	is_climbing = true
@@ -118,7 +122,7 @@ func start_climbing(pole_position: Vector3, height_limit: float = INF) -> void:
 	climbing_started.emit()
 
 func climb_step(height_per_key: float = 0.3, anim_time_per_key: float = 0.15) -> void:
-	if not is_climbing: return
+	if not is_climbing or climb_resting: return
 	consecutive_typing_errors = 0
 	
 	audio_ctrl.play_climb_step()
@@ -134,6 +138,7 @@ func climb_step(height_per_key: float = 0.3, anim_time_per_key: float = 0.15) ->
 	climb_tween.tween_callback(animator.pause)
 
 func force_dismount(is_failing: bool) -> void:
+	climb_resting = false
 	audio_ctrl.stop_climb_voice()
 	consecutive_typing_errors = 0
 	typing_uses_space = false
@@ -146,8 +151,18 @@ func force_dismount(is_failing: bool) -> void:
 	camera_ctrl.switch_cameras(camera_ctrl.climbing_cam, camera_ctrl.first_person_cam, 0.4)
 	climbing_stopped.emit()
 
+func set_climb_resting(resting: bool) -> void:
+	climb_resting = resting
+	velocity = Vector3.ZERO
+	if resting:
+		target_climb_y = global_position.y
+		if climb_tween and climb_tween.is_valid():
+			climb_tween.kill()
+		animator.pause()
+	audio_ctrl.set_climb_resting(resting)
+
 func on_typing_error() -> void:
-	if not is_climbing:
+	if not is_climbing or climb_resting:
 		return
 	consecutive_typing_errors += 1
 	var repeated := consecutive_typing_errors % 3 == 0

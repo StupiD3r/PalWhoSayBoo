@@ -160,6 +160,13 @@ var current_word: String = ""
 var next_word: String = ""
 var typed_text: String = ""
 var is_active: bool = false
+@export var rest_score_interval: int = 2000
+@export var rest_duration_seconds: float = 10.0
+var is_resting: bool = false
+var rest_remaining: float = 0.0
+var next_rest_score: int = 2000
+var rest_overlay: ColorRect
+var rest_countdown: Label
 var failure_reason: String = ""
 var score: int = 0
 var time_elapsed: float = 0.0
@@ -249,6 +256,7 @@ func _ready() -> void:
 	feedback.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	get_viewport().size_changed.connect(_layout_queue)
 	_layout_queue()
+	_build_rest_ui()
 	scratch_effect = MissScratch.new()
 	# A sibling layer can finish a fatal swipe after the typing UI is hidden.
 	get_parent().add_child.call_deferred(scratch_effect)
@@ -267,6 +275,12 @@ func get_spawn_interval() -> float:
 
 func _process(delta: float) -> void:
 	if not is_active:
+		return
+	if is_resting:
+		rest_remaining = maxf(0.0, rest_remaining - delta)
+		_update_rest_ui()
+		if rest_remaining <= 0.0:
+			_end_rest()
 		return
 	var previous_phase := get_phase()
 	time_elapsed += delta
@@ -327,6 +341,8 @@ func _process(delta: float) -> void:
 	_refresh_cards()
 
 func start_typing_minigame() -> void:
+	_end_rest()
+	next_rest_score = maxi(1, rest_score_interval)
 	if is_instance_valid(scratch_effect):
 		scratch_effect.reset_effect()
 	_clear_queue()
@@ -360,6 +376,7 @@ func stop_typing_minigame() -> void:
 	if not is_active:
 		return
 	is_active = false
+	_end_rest()
 	_reset_wpm_indicator()
 	_set_typing_streak(0)
 	challenge_active = false
@@ -522,7 +539,7 @@ func _clear_queue() -> void:
 	preview_label.text = ""
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not is_active or word_queue.is_empty():
+	if not is_active or is_resting or word_queue.is_empty():
 		return
 	if event is not InputEventKey or not event.pressed or event.echo:
 		return
@@ -572,6 +589,7 @@ func on_word_completed() -> void:
 			if audio and audio.has_method("play_sentence_complete"):
 				audio.play_sentence_complete()
 		_finish_challenge()
+		_try_begin_rest()
 		return
 	if player:
 		var audio := player.get_node_or_null("PlayerAudio")
@@ -580,6 +598,8 @@ func on_word_completed() -> void:
 	completed_regular_words += 1
 	if completed_regular_words >= words_until_challenge:
 		challenge_pending = true
+	if _try_begin_rest():
+		return
 	if challenge_pending and word_queue.is_empty():
 		_begin_challenge()
 	elif word_queue.is_empty():
@@ -590,6 +610,69 @@ func on_word_completed() -> void:
 func _schedule_challenge() -> void:
 	var minimum := maxi(1, minimum_words_before_challenge)
 	words_until_challenge = randi_range(minimum, maxi(minimum, maximum_words_before_challenge))
+
+func _build_rest_ui() -> void:
+	rest_overlay = ColorRect.new()
+	rest_overlay.name = "ClimbingRest"
+	rest_overlay.color = Color(0.015, 0.025, 0.04, 0.55)
+	rest_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	queue_root.add_child(rest_overlay)
+	rest_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var center := CenterContainer.new()
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	rest_overlay.add_child(center)
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var content := VBoxContainer.new()
+	content.add_theme_constant_override("separation", 20)
+	center.add_child(content)
+	var message := Label.new()
+	message.text = "You've been climbing hard.\nCatch your breath."
+	message.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	message.add_theme_font_size_override("font_size", 26)
+	content.add_child(message)
+	rest_countdown = Label.new()
+	rest_countdown.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	rest_countdown.add_theme_font_override("font", word_font)
+	rest_countdown.add_theme_font_size_override("font_size", 42)
+	content.add_child(rest_countdown)
+	rest_overlay.hide()
+
+func _try_begin_rest() -> bool:
+	if not is_active or is_resting or rest_score_interval <= 0 or score < next_rest_score:
+		return false
+	while next_rest_score <= score:
+		next_rest_score += rest_score_interval
+	is_resting = true
+	rest_remaining = maxf(3.0, rest_duration_seconds)
+	queue_row.hide()
+	preview_label.hide()
+	rest_overlay.show()
+	if player and player.has_method("set_climb_resting"):
+		player.set_climb_resting(true)
+	_update_rest_ui()
+	return true
+
+func _update_rest_ui() -> void:
+	var seconds := ceili(rest_remaining)
+	rest_countdown.text = "RESUMING IN " + str(seconds) if seconds <= 3 else str(seconds) + "s"
+
+func _end_rest() -> void:
+	if not is_resting:
+		return
+	is_resting = false
+	rest_remaining = 0.0
+	rest_overlay.hide()
+	queue_row.show()
+	preview_label.show()
+	if player and player.has_method("set_climb_resting"):
+		player.set_climb_resting(false)
+	if is_active:
+		if word_queue.is_empty():
+			if challenge_pending:
+				_begin_challenge()
+			else:
+				_spawn_word()
+		update_ui()
 
 func _set_space_typing(enabled: bool) -> void:
 	if player:
@@ -663,6 +746,11 @@ func _play_expiration_feedback(entry: QueuedWord) -> void:
 	feedback.float_text("TIME UP", origin, Color(1.0, 0.45, 0.4), word_font)
 
 func _exit_tree() -> void:
+	if is_resting and is_instance_valid(player) and player.has_method("set_climb_resting"):
+		player.set_climb_resting(false)
+		var audio := player.get_node_or_null("PlayerAudio")
+		if audio and audio.has_method("stop_climb_voice"):
+			audio.stop_climb_voice()
 	if is_instance_valid(scratch_effect) and not scratch_effect.is_queued_for_deletion():
 		scratch_effect.queue_free()
 

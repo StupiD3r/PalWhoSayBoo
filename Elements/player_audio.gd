@@ -91,6 +91,14 @@ func stop_climb_voice() -> void:
 	if is_instance_valid(climb_voice):
 		climb_voice.stop()
 
+func set_climb_resting(resting: bool) -> void:
+	stop_climb_voice()
+	if resting:
+		_play_climb_voice(exhaust_stream)
+	else:
+		climb_active = get_parent().get("is_climbing") == true
+		climb_voice_cooldown = 2.5
+
 func _process(delta: float) -> void:
 	if not climb_active:
 		return
