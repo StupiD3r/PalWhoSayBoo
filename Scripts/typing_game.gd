@@ -1,6 +1,7 @@
 extends CanvasLayer
 
 const MissScratch = preload("res://Scripts/miss_scratch_effect.gd")
+const MidclimbScare = preload("res://Scripts/midclimb_scare.gd")
 
 @export var next_word_label: RichTextLabel
 @export var current_word_label: RichTextLabel
@@ -167,6 +168,11 @@ var rest_remaining: float = 0.0
 var next_rest_score: int = 2000
 var rest_overlay: ColorRect
 var rest_countdown: Label
+@export var midclimb_scares_enabled: bool = true
+var scare_controller: Node3D
+var scare_active: bool = false
+var next_scare_time: float = 20.0
+var scare_pending: bool = false
 var failure_reason: String = ""
 var score: int = 0
 var time_elapsed: float = 0.0
@@ -257,6 +263,10 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_layout_queue)
 	_layout_queue()
 	_build_rest_ui()
+	scare_controller = MidclimbScare.new()
+	scare_controller.name = "MidclimbScare"
+	scare_controller.finished.connect(_on_scare_finished)
+	get_parent().add_child.call_deferred(scare_controller)
 	scratch_effect = MissScratch.new()
 	# A sibling layer can finish a fatal swipe after the typing UI is hidden.
 	get_parent().add_child.call_deferred(scratch_effect)
@@ -276,6 +286,8 @@ func get_spawn_interval() -> float:
 func _process(delta: float) -> void:
 	if not is_active:
 		return
+	if scare_active:
+		return
 	if is_resting:
 		rest_remaining = maxf(0.0, rest_remaining - delta)
 		_update_rest_ui()
@@ -284,6 +296,8 @@ func _process(delta: float) -> void:
 		return
 	var previous_phase := get_phase()
 	time_elapsed += delta
+	if midclimb_scares_enabled and time_elapsed >= next_scare_time:
+		scare_pending = true
 	if get_phase() != previous_phase:
 		_layout_queue()
 		spawn_elapsed = get_spawn_interval()
@@ -341,6 +355,9 @@ func _process(delta: float) -> void:
 	_refresh_cards()
 
 func start_typing_minigame() -> void:
+	_cancel_scare()
+	scare_pending = false
+	next_scare_time = randf_range(20.0, 30.0)
 	_end_rest()
 	next_rest_score = maxi(1, rest_score_interval)
 	if is_instance_valid(scratch_effect):
@@ -376,6 +393,7 @@ func stop_typing_minigame() -> void:
 	if not is_active:
 		return
 	is_active = false
+	_cancel_scare()
 	_end_rest()
 	_reset_wpm_indicator()
 	_set_typing_streak(0)
@@ -539,7 +557,7 @@ func _clear_queue() -> void:
 	preview_label.text = ""
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not is_active or is_resting or word_queue.is_empty():
+	if not is_active or is_resting or scare_active or word_queue.is_empty():
 		return
 	if event is not InputEventKey or not event.pressed or event.echo:
 		return
@@ -589,7 +607,8 @@ func on_word_completed() -> void:
 			if audio and audio.has_method("play_sentence_complete"):
 				audio.play_sentence_complete()
 		_finish_challenge()
-		_try_begin_rest()
+		if not _try_begin_rest():
+			_try_begin_scare()
 		return
 	if player:
 		var audio := player.get_node_or_null("PlayerAudio")
@@ -599,6 +618,8 @@ func on_word_completed() -> void:
 	if completed_regular_words >= words_until_challenge:
 		challenge_pending = true
 	if _try_begin_rest():
+		return
+	if _try_begin_scare():
 		return
 	if challenge_pending and word_queue.is_empty():
 		_begin_challenge()
@@ -610,6 +631,38 @@ func on_word_completed() -> void:
 func _schedule_challenge() -> void:
 	var minimum := maxi(1, minimum_words_before_challenge)
 	words_until_challenge = randi_range(minimum, maxi(minimum, maximum_words_before_challenge))
+
+func _try_begin_scare() -> bool:
+	if not midclimb_scares_enabled or not scare_pending or not is_active or is_resting or scare_active:
+		return false
+	if not is_instance_valid(scare_controller) or not scare_controller.is_node_ready():
+		return false
+	if not scare_controller.begin(player):
+		return false
+	scare_active = true
+	scare_pending = false
+	queue_root.hide()
+	return true
+
+func _cancel_scare() -> void:
+	if is_instance_valid(scare_controller) and scare_controller.active:
+		scare_controller.cancel()
+	scare_active = false
+	if is_instance_valid(queue_root):
+		queue_root.show()
+
+func _on_scare_finished() -> void:
+	scare_active = false
+	queue_root.show()
+	next_scare_time = time_elapsed + randf_range(30.0, 50.0)
+	if not is_active:
+		return
+	if word_queue.is_empty():
+		if challenge_pending:
+			_begin_challenge()
+		else:
+			_spawn_word()
+	update_ui()
 
 func _build_rest_ui() -> void:
 	rest_overlay = ColorRect.new()
@@ -638,7 +691,7 @@ func _build_rest_ui() -> void:
 	rest_overlay.hide()
 
 func _try_begin_rest() -> bool:
-	if not is_active or is_resting or rest_score_interval <= 0 or score < next_rest_score:
+	if not is_active or is_resting or scare_active or rest_score_interval <= 0 or score < next_rest_score:
 		return false
 	while next_rest_score <= score:
 		next_rest_score += rest_score_interval
@@ -660,6 +713,8 @@ func _end_rest() -> void:
 	if not is_resting:
 		return
 	is_resting = false
+	scare_pending = false
+	next_scare_time = maxf(next_scare_time, time_elapsed + 8.0)
 	rest_remaining = 0.0
 	rest_overlay.hide()
 	queue_row.show()
@@ -702,6 +757,7 @@ func trigger_elimination(reason: String = "Your run has ended.") -> void:
 		return
 	# Dismount emits climbing_stopped immediately, so set this before it does.
 	failure_reason = reason
+	_cancel_scare()
 	if player and player.has_method("force_dismount"):
 		player.force_dismount(true)
 	stop_typing_minigame()
@@ -746,6 +802,9 @@ func _play_expiration_feedback(entry: QueuedWord) -> void:
 	feedback.float_text("TIME UP", origin, Color(1.0, 0.45, 0.4), word_font)
 
 func _exit_tree() -> void:
+	_cancel_scare()
+	if is_instance_valid(scare_controller) and not scare_controller.is_queued_for_deletion():
+		scare_controller.queue_free()
 	if is_resting and is_instance_valid(player) and player.has_method("set_climb_resting"):
 		player.set_climb_resting(false)
 		var audio := player.get_node_or_null("PlayerAudio")
