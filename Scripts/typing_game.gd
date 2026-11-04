@@ -2,6 +2,7 @@ extends CanvasLayer
 
 const MissScratch = preload("res://Scripts/miss_scratch_effect.gd")
 const MidclimbScare = preload("res://Scripts/midclimb_scare.gd")
+const FalseHopeEnding = preload("res://Scripts/false_hope_ending.gd")
 
 @export var next_word_label: RichTextLabel
 @export var current_word_label: RichTextLabel
@@ -173,6 +174,8 @@ var scare_controller: Node3D
 var scare_active: bool = false
 var next_scare_time: float = 20.0
 var scare_pending: bool = false
+var fall_controller: Node3D
+var ending_active: bool = false
 var failure_reason: String = ""
 var score: int = 0
 var time_elapsed: float = 0.0
@@ -267,6 +270,11 @@ func _ready() -> void:
 	scare_controller.name = "MidclimbScare"
 	scare_controller.finished.connect(_on_scare_finished)
 	get_parent().add_child.call_deferred(scare_controller)
+	fall_controller = FalseHopeEnding.new()
+	fall_controller.name = "FalseHopeEnding"
+	fall_controller.pole = get_parent().get_node_or_null("Bamboo/BambooPole")
+	fall_controller.finished.connect(_finish_fall_ending)
+	get_parent().add_child.call_deferred(fall_controller)
 	scratch_effect = MissScratch.new()
 	# A sibling layer can finish a fatal swipe after the typing UI is hidden.
 	get_parent().add_child.call_deferred(scratch_effect)
@@ -286,7 +294,7 @@ func get_spawn_interval() -> float:
 func _process(delta: float) -> void:
 	if not is_active:
 		return
-	if scare_active:
+	if scare_active or ending_active:
 		return
 	if is_resting:
 		rest_remaining = maxf(0.0, rest_remaining - delta)
@@ -355,6 +363,7 @@ func _process(delta: float) -> void:
 	_refresh_cards()
 
 func start_typing_minigame() -> void:
+	_cancel_fall_ending()
 	_cancel_scare()
 	scare_pending = false
 	next_scare_time = randf_range(20.0, 30.0)
@@ -390,7 +399,7 @@ func start_typing_minigame() -> void:
 	update_ui()
 
 func stop_typing_minigame() -> void:
-	if not is_active:
+	if not is_active or ending_active:
 		return
 	is_active = false
 	_cancel_scare()
@@ -557,7 +566,7 @@ func _clear_queue() -> void:
 	preview_label.text = ""
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not is_active or is_resting or scare_active or word_queue.is_empty():
+	if not is_active or is_resting or scare_active or ending_active or word_queue.is_empty():
 		return
 	if event is not InputEventKey or not event.pressed or event.echo:
 		return
@@ -753,11 +762,30 @@ func _finish_challenge() -> void:
 	_spawn_word()
 
 func trigger_elimination(reason: String = "Your run has ended.") -> void:
-	if not is_active:
+	if not is_active or ending_active:
 		return
 	# Dismount emits climbing_stopped immediately, so set this before it does.
 	failure_reason = reason
 	_cancel_scare()
+	_end_rest()
+	if reason.begins_with("Accuracy too low.") and is_instance_valid(fall_controller) and fall_controller.is_node_ready():
+		if fall_controller.begin(player):
+			ending_active = true
+			queue_root.hide()
+			return
+	_finalize_elimination()
+
+func _finish_fall_ending() -> void:
+	ending_active = false
+	if is_active:
+		_finalize_elimination()
+
+func _cancel_fall_ending() -> void:
+	if is_instance_valid(fall_controller) and fall_controller.active:
+		fall_controller.cancel()
+	ending_active = false
+
+func _finalize_elimination() -> void:
 	if player and player.has_method("force_dismount"):
 		player.force_dismount(true)
 	stop_typing_minigame()
@@ -802,6 +830,9 @@ func _play_expiration_feedback(entry: QueuedWord) -> void:
 	feedback.float_text("TIME UP", origin, Color(1.0, 0.45, 0.4), word_font)
 
 func _exit_tree() -> void:
+	_cancel_fall_ending()
+	if is_instance_valid(fall_controller) and not fall_controller.is_queued_for_deletion():
+		fall_controller.queue_free()
 	_cancel_scare()
 	if is_instance_valid(scare_controller) and not scare_controller.is_queued_for_deletion():
 		scare_controller.queue_free()

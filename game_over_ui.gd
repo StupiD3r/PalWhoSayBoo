@@ -30,8 +30,15 @@ var restart_button: Button
 var results_column: VBoxContainer
 var locked_player: Node
 var previous_player_mode: Node.ProcessMode
+var restart_scene: PackedScene
+var name_prompt_generation: int = 0
+var overview_camera: Camera3D
+var previous_camera: Camera3D
+var overview_hud: Node
+var hud_was_visible: bool = false
 
 func _ready() -> void:
+	_cache_restart_scene()
 	visible = false
 	results_column = $VBoxContainer
 	restart_button = $VBoxContainer/RestartBTN
@@ -41,12 +48,24 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_layout_results)
 	_layout_results()
 
+func _cache_restart_scene() -> void:
+	# Pin the already loaded map while its original PackedScene is still cached.
+	# Otherwise retry reparses the large text scene after its resource is released.
+	var scene := get_parent()
+	while scene != null and scene.scene_file_path.is_empty():
+		scene = scene.get_parent()
+	if scene == null:
+		scene = get_tree().current_scene
+	if scene != null and not scene.scene_file_path.is_empty():
+		restart_scene = ResourceLoader.load(scene.scene_file_path) as PackedScene
+
 func _build_results_ui() -> void:
 	var screen := Control.new()
 	screen.name = "ResultsScreen"
 	add_child(screen)
 	screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var background := $ColorRect as ColorRect
+	background.color = Color(0.01, 0.015, 0.025, 0.55)
 	background.reparent(screen)
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var scroll := ScrollContainer.new()
@@ -148,14 +167,29 @@ func show_stats(final_score: int, peak_wpm: int, avg_wpm: int, accuracy: float) 
 		pending_correct_characters = typing.get("total_chars_typed")
 	awaiting_name = true
 	name_prompt.text = "NEW HIGH SCORE! Enter your name." if best_player.is_empty() or pending_score > best_score else "Enter your name for this run."
-	name_input.text = last_player_name
+	name_input.clear()
+	name_input.editable = false
+	name_prompt_generation += 1
 	name_form.show()
 	status_label.hide()
 	restart_button.disabled = true
 	_lock_player()
+	_show_map_overview()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	visible = true
-	name_input.grab_focus.call_deferred()
+	_focus_name_after_release(name_prompt_generation)
+
+func _focus_name_after_release(generation: int) -> void:
+	var earliest := Time.get_ticks_msec() + 200
+	# Let the fatal typing event finish and held gameplay keys come up first.
+	await get_tree().process_frame
+	while Input.is_anything_pressed() or Time.get_ticks_msec() < earliest:
+		if generation != name_prompt_generation or not visible or not awaiting_name:
+			return
+		await get_tree().process_frame
+	if generation == name_prompt_generation and visible and awaiting_name:
+		name_input.editable = true
+		name_input.grab_focus()
 
 func _clean_name(value: String) -> String:
 	return value.replace("\n", " ").replace("\r", " ").replace("\t", " ").strip_edges().left(24)
@@ -236,11 +270,11 @@ func _unlock_player() -> void:
 	locked_player = null
 
 func _on_restart_button_pressed() -> void:
-	if awaiting_name:
+	if awaiting_name or restart_button.disabled:
 		return
 	restart_button.disabled = true
 	Engine.set_meta("pal_who_say_boo_retry_wake", true)
-	var error := get_tree().reload_current_scene()
+	var error := get_tree().change_scene_to_packed(restart_scene) if restart_scene != null else get_tree().reload_current_scene()
 	if error != OK:
 		Engine.remove_meta("pal_who_say_boo_retry_wake")
 		restart_button.disabled = false
@@ -249,7 +283,50 @@ func _on_restart_button_pressed() -> void:
 
 func hide_stats() -> void:
 	visible = false
+	_close_map_overview()
 	_unlock_player()
+
+func _show_map_overview() -> void:
+	if is_instance_valid(overview_camera):
+		overview_camera.make_current()
+		return
+	var map := get_parent()
+	var house := map.get_node_or_null("House") as Node3D
+	var pole := map.get_node_or_null("Bamboo/BambooPole") as Node3D
+	if house == null or pole == null:
+		return
+	previous_camera = get_viewport().get_camera_3d()
+	var center := (house.global_position + pole.global_position) * 0.5
+	var span := maxf(house.global_position.distance_to(pole.global_position), 80.0)
+	center.y = maxf(house.global_position.y, pole.global_position.y) + 12.0
+	overview_camera = Camera3D.new()
+	overview_camera.name = "ResultsMapOverview"
+	# Own it with the UI so retry and scene changes clean it up automatically.
+	add_child(overview_camera)
+	overview_camera.fov = 65.0
+	overview_camera.far = maxf(2000.0, span * 5.0)
+	if is_instance_valid(previous_camera):
+		overview_camera.environment = previous_camera.environment
+		overview_camera.attributes = previous_camera.attributes
+		overview_camera.cull_mask = previous_camera.cull_mask
+	overview_camera.global_position = center + Vector3(-0.55, 0.75, 0.75) * span
+	overview_camera.look_at(center, Vector3.UP)
+	overview_camera.make_current()
+	overview_hud = map.get_node_or_null("HUD")
+	if overview_hud != null and overview_hud.has_method("hide"):
+		hud_was_visible = bool(overview_hud.get("visible"))
+		overview_hud.hide()
+
+func _close_map_overview() -> void:
+	if is_instance_valid(previous_camera):
+		previous_camera.make_current()
+	previous_camera = null
+	if is_instance_valid(overview_camera):
+		overview_camera.queue_free()
+	overview_camera = null
+	if is_instance_valid(overview_hud):
+		overview_hud.set("visible", hud_was_visible)
+	overview_hud = null
 
 func _open_leaderboards() -> void:
 	if is_instance_valid(leaderboard_view):
