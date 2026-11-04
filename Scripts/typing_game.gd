@@ -332,10 +332,10 @@ func _process(delta: float) -> void:
 			_set_typing_streak(0)
 			_remove_word(index)
 			word_expired.emit(expired_text)
-			if not is_active:
+			if not is_active or ending_active:
 				return
 			_apply_missed_word_risk("sentence" if was_challenge else "word")
-			if not is_active:
+			if not is_active or ending_active:
 				return
 			if was_challenge:
 				_finish_challenge()
@@ -768,8 +768,9 @@ func trigger_elimination(reason: String = "Your run has ended.") -> void:
 	failure_reason = reason
 	_cancel_scare()
 	_end_rest()
-	if reason.begins_with("Accuracy too low.") and is_instance_valid(fall_controller) and fall_controller.is_node_ready():
-		if fall_controller.begin(player):
+	var caught := reason.begins_with("The monster caught you.")
+	if (reason.begins_with("Accuracy too low.") or caught) and is_instance_valid(fall_controller) and fall_controller.is_node_ready():
+		if fall_controller.begin(player, caught):
 			ending_active = true
 			queue_root.hide()
 			return
@@ -791,6 +792,8 @@ func _finalize_elimination() -> void:
 	stop_typing_minigame()
 
 func _apply_missed_word_risk(expired_kind: String = "word") -> void:
+	if ending_active:
+		return
 	# Roll the current chance first; the increase applies to the next miss.
 	var chance := miss_elimination_percent
 	missed_word_count += 1

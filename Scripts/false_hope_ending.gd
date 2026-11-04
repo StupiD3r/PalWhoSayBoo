@@ -2,6 +2,9 @@ extends Node3D
 
 signal finished
 const DURATION := 5.9
+const AttackVisuals = preload("res://Scripts/midclimb_scare.gd")
+var monster_ending: bool = false
+var attack_visuals: Node3D
 var pole: Node3D
 var flag: MeshInstance3D
 var flag_anchor: Node3D
@@ -31,6 +34,11 @@ var slipped: bool = false
 func _ready() -> void:
 	set_process(false)
 	_make_flag()
+	# Share the model, private light and blood shader with the nonfatal scare.
+	# Its camera sequence remains inactive; this ending drives the visuals.
+	attack_visuals = AttackVisuals.new()
+	attack_visuals.name = "FatalAttackVisuals"
+	add_child(attack_visuals)
 	overlay = CanvasLayer.new()
 	overlay.layer = 15
 	add_child(overlay)
@@ -100,7 +108,7 @@ void fragment() { ALBEDO = vec3(0.96, 0.96, 0.92); ROUGHNESS = 0.9; EMISSION = v
 	flag.position = Vector3.RIGHT * size * 0.5
 	target = flag.global_position
 
-func begin(player: CharacterBody3D) -> bool:
+func begin(player: CharacterBody3D, caught_by_monster: bool = false) -> bool:
 	if active or not is_instance_valid(flag) or not is_instance_valid(player) or player.get("is_climbing") != true:
 		return false
 	var controller := player.get_node_or_null("PlayerCamera")
@@ -109,6 +117,10 @@ func begin(player: CharacterBody3D) -> bool:
 	if fpv == null or current == null or not player.is_ancestor_of(current):
 		return false
 	actor = player
+	monster_ending = caught_by_monster
+	attack_visuals.monster.hide()
+	attack_visuals.overlay.visible = monster_ending
+	attack_visuals.edges.set_shader_parameter("strength", 0.0)
 	original_camera = current
 	original_pose = current.global_transform.orthonormalized()
 	eye_pose = fpv.global_transform.orthonormalized()
@@ -177,15 +189,42 @@ func _process(delta: float) -> void:
 		var jolt := sin((elapsed - 0.65) * 35.0) * (1.0 - smoothstep(0.65, 1.3, elapsed))
 		camera.rotate_object_local(Vector3.FORWARD, jolt * 0.035 + sin(fall_time * 2.0) * 0.015)
 		camera.fov = lerpf(75.0, 32.0, smoothstep(0.8, 2.4, elapsed))
+	if monster_ending:
+		_update_monster_attack()
 	black.color.a = smoothstep(4.7, 5.55, elapsed)
 	wind.volume_db = lerpf(-34.0, -17.0, smoothstep(0.65, 4.4, elapsed)) - black.color.a * 35.0
 	if elapsed >= DURATION:
 		cancel()
 		finished.emit()
 
+func _update_monster_attack() -> void:
+	if elapsed < 2.0:
+		return
+	# The player is already falling when they notice her alongside the pole.
+	var origin := camera.global_position
+	var direction := (away + Vector3.UP * 0.45).normalized()
+	var attack_pose := Transform3D(Basis.IDENTITY, origin).looking_at(origin + direction, Vector3.UP)
+	var turn := smoothstep(2.0, 2.6, elapsed)
+	camera.global_transform = camera.global_transform.interpolate_with(attack_pose, turn)
+	var rush := smoothstep(2.65, 3.15, elapsed)
+	camera.fov = lerpf(camera.fov, 66.0 - rush * 7.0, turn)
+	var monster_pose := attack_pose * Transform3D(Basis.IDENTITY, Vector3(0.0, -0.55, -lerpf(6.0, 1.1, rush)))
+	attack_visuals.monster.global_position = monster_pose.origin
+	attack_visuals.monster.look_at(origin, Vector3.UP, true)
+	attack_visuals.monster.visible = elapsed < 4.85
+	var impact := smoothstep(3.02, 3.2, elapsed) * (1.0 - smoothstep(4.1, 4.85, elapsed))
+	camera.rotate_object_local(Vector3.RIGHT, sin(elapsed * 83.0) * impact * 0.028)
+	camera.rotate_object_local(Vector3.FORWARD, sin(elapsed * 67.0) * impact * 0.045)
+	camera.global_position += attack_pose.basis.x * sin(elapsed * 91.0) * impact * 0.025
+	attack_visuals.edges.set_shader_parameter("strength", smoothstep(3.12, 3.5, elapsed))
+	attack_visuals.edges.set_shader_parameter("age", maxf(0.0, elapsed - 3.12))
+
 func cancel() -> void:
 	active = false
 	set_process(false)
+	if is_instance_valid(attack_visuals):
+		attack_visuals.monster.hide()
+		attack_visuals.overlay.hide()
 	if is_instance_valid(hud):
 		hud.set("visible", hud_was_visible)
 	hud = null
