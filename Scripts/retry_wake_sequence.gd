@@ -2,6 +2,10 @@ extends Node
 
 const RETRY_META := "pal_who_say_boo_retry_wake"
 const DURATION := 8.2
+const GASP_TIME := 0.06
+@export_range(-40.0, 0.0) var gasp_volume_db: float = -12.0
+var gasp_sound: AudioStreamPlayer
+var gasp_played: bool = false
 
 var player: CharacterBody3D
 var gameplay_camera: Camera3D
@@ -21,11 +25,15 @@ var horizontal_forward := Vector3.FORWARD
 # sideways offset, forward offset. Offsets are relative to the final standing spot.
 var poses: Array[Array] = [
 	[0.00, 0.00, 0.0, 88.0, 0.0, 1.0, 2.8, -4.0, -0.70, -1.20],
-	[0.25, 0.02, 0.0, 84.0, 0.5, 0.12, 2.0, 6.0, -0.70, -1.18],
-	[0.45, 0.03, 0.0, 80.0, 0.0, 0.0, 1.6, 3.0, -0.70, -1.15],
-	# Sit up from the pillow and let the player process the nightmare.
-	[1.45, 0.44, 0.0, 3.0, 1.5, 0.0, 0.5, 1.0, -0.70, -0.45],
-	[1.75, 0.44, 0.0, -2.0, 0.0, 0.45, 0.3, 0.0, -0.70, -0.45],
+	# Eyes, gasp and sit-up start together, then the body settles from the jolt.
+	[0.06, 0.00, 0.0, 88.0, 0.0, 1.0, 2.8, -4.0, -0.70, -1.20],
+	[0.18, 0.24, 0.0, 40.0, -1.5, 0.06, 1.3, 7.0, -0.70, -0.78],
+	[0.34, 0.47, 0.0, -6.0, 2.0, 0.0, 0.6, 3.0, -0.70, -0.42],
+	[0.65, 0.44, 0.0, -2.0, 0.0, 0.0, 0.3, 0.0, -0.70, -0.45],
+	# Small breathing movement while seated, before checking the room.
+	[0.95, 0.447, 0.0, -1.0, 0.4, 0.0, 0.2, 0.5, -0.70, -0.45],
+	[1.35, 0.44, 0.0, -2.0, 0.0, 0.0, 0.1, 0.0, -0.70, -0.45],
+	[1.75, 0.445, 0.0, -1.5, -0.3, 0.15, 0.1, 0.0, -0.70, -0.45],
 	[1.95, 0.44, 0.0, -2.0, 0.0, 0.0, 0.1, 0.0, -0.70, -0.45],
 	[2.70, 0.44, 0.0, -2.0, 0.0, 0.0, 0.0, 0.0, -0.70, -0.45],
 	# Check both sides while remaining seated.
@@ -43,6 +51,14 @@ var poses: Array[Array] = [
 ]
 
 func play(actor: CharacterBody3D, gameplay: Camera3D, camera: Camera3D, eyes: Control, callback: Callable) -> void:
+	if gasp_sound == null:
+		gasp_sound = AudioStreamPlayer.new()
+		gasp_sound.name = "RetryWakeGasp"
+		gasp_sound.stream = preload("res://Assets/Audio/retry_wake_gasp.ogg")
+		add_child(gasp_sound)
+	gasp_sound.stop()
+	gasp_sound.volume_db = gasp_volume_db
+	gasp_played = false
 	player = actor
 	gameplay_camera = gameplay
 	cutscene_camera = camera
@@ -76,6 +92,9 @@ func _process(delta: float) -> void:
 	if finished or not is_instance_valid(cutscene_camera):
 		return
 	elapsed = minf(DURATION, elapsed + delta)
+	if not gasp_played and elapsed >= GASP_TIME:
+		gasp_played = true
+		gasp_sound.play()
 	_apply_pose(elapsed)
 	if elapsed >= DURATION:
 		finished = true
