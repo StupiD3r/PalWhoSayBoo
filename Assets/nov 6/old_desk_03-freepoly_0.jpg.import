@@ -1,0 +1,44 @@
+[remap]
+
+importer="texture"
+type="CompressedTexture2D"
+uid="uid://dv8jsanfo6lxt"
+path.s3tc="res://.godot/imported/old_desk_03-freepoly_0.jpg-b69cefc865d45bb4a816b672ff114c84.s3tc.ctex"
+metadata={
+"imported_formats": ["s3tc_bptc"],
+"vram_texture": true
+}
+generator_parameters={
+"md5": "03c9571cb84aaddaf55fe281f6c7366e"
+}
+
+[deps]
+
+source_file="res://Assets/nov 6/old_desk_03-freepoly_0.jpg"
+dest_files=["res://.godot/imported/old_desk_03-freepoly_0.jpg-b69cefc865d45bb4a816b672ff114c84.s3tc.ctex"]
+
+[params]
+
+compress/mode=2
+compress/high_quality=false
+compress/lossy_quality=0.7
+compress/uastc_level=0
+compress/rdo_quality_loss=0.0
+compress/hdr_compression=1
+compress/normal_map=0
+compress/channel_pack=0
+mipmaps/generate=true
+mipmaps/limit=-1
+roughness/mode=0
+roughness/src_normal=""
+process/channel_remap/red=0
+process/channel_remap/green=1
+process/channel_remap/blue=2
+process/channel_remap/alpha=3
+process/fix_alpha_border=true
+process/premult_alpha=false
+process/normal_map_invert_y=false
+process/hdr_as_srgb=false
+process/hdr_clamp_exposure=false
+process/size_limit=0
+detect_3d/compress_to=0
