@@ -32,6 +32,8 @@ var objective: Label
 var dialogue: Array[Array] = [
 	["LOLA", "APO!!"],
 	["LOLA", "Pupunta ka na ba sa piyesta?"],
+	["LOLA", "Tungkol sa competition na sinalihan mo."],
+	["IKAW", "Bakit, anong meron sa Palosebo?"],
 	["LOLA", "Sigurado ka na? Maraming kumakalat na balita ngayon… may sumpa raw ang posteng ’yon."],
 	["IKAW", "Ano ka ba, La? Kaya kong akyatin ’yon, noh!"],
 	["LOLA", "Sige… mag-ingat ka."],
@@ -209,10 +211,10 @@ func _process(delta: float) -> void:
 			_release()
 		return
 	line_age += delta
-	reveal += delta * (28.0 if line_index == 8 else 42.0)
+	reveal += delta * (28.0 if line_index == 10 else 42.0)
 	subtitle.visible_characters = mini(int(reveal), subtitle.text.length())
 	var target := _head_target()
-	if line_index == 6 and is_instance_valid(pole):
+	if line_index == 8 and is_instance_valid(pole):
 		target = pole.global_position
 		target.y = camera.global_position.y
 	var desired := Transform3D(camera.global_basis, source_pose.origin).looking_at(target, Vector3.UP)
@@ -267,14 +269,14 @@ func _show_line() -> void:
 	speaker.text = dialogue[line_index][0]
 	speaker.modulate = Color(0.6, 0.85, 1.0) if speaker.text == "IKAW" else Color(1.0, 0.82, 0.45)
 	subtitle.text = dialogue[line_index][1]
-	subtitle.modulate = Color(1.0, 0.88, 0.61) if line_index == 8 else Color.WHITE
+	subtitle.modulate = Color(1.0, 0.88, 0.61) if line_index == 10 else Color.WHITE
 	subtitle.visible_characters = 0
 	reveal = 0.0
 	line_age = 0.0
 	hint.text = "E — Ipakita ang linya"
 
 func advance_dialogue() -> void:
-	if line_age < 0.35 or (line_index in [6, 7] and line_age < 1.0):
+	if line_age < 0.35 or (line_index in [8, 9] and line_age < 1.0):
 		return
 	if subtitle.visible_characters < subtitle.text.length():
 		reveal = subtitle.text.length()

@@ -162,6 +162,8 @@
 [ext_resource type="Script" uid="uid://f38dgins562a" path="res://Scripts/animation_player.gd" id="162_bqpu3"]
 [ext_resource type="Texture2D" uid="uid://dq2y2ww3mvjnc" path="res://Assets/NPC/Character_02.png" id="163_8fo06"]
 [ext_resource type="Script" uid="uid://b0r3cbqc8vurc" path="res://Scripts/dialogue_trigger.gd" id="164_rbr4c"]
+[ext_resource type="Script" uid="uid://fy0oe4k1b46v" path="res://Scripts/pst_sound_trigger.gd" id="165_peyyu"]
+[ext_resource type="AudioStream" uid="uid://dcppbsaodcle8" path="res://Assets/Audio/pst.mp3" id="166_xcm6c"]
 [ext_resource type="Texture2D" uid="uid://gergjstlf78a" path="res://Assets/Terrain/Ground/Ground078_2K-PNG/Ground078_2K-jpeg_Color.jpg" id="terrain_dirt"]
 [ext_resource type="Texture2D" uid="uid://du575in7dk1om" path="res://Assets/Terrain/Ground/Ground037_2K-PNG/Ground037_2K-Jpeg_Color.jpg" id="terrain_grass"]
 
@@ -10483,6 +10485,9 @@ _data = {
 [sub_resource type="BoxShape3D" id="BoxShape3D_rtkds"]
 size = Vector3(2.981079, 1.6626587, 2.8652039)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_1j03s"]
+size = Vector3(13.875244, 1, 7.887451)
+
 [node name="Main" type="Node3D" unique_id=1181372035 groups=["Player", "player"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.704742, 0.796432, -13.015881)
 
@@ -15709,6 +15714,18 @@ shape = SubResource("BoxShape3D_rtkds")
 [node name="DialogueCamera" type="Camera3D" parent="justnpc2" unique_id=162208954]
 transform = Transform3D(0.8000001, 0, 2.682209e-07, 0, 0.8, 0, -2.682209e-07, 0, 0.8000001, -0.101119995, 4.185769, 2.185299)
 fov = 50.0
+
+[node name="PstSoundTrigger" type="Area3D" parent="." unique_id=44385608 groups=["Player", "player"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.872295, 0, 42.879)
+script = ExtResource("165_peyyu")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PstSoundTrigger" unique_id=89455758]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0621338, 0, -0.4173584)
+shape = SubResource("BoxShape3D_1j03s")
+
+[node name="Sound" type="AudioStreamPlayer" parent="PstSoundTrigger" unique_id=1434893060]
+stream = ExtResource("166_xcm6c")
+volume_db = -10.0
 
 [connection signal="climbing_started" from="Player" to="TypingUI" method="start_typing_minigame"]
 [connection signal="climbing_stopped" from="Player" to="TypingUI" method="stop_typing_minigame"]
