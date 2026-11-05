@@ -161,6 +161,7 @@
 [ext_resource type="Texture2D" uid="uid://b1hthacjlsy2x" path="res://Assets/NPC/Character_36_Female.png" id="161_b4ksb"]
 [ext_resource type="Script" uid="uid://f38dgins562a" path="res://Scripts/animation_player.gd" id="162_bqpu3"]
 [ext_resource type="Texture2D" uid="uid://dq2y2ww3mvjnc" path="res://Assets/NPC/Character_02.png" id="163_8fo06"]
+[ext_resource type="Script" uid="uid://ddla3n5toswqw" path="res://Scripts/trigger_dancing_npc.gd" id="164_qgu6i"]
 [ext_resource type="Script" uid="uid://b0r3cbqc8vurc" path="res://Scripts/dialogue_trigger.gd" id="164_rbr4c"]
 [ext_resource type="Script" uid="uid://fy0oe4k1b46v" path="res://Scripts/pst_sound_trigger.gd" id="165_peyyu"]
 [ext_resource type="AudioStream" uid="uid://dcppbsaodcle8" path="res://Assets/Audio/pst.mp3" id="166_xcm6c"]
@@ -10156,6 +10157,9 @@ _data = {
 &"mixamo_com": SubResource("Animation_68blv")
 }
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_2hy8b"]
+size = Vector3(45.10901, 4.359375, 8.710815)
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1bo41"]
 resource_name = "Character_02"
 vertex_color_use_as_albedo = true
@@ -15648,6 +15652,17 @@ skeleton = NodePath("..")
 [node name="AnimationPlayer" type="AnimationPlayer" parent="DancingNPC2" unique_id=1376845140]
 libraries/ = SubResource("AnimationLibrary_4bdf8")
 script = ExtResource("162_bqpu3")
+
+[node name="TriggerDancingNPC" type="Area3D" parent="DancingNPC2" unique_id=333522191 groups=["Player", "player"]]
+script = ExtResource("164_qgu6i")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DancingNPC2/TriggerDancingNPC" unique_id=389919007]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.457346, 1.6796875, -0.73896027)
+shape = SubResource("BoxShape3D_2hy8b")
+
+[node name="DancingNPCCam" type="Camera3D" parent="DancingNPC2" unique_id=1095819002]
+transform = Transform3D(0.7607347, 0.039903335, 0.106800795, -0.080671795, 0.6975821, 0.3139862, -0.08056519, -0.3217188, 0.6940622, -0.81838703, 4.411994, 6.5982056)
+fov = 55.0
 
 [node name="justnpc2" type="Node3D" parent="." unique_id=2116098614]
 transform = Transform3D(1.1347295, 0, -0.52429855, 0, 1.25, 0, 0.52429855, 0, 1.1347295, 192.97362, -0.796432, 32.547493)

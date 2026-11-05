@@ -17,7 +17,7 @@ const MIX = {
 	"Warning": 10.0,
 	"Scratch": 10.0,
 	"Stinger": -3.0,
-	"AmbientMusic": -35.0,
+	"AmbientMusic": -25.0,
 	"MenuMusic": 14.0,
 	"Radio": -14.0,
 	"StageMusic": -12.0,
