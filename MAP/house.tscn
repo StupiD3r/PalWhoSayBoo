@@ -1189,6 +1189,7 @@ mesh = SubResource("ArrayMesh_7ldsn")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Sketchfab_Scene/Sketchfab_model/bed83h_fbx/RootNode/Bed/Bed_DefaultMaterial_0/StaticBody3D" unique_id=953470055]
 shape = SubResource("ConvexPolygonShape3D_ix2n2")
+
 [node name="Sketchfab_Scene25" parent="." unique_id=306805736 instance=ExtResource("34_603f2")]
 transform = Transform3D(0.005, 0, 0, 0, 0.005, 0, 0, 0, 0.005, -12.806601, 1.9100238, -9.768101)
 
@@ -1259,7 +1260,7 @@ transform = Transform3D(0.38, 0, 0, 0, 0.38, 0, 0, 0, 0.38, 3.513834, 4.099956, 
 transform = Transform3D(0.025, 0, 0, 0, 0.019, 0, 0, 0, 0.015, -2.447569, 0.558, -9.954305)
 
 [node name="Sketchfab_Scene24" parent="." unique_id=1241942291 instance=ExtResource("57_asqw6")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4704697, 2.9526887, -9.925046)
+transform = Transform3D(0.62, 0, 0, 0, 0.62, 0, 0, 0, 0.62, -2.4704697, 2.6205773, -9.925046)
 
 [connection signal="body_entered" from="Radio and Table at room 2/Table/Radio/RadioTrigger" to="Radio and Table at room 2/Table/Radio/RadioTrigger" method="_on_body_entered"]
 
