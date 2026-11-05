@@ -24,9 +24,16 @@ var overlay: CanvasLayer
 var edges: ShaderMaterial
 var countdown: Label
 var turn_side: float = 1.0
+var scare_sound: AudioStreamPlayer
+var scare_sound_played: bool = false
 
 func _ready() -> void:
 	set_process(false)
+	scare_sound = AudioStreamPlayer.new()
+	scare_sound.name = "MidclimbAttackSound"
+	scare_sound.stream = preload("res://Assets/Audio/mid climb manananggal 2.mp3")
+	scare_sound.volume_db = -12.0
+	add_child(scare_sound)
 	monster = Node3D.new()
 	add_child(monster)
 	var model := MONSTER.instantiate() as Node3D
@@ -133,6 +140,9 @@ func begin(player: CharacterBody3D) -> bool:
 	fpv_pose.origin += forward * 0.25
 	fpv_pose = fpv_pose.looking_at(fpv_pose.origin + forward, Vector3.UP)
 	previous_process_mode = player.process_mode
+	var audio := player.get_node_or_null("PlayerAudio")
+	if audio and audio.has_method("stop_ghost_breath"):
+		audio.stop_ghost_breath()
 	actor_mesh = player.get_node_or_null("Player") as Node3D
 	if actor_mesh:
 		previous_mesh_visible = actor_mesh.visible
@@ -149,6 +159,8 @@ func begin(player: CharacterBody3D) -> bool:
 	camera.attributes = current.attributes
 	camera.make_current()
 	elapsed = 0.0
+	scare_sound_played = false
+	scare_sound.stop()
 	active = true
 	overlay.show()
 	edges.set_shader_parameter("strength", 0.0)
@@ -168,6 +180,9 @@ func _process(delta: float) -> void:
 		finished.emit()
 		return
 	elapsed += delta
+	if not scare_sound_played and elapsed >= 0.95 and elapsed < TOTAL_DURATION:
+		scare_sound_played = true
+		scare_sound.play()
 	if elapsed >= TOTAL_DURATION:
 		cancel()
 		finished.emit()
@@ -205,6 +220,8 @@ func _process(delta: float) -> void:
 	edges.set_shader_parameter("age", maxf(0.0, elapsed - 1.18))
 
 func cancel(restore_camera: bool = true) -> void:
+	if is_instance_valid(scare_sound):
+		scare_sound.stop()
 	active = false
 	set_process(false)
 	if is_instance_valid(actor):

@@ -30,6 +30,10 @@ var black: ColorRect
 var wind: AudioStreamPlayer
 var creak: AudioStreamPlayer
 var slipped: bool = false
+var body_sound: AudioStreamPlayer
+var attack_sound: AudioStreamPlayer
+var body_sound_played: bool = false
+var attack_sound_played: bool = false
 
 func _ready() -> void:
 	set_process(false)
@@ -56,6 +60,16 @@ func _ready() -> void:
 	creak.stream = preload("res://Assets/Audio/bamboo_creak_1.ogg")
 	creak.volume_db = -14.0
 	add_child(creak)
+	body_sound = AudioStreamPlayer.new()
+	body_sound.name = "BodyFallSound"
+	body_sound.stream = preload("res://Assets/Audio/body falling .mp3")
+	body_sound.volume_db = -8.0
+	add_child(body_sound)
+	attack_sound = AudioStreamPlayer.new()
+	attack_sound.name = "FatalMonsterSound"
+	attack_sound.stream = preload("res://Assets/Audio/manananggal ending.mp3")
+	attack_sound.volume_db = -14.0
+	add_child(attack_sound)
 
 func _make_flag() -> void:
 	if not is_instance_valid(pole):
@@ -141,6 +155,9 @@ func begin(player: CharacterBody3D, caught_by_monster: bool = false) -> bool:
 		hud_was_visible = bool(hud.get("visible"))
 		hud.hide()
 	previous_mode = player.process_mode
+	var audio := player.get_node_or_null("PlayerAudio")
+	if audio and audio.has_method("stop_ghost_breath"):
+		audio.stop_ghost_breath()
 	actor_mesh = player.get_node_or_null("Player") as Node3D
 	if actor_mesh:
 		original_mesh_visible = actor_mesh.visible
@@ -158,6 +175,10 @@ func begin(player: CharacterBody3D, caught_by_monster: bool = false) -> bool:
 	camera.make_current()
 	elapsed = 0.0
 	slipped = false
+	body_sound_played = false
+	attack_sound_played = false
+	body_sound.stop()
+	attack_sound.stop()
 	active = true
 	black.color.a = 0.0
 	overlay.show()
@@ -174,6 +195,13 @@ func _process(delta: float) -> void:
 		finished.emit()
 		return
 	elapsed = minf(DURATION, elapsed + delta)
+	if monster_ending and not attack_sound_played and elapsed >= 2.4:
+		attack_sound_played = true
+		attack_sound.play()
+	if not body_sound_played and elapsed >= 5.55:
+		body_sound_played = true
+		# Skip the recording's quiet lead-in; the impact lands after the screen fades.
+		body_sound.play(0.43)
 	if not slipped and elapsed >= 0.65:
 		slipped = true
 		creak.play()
@@ -194,7 +222,7 @@ func _process(delta: float) -> void:
 	black.color.a = smoothstep(4.7, 5.55, elapsed)
 	wind.volume_db = lerpf(-34.0, -17.0, smoothstep(0.65, 4.4, elapsed)) - black.color.a * 35.0
 	if elapsed >= DURATION:
-		cancel()
+		cancel(true)
 		finished.emit()
 
 func _update_monster_attack() -> void:
@@ -219,9 +247,13 @@ func _update_monster_attack() -> void:
 	attack_visuals.edges.set_shader_parameter("strength", smoothstep(3.12, 3.5, elapsed))
 	attack_visuals.edges.set_shader_parameter("age", maxf(0.0, elapsed - 3.12))
 
-func cancel() -> void:
+func cancel(keep_impact_tail: bool = false) -> void:
 	active = false
 	set_process(false)
+	if is_instance_valid(body_sound) and not keep_impact_tail:
+		body_sound.stop()
+	if is_instance_valid(attack_sound):
+		attack_sound.stop()
 	if is_instance_valid(attack_visuals):
 		attack_visuals.monster.hide()
 		attack_visuals.overlay.hide()

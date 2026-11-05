@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://mogoqjbhf5py"
+path="res://.godot/imported/ghost breathe.mp3-c0569d2a670a09ee0cc12baef5d427b4.mp3str"
+
+[deps]
+
+source_file="res://Assets/Audio/ghost breathe.mp3"
+dest_files=["res://.godot/imported/ghost breathe.mp3-c0569d2a670a09ee0cc12baef5d427b4.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

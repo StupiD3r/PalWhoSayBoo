@@ -2,8 +2,8 @@ extends Node
 
 @onready var step_sound: AudioStreamPlayer = get_node_or_null("StepSound") as AudioStreamPlayer
 @onready var walk_sound: AudioStreamPlayer = $WalkSound # --- NEW ---
-var walking_stream: AudioStreamOggVorbis = preload("res://Assets/Audio/walking.ogg")
-var running_stream: AudioStreamOggVorbis = preload("res://Assets/Audio/running.ogg")
+var walking_stream: AudioStreamOggVorbis = preload("res://Assets/Audio/footstep_walk.ogg")
+var running_stream: AudioStreamOggVorbis = preload("res://Assets/Audio/footstep_run.ogg")
 @export_range(-40.0, 0.0) var footstep_volume_db: float = -12.0
 
 var typing_streak: int = 0
@@ -30,6 +30,8 @@ var atmosphere_climbing: bool = false
 var previous_climb_y: float = 0.0
 var creak_cooldown: float = 0.0
 var last_creak_index: int = -1
+var ghost_breath: AudioStreamPlayer
+var ghost_cooldown: float = 18.0
 
 @export var typing_sounds_enabled: bool = true
 @export_range(-40.0, 0.0) var typing_volume_db: float = -18.0
@@ -53,6 +55,11 @@ var landing_sound: AudioStreamPlayer
 @export_range(-40.0, 0.0) var landing_volume_db: float = -16.0
 
 func _ready() -> void:
+	ghost_breath = AudioStreamPlayer.new()
+	ghost_breath.name = "GhostBreath"
+	ghost_breath.stream = preload("res://Assets/Audio/ghost breathe.mp3")
+	ghost_breath.volume_db = -16.0
+	add_child(ghost_breath)
 	climb_wind = AudioStreamPlayer.new()
 	climb_wind.name = "ClimbingWind"
 	var wind_stream := preload("res://Assets/Audio/swirling wind.mp3").duplicate() as AudioStreamMP3
@@ -72,6 +79,8 @@ func _ready() -> void:
 	running_stream = running_stream.duplicate() as AudioStreamOggVorbis
 	walking_stream.loop = true
 	running_stream.loop = true
+	walking_stream.set_meta("mix_profile", "Walking")
+	running_stream.set_meta("mix_profile", "Running")
 	walk_sound.stop()
 	walk_sound.stream = walking_stream
 	walk_sound.volume_db = footstep_volume_db
@@ -106,8 +115,10 @@ func _ready() -> void:
 func start_climb_voice() -> void:
 	stop_climb_voice()
 	climb_active = true
+	ghost_cooldown = randf_range(12.0, 22.0)
 
 func stop_climb_voice() -> void:
+	stop_ghost_breath()
 	climb_active = false
 	climb_effort_steps = 0
 	climb_voice_cooldown = 0.0
@@ -141,6 +152,7 @@ func _update_climb_atmosphere(delta: float) -> void:
 	if climbing:
 		var height := body.global_position.y
 		var resting: bool = body.get("climb_resting") == true
+		_update_ghost_breath(delta, resting)
 		if not atmosphere_climbing:
 			previous_climb_y = height
 			creak_cooldown = 1.0
@@ -160,19 +172,39 @@ func _update_climb_atmosphere(delta: float) -> void:
 			last_creak_index = index
 			bamboo_creak.stream = creak_streams[index]
 			bamboo_creak.pitch_scale = randf_range(0.94, 1.06)
+			_route_sound(bamboo_creak)
 			bamboo_creak.play()
 			creak_cooldown = randf_range(3.5, 6.0)
 		previous_climb_y = height
 	else:
 		bamboo_creak.stop()
+		if ghost_breath.playing:
+			stop_ghost_breath()
 	atmosphere_climbing = climbing
 	climb_wind.volume_db = lerpf(climb_wind.volume_db, target_volume, 1.0 - exp(-2.5 * delta))
 	if not climbing and climb_wind.volume_db < -59.5:
 		climb_wind.stop()
 
+func _update_ghost_breath(delta: float, resting: bool) -> void:
+	if resting:
+		ghost_breath.stop()
+		ghost_cooldown = maxf(ghost_cooldown, 8.0)
+		return
+	ghost_cooldown = maxf(0.0, ghost_cooldown - delta)
+	if ghost_cooldown <= 0.0 and not ghost_breath.playing and not climb_voice.playing:
+		ghost_breath.pitch_scale = randf_range(0.97, 1.03)
+		ghost_breath.play()
+		ghost_cooldown = randf_range(25.0, 45.0)
+
+func stop_ghost_breath() -> void:
+	if is_instance_valid(ghost_breath):
+		ghost_breath.stop()
+	ghost_cooldown = randf_range(25.0, 45.0)
+
 func _play_climb_voice(stream: AudioStream) -> void:
 	climb_voice.stream = stream
 	climb_voice.pitch_scale = randf_range(0.97, 1.03)
+	_route_sound(climb_voice)
 	climb_voice.play()
 	climb_voice_cooldown = maxf(2.5, stream.get_length() + 0.8)
 
@@ -287,6 +319,7 @@ func play_walk_step(sprinting: bool = false) -> void:
 	if walk_sound.stream != stream:
 		walk_sound.stop()
 		walk_sound.stream = stream
+	_route_sound(walk_sound)
 	if not walk_sound.playing:
 		walk_sound.pitch_scale = 1.0
 		walk_sound.play()
@@ -294,3 +327,8 @@ func play_walk_step(sprinting: bool = false) -> void:
 func stop_walk_step() -> void:
 	if walk_sound and walk_sound.playing:
 		walk_sound.stop()
+
+func _route_sound(sound: AudioStreamPlayer) -> void:
+	var mix := get_node_or_null("/root/AudioMix")
+	if mix:
+		mix.route_player(sound)

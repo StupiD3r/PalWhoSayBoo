@@ -20,6 +20,11 @@ config/name="PalWhoSayBoo"
 run/main_scene="uid://b4kv2o18ar86j"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 
+[autoload]
+
+AudioMix="*res://Scripts/audio_mix.gd"
+PauseMenu="*res://Scripts/pause_menu.gd"
+
 [display]
 
 window/size/mode=3

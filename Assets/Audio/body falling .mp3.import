@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://cao6m2ktx0t5k"
+path="res://.godot/imported/body falling .mp3-a2fb238aaab36566d60d7e168e94a2de.mp3str"
+
+[deps]
+
+source_file="res://Assets/Audio/body falling .mp3"
+dest_files=["res://.godot/imported/body falling .mp3-a2fb238aaab36566d60d7e168e94a2de.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

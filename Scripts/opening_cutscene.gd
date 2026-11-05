@@ -1,6 +1,7 @@
 extends Node3D
 
 const RetryWake = preload("res://Scripts/retry_wake_sequence.gd")
+const LolaGuide = preload("res://Scripts/lola_guide.gd")
 
 @export var player: CharacterBody3D
 @export var gameplay_camera: Camera3D
@@ -40,6 +41,11 @@ func _start_ambient_music() -> void:
 
 func _begin_cutscene() -> void:
 	var is_retry := bool(Engine.get_meta(RetryWake.RETRY_META, false))
+	if get_parent().has_node("Lola") and not get_parent().has_node("LolaGuide"):
+		var guide := LolaGuide.new()
+		guide.name = "LolaGuide"
+		guide.required_intro = not is_retry and not bool(Engine.get_meta(LolaGuide.COMPLETED_META, false))
+		get_parent().add_child.call_deferred(guide)
 	if Engine.has_meta(RetryWake.RETRY_META):
 		Engine.remove_meta(RetryWake.RETRY_META)
 	# Find your existing player if it wasn't assigned.

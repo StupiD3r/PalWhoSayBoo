@@ -26,6 +26,11 @@ func _input(event):
 	if player_node and event.is_action_pressed("interact"):
 		# ONLY attach when not climbing. Pressing 'E' during climb does NOTHING now!
 		if not player_node.is_climbing:
+			var guide := get_tree().current_scene.get_node_or_null("LolaGuide") if get_tree().current_scene else null
+			if guide != null and guide.get("required_intro") == true:
+				guide.show_required_hint()
+				get_viewport().set_input_as_handled()
+				return
 			player_node.start_climbing(global_position, get_climb_height_limit())
 			# The attaching key must not also reach the new typing session.
 			get_viewport().set_input_as_handled()
