@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://bklqgvicspkb2"
+path="res://.godot/imported/Budots 2 (Original Budots).mp3-5e4c7570873d5e6130e3563de59cc4ba.mp3str"
+
+[deps]
+
+source_file="res://Budots 2 (Original Budots).mp3"
+dest_files=["res://.godot/imported/Budots 2 (Original Budots).mp3-5e4c7570873d5e6130e3563de59cc4ba.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

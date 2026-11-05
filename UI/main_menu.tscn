@@ -89,3 +89,4 @@ volume_db = -10.0
 
 [node name="BGM" type="AudioStreamPlayer" parent="." unique_id=51515649]
 stream = ExtResource("5_f40uw")
+volume_db = -32.0
