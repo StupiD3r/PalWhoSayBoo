@@ -4,10 +4,10 @@ extends Node
 @onready var walk_sound: AudioStreamPlayer = $WalkSound # --- NEW ---
 var walking_stream: AudioStreamOggVorbis = preload("res://Assets/Audio/footstep_walk.ogg")
 var running_stream: AudioStreamOggVorbis = preload("res://Assets/Audio/footstep_run.ogg")
-@export_range(-40.0, 0.0) var footstep_volume_db: float = -12.0
+@export_range(-40.0, 0.0) var footstep_volume_db: float = -35.0
 
 var typing_streak: int = 0
-@export_range(-40.0, 0.0) var climb_voice_volume_db: float = -16.0
+@export_range(-40.0, 0.0) var climb_voice_volume_db: float = -20.0
 var climb_voice: AudioStreamPlayer
 var grunt_stream: AudioStreamOggVorbis = preload("res://Assets/Audio/grunt.ogg")
 var exhaust_stream: AudioStreamOggVorbis = preload("res://Assets/Audio/exhaust.ogg")

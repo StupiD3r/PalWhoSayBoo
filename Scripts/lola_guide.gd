@@ -42,6 +42,8 @@ var dialogue: Array[Array] = [
 ]
 
 func _ready() -> void:
+	add_to_group("lola_intro_dialogue")
+	reset_for_retry()
 	player = get_parent().get_node_or_null("Player") as CharacterBody3D
 	lola = get_parent().get_node_or_null("Lola") as Node3D
 	pole = get_parent().get_node_or_null("Bamboo/BambooPole") as Node3D
@@ -55,6 +57,33 @@ func _ready() -> void:
 	_build_ui()
 	if player.has_signal("climbing_started"):
 		player.connect("climbing_started", func(): objective_done = true)
+
+func reset_for_retry() -> void:
+	# Also supports retries that reuse this scene instead of reloading it.
+	if active:
+		_release()
+
+	required_intro = true
+	objective_done = false
+	near_lola = false
+	active = false
+	returning = false
+	line_index = 0
+	line_age = 0.0
+	reveal = 0.0
+	return_age = 0.0
+
+	# Engine metadata survives scene reloads, so clear the previous run.
+	if Engine.has_meta(COMPLETED_META):
+		Engine.remove_meta(COMPLETED_META)
+
+	if is_instance_valid(panel):
+		panel.hide()
+	if is_instance_valid(prompt):
+		prompt.hide()
+	if is_instance_valid(objective):
+		objective.text = "Kausapin muna si Lola sa labas ng bahay."
+		objective.visible = _can_talk()
 
 func _build_ui() -> void:
 	layer = CanvasLayer.new()
