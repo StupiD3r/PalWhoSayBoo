@@ -1948,8 +1948,9 @@ shape = SubResource("BoxShape3D_b0il4")
 [node name="RadioAudio" type="AudioStreamPlayer3D" parent="Radio and Table at room 2/Table/Radio/RadioTrigger" unique_id=1440571904]
 transform = Transform3D(2.857143, 0, 1.1920929e-07, 0, 2.857143, 0, -1.1920929e-07, 0, 2.857143, 0, 0, 0)
 stream = ExtResource("22_426ww")
+volume_db = -12.0
 max_db = 0.5
-max_distance = 27.0
+max_distance = 21.0
 
 [node name="empty_glass" type="Node3D" parent="." unique_id=1670533876]
 transform = Transform3D(1.4999983, 0, -0.0022367947, 0, 2.5, 0, 0.0022367947, 0, 1.4999983, -12.506161, 1.9716556, -9.060245)
@@ -2156,10 +2157,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 3.1129057e-22, 0, 3.112904e-22, 1, 0.0103
 shape = SubResource("BoxShape3D_2hy8b")
 
 [node name="Prompt" type="Label3D" parent="MCBedroomDoor" unique_id=558981406]
-transform = Transform3D(-0.99959815, 0.0020234422, -0.02827485, -0.028347159, -0.071353815, 0.99704844, -4.821826e-08, 0.99744904, 0.07138249, -0.6692227, 0.1209874, -0.0537889)
+transform = Transform3D(-0.99959815, 0.0020234422, -0.02827485, -0.028347159, -0.07135384, 0.9970486, -4.821826e-08, 0.99744904, 0.071382515, -0.6692227, 0.11009154, -0.0537889)
 billboard = 1
 text = "E — Open"
-font_size = 7
+font_size = 9
 
 [node name="Bedroom2Door" type="Node3D" parent="." unique_id=803806227]
 transform = Transform3D(-1.5736325, -1.0647445, -1.7346889e-07, 7.153565e-15, -3.095493e-07, 1.9, -1.0647445, 1.5736325, 2.5637723e-07, 0.13321924, 2.169341, -0.3686962)
