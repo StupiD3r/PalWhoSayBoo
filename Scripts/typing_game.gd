@@ -154,16 +154,34 @@ class FeedbackOverlay:
 			ghost.queue_free()
 		)
 
-var easy_words = ["poste", "barya", "kapit", "dulas", "hawak", "bilis", "talon", "tangkad", "panalo", "punongkahoy"]
-var medium_words = ["kawayan", "grasa", "panatag", "pagsisikap", "premyo", "abot", "taas", "pawis"]
-var hard_words = ["palosebo", "madulas", "tradisyon", "piyesta", "kampyeon", "pagsubok"]
+var easy_words = [
+	"poste", "barya", "kapit", "dulas", "hawak", "bilis", "talon", "tangkad",
+	"panalo", "punongkahoy", "adobo", "sinigang", "sisig", "taho", "suman", "puto",
+	"kakanin", "bibingka", "balut", "turon", "sago", "gulaman", "pandesal", "barong",
+	"saya", "bakya", "abaniko", "banig", "parol", "bahay", "kubo", "bayan",
+	"barangay", "harana", "kundiman", "sipa", "arnis", "sungka", "agawan", "mano",
+]
+var medium_words = [
+	"kawayan", "grasa", "panatag", "pagsisikap", "premyo", "abot", "taas", "pawis",
+	"tinola", "kare-kare", "lechon", "pancit", "lumpia", "champorado", "ensaymada", "halo-halo",
+	"sapin-sapin", "pakbet", "kinilaw", "longganisa", "tocino", "kamayan", "hablon", "malong",
+	"patadyong", "salakot", "tinikling", "carinosa", "singkil", "kulintang", "bandurria", "rondalla",
+	"bayanihan", "balagtasan", "bugtong", "alamat", "aswang", "diwata",
+]
+var hard_words = [
+	"palosebo", "madulas", "tradisyon", "piyesta", "kampyeon", "pagsubok", "simbang-gabi", "santacruzan",
+	"panagbenga", "pahiyas", "sinulog", "kadayawan", "ati-atihan", "pamamanhikan", "pagmamano", "pakikisama",
+	"pakikipagkapwa", "paggalang", "pagkakaisa", "kasaysayan", "kalayaan", "katipunan", "baybayin", "pabasa",
+	"senakulo", "komedya", "sarsuwela", "kumintang", "maglalatik", "pandanggo", "patintero", "tumbang-preso",
+	"luksong-baka", "luksong-tinik", "manananggal", "nuno-sa-punso",
+]
 
 var current_word: String = ""
 var next_word: String = ""
 var typed_text: String = ""
 var is_active: bool = false
 @export var rest_score_interval: int = 2000
-@export var rest_duration_seconds: float = 10.0
+@export var rest_duration_seconds: float = 3.0
 var is_resting: bool = false
 var rest_remaining: float = 0.0
 var next_rest_score: int = 2000

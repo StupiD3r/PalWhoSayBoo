@@ -3,9 +3,10 @@ extends Node3D
 signal finished
 
 const MONSTER = preload("res://Assets/Mananaggal/mananaggal_model.glb")
-const RETURN_START := 1.85
-const COUNTDOWN_START := 2.55
-const TOTAL_DURATION := 5.55
+const CAMERA_SNAP_SECONDS := 0.12
+const RETURN_START := 0.77
+const RETURN_END := 1.47
+const TOTAL_DURATION := RETURN_END + 3.0
 
 var active: bool = false
 var elapsed: float = 0.0
@@ -22,7 +23,6 @@ var source_fov: float = 75.0
 var fpv_fov: float = 75.0
 var overlay: CanvasLayer
 var edges: ShaderMaterial
-var countdown: Label
 var turn_side: float = 1.0
 var scare_sound: AudioStreamPlayer
 var scare_sound_played: bool = false
@@ -101,18 +101,6 @@ void fragment() {
 	edges = ShaderMaterial.new()
 	edges.shader = shader
 	screen.material = edges
-	countdown = Label.new()
-	countdown.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	countdown.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	countdown.add_theme_font_size_override("font_size", 160)
-	countdown.add_theme_color_override("font_outline_color", Color(0.04, 0.0, 0.0))
-	countdown.add_theme_constant_override("outline_size", 10)
-	countdown.add_theme_color_override("font_shadow_color", Color.BLACK)
-	countdown.add_theme_constant_override("shadow_offset_x", 2)
-	countdown.add_theme_constant_override("shadow_offset_y", 2)
-	countdown.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	overlay.add_child(countdown)
-	countdown.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	overlay.hide()
 
 func begin(player: CharacterBody3D) -> bool:
@@ -164,7 +152,6 @@ func begin(player: CharacterBody3D) -> bool:
 	active = true
 	overlay.show()
 	edges.set_shader_parameter("strength", 0.0)
-	countdown.text = ""
 	set_process(true)
 	return true
 
@@ -180,7 +167,7 @@ func _process(delta: float) -> void:
 		finished.emit()
 		return
 	elapsed += delta
-	if not scare_sound_played and elapsed >= 0.95 and elapsed < TOTAL_DURATION:
+	if not scare_sound_played and elapsed >= CAMERA_SNAP_SECONDS and elapsed < TOTAL_DURATION:
 		scare_sound_played = true
 		scare_sound.play()
 	if elapsed >= TOTAL_DURATION:
@@ -188,36 +175,34 @@ func _process(delta: float) -> void:
 		finished.emit()
 		return
 	var impact := 0.0
-	if elapsed < 0.65:
-		camera.global_transform = source_pose.interpolate_with(fpv_pose, smoothstep(0.0, 0.65, elapsed))
-		camera.fov = lerpf(source_fov, fpv_fov, smoothstep(0.0, 0.65, elapsed))
+	if elapsed < CAMERA_SNAP_SECONDS:
+		camera.global_transform = source_pose.interpolate_with(fpv_pose, smoothstep(0.0, CAMERA_SNAP_SECONDS, elapsed))
+		camera.fov = lerpf(source_fov, fpv_fov, smoothstep(0.0, CAMERA_SNAP_SECONDS, elapsed))
 	elif elapsed < RETURN_START:
 		camera.global_transform = fpv_pose
-		var rush := smoothstep(0.95, 1.32, elapsed)
+		var rush := smoothstep(CAMERA_SNAP_SECONDS, 0.24, elapsed)
 		var distance := lerpf(4.5, 1.05, rush)
-		var retreat := smoothstep(1.5, RETURN_START, elapsed)
+		var retreat := smoothstep(0.42, RETURN_START, elapsed)
 		var local_position := Vector3(retreat * 4.0, -0.55 + sin(elapsed * 3.0) * 0.06 + retreat * 3.0, -distance - retreat * 2.0)
 		monster.global_position = fpv_pose * local_position
 		monster.look_at(fpv_pose.origin, Vector3.UP, true)
 		monster.visible = true
-		impact = smoothstep(1.18, 1.32, elapsed) * (1.0 - smoothstep(1.42, 2.05, elapsed))
+		impact = smoothstep(0.18, 0.24, elapsed) * (1.0 - smoothstep(0.34, 0.97, elapsed))
 		camera.fov = fpv_fov - rush * (1.0 - retreat) * 5.0
 		camera.rotate_object_local(Vector3.RIGHT, sin(elapsed * 83.0) * impact * 0.018)
 		camera.rotate_object_local(Vector3.FORWARD, sin(elapsed * 67.0) * impact * 0.025)
 		camera.global_position += fpv_pose.basis.x * sin(elapsed * 91.0) * impact * 0.018
 	else:
 		monster.hide()
-		var weight := smoothstep(RETURN_START, COUNTDOWN_START, elapsed)
+		var weight := smoothstep(RETURN_START, RETURN_END, elapsed)
 		camera.global_transform = fpv_pose.interpolate_with(source_pose, weight)
 		camera.fov = lerpf(fpv_fov, source_fov, weight)
-		impact = (1.0 - smoothstep(RETURN_START, COUNTDOWN_START, elapsed)) * 0.4
-		if elapsed >= COUNTDOWN_START:
-			if actor_mesh:
-				actor_mesh.visible = previous_mesh_visible
-			countdown.text = str(ceili(TOTAL_DURATION - elapsed))
-	var blood_strength := smoothstep(1.18, 1.4, elapsed) * (1.0 - smoothstep(COUNTDOWN_START, TOTAL_DURATION, elapsed))
+		impact = (1.0 - smoothstep(RETURN_START, RETURN_END, elapsed)) * 0.4
+		if elapsed >= RETURN_END and is_instance_valid(actor_mesh):
+			actor_mesh.visible = previous_mesh_visible
+	var blood_strength := smoothstep(0.18, 0.32, elapsed) * (1.0 - smoothstep(RETURN_END, TOTAL_DURATION, elapsed))
 	edges.set_shader_parameter("strength", blood_strength)
-	edges.set_shader_parameter("age", maxf(0.0, elapsed - 1.18))
+	edges.set_shader_parameter("age", maxf(0.0, elapsed - 0.18))
 
 func cancel(restore_camera: bool = true) -> void:
 	if is_instance_valid(scare_sound):
