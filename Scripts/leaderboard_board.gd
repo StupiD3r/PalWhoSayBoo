@@ -1,5 +1,6 @@
 extends Node3D
 
+const DEFAULT_PATH := "user://release_high_scores_v1.cfg"
 const Store = preload("res://Scripts/leaderboard_store.gd")
 const RecordsView = preload("res://Scripts/leaderboard_view.gd")
 @export var pole_path: NodePath = NodePath("../Bamboo/BambooPole")

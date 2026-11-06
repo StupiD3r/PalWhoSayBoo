@@ -8,7 +8,7 @@ const LeaderboardView = preload("res://Scripts/leaderboard_view.gd")
 @export var average_wpm_label: Label
 @export var accuracy_label: Label
 
-var record_path: String = "user://pal_who_say_boo_high_score.cfg"
+var record_path: String = "user://release_high_scores_v1.cfg"
 var best_score: int = 0
 var best_player: String = ""
 var last_player_name: String = ""

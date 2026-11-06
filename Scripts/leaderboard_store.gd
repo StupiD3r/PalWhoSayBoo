@@ -86,3 +86,32 @@ func _rank(existing: Array, attempt: Dictionary, metric: String) -> Array:
 		return int(a[metric]) > int(b[metric])
 	)
 	return rows.slice(0, 10)
+	
+func delete_player(player_name: String) -> Error:
+	var data := load_data()
+	var target := clean_name(player_name).to_lower()
+
+	# Filter out the player from all 3 lists
+	data.scores = data.scores.filter(func(row): return str(row.name).to_lower() != target)
+	data.wpm = data.wpm.filter(func(row): return str(row.name).to_lower() != target)
+	data.recent = data.recent.filter(func(row): return str(row.name).to_lower() != target)
+
+	if str(data.last_name).to_lower() == target:
+		data.last_name = ""
+
+	var config := ConfigFile.new()
+	config.set_value("leaderboards", "version", 1)
+	config.set_value("leaderboards", "scores", data.scores)
+	config.set_value("leaderboards", "wpm", data.wpm)
+	config.set_value("leaderboards", "recent", data.recent)
+	config.set_value("player", "last_name", data.last_name)
+
+	# Ensure the legacy record section stays updated if the #1 player is deleted
+	if not data.scores.is_empty():
+		config.set_value("record", "name", data.scores[0].name)
+		config.set_value("record", "score", data.scores[0].score)
+	else:
+		config.set_value("record", "name", "")
+		config.set_value("record", "score", 0)
+
+	return config.save(save_path)

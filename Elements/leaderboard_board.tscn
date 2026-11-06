@@ -1,6 +1,6 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://ej264avsu22b"]
 
-[ext_resource type="Script" path="res://Scripts/leaderboard_board.gd" id="1_board"]
+[ext_resource type="Script" uid="uid://bp65v2p5d0ls4" path="res://Scripts/leaderboard_board.gd" id="1_board"]
 
-[node name="LeaderboardBoard" type="Node3D"]
+[node name="LeaderboardBoard" type="Node3D" unique_id=817202593]
 script = ExtResource("1_board")
