@@ -16,6 +16,26 @@
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_aicxv"]
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xpe5a"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1j03s"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4ppty"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_k4wes"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2hy8b"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ca7lo"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_f270l"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2hvxo"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_n3pt0"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_o38qm"]
+
 [node name="Main_menu" type="Control" unique_id=1425458090]
 layout_mode = 3
 anchors_preset = 15
@@ -65,10 +85,10 @@ text = "BY PHOBICPHILIA"
 
 [node name="StartButton" type="Button" parent="." unique_id=1977444737]
 layout_mode = 0
-offset_left = 677.0
-offset_top = 268.0
-offset_right = 910.0
-offset_bottom = 322.0
+offset_left = 671.0
+offset_top = 194.0
+offset_right = 919.0
+offset_bottom = 275.0
 theme_override_colors/font_color = Color(0.26293206, 0.2629327, 0.2629322, 1)
 theme_override_colors/font_pressed_color = Color(0.4390491, 0.43904912, 0.43904912, 1)
 theme_override_font_sizes/font_size = 53
@@ -90,3 +110,35 @@ volume_db = -10.0
 [node name="BGM" type="AudioStreamPlayer" parent="." unique_id=51515649]
 stream = ExtResource("5_f40uw")
 volume_db = -32.0
+
+[node name="CreditsButton" type="Button" parent="." unique_id=1422607876]
+layout_mode = 0
+offset_left = 674.0
+offset_top = 272.0
+offset_right = 913.0
+offset_bottom = 341.0
+theme_override_colors/font_color = Color(0.37162158, 0.37162253, 0.37162188, 1)
+theme_override_colors/font_pressed_color = Color(0.422371, 0.422371, 0.422371, 1)
+theme_override_font_sizes/font_size = 25
+theme_override_styles/normal = SubResource("StyleBoxEmpty_xpe5a")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_1j03s")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_4ppty")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_k4wes")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_2hy8b")
+text = "CREDITS"
+
+[node name="QuitButton" type="Button" parent="." unique_id=2060046194]
+layout_mode = 0
+offset_left = 743.0
+offset_top = 339.0
+offset_right = 844.0
+offset_bottom = 387.0
+theme_override_colors/font_color = Color(0.36659402, 0.36659488, 0.36659428, 1)
+theme_override_colors/font_pressed_color = Color(0.47918278, 0.47918278, 0.47918278, 1)
+theme_override_font_sizes/font_size = 25
+theme_override_styles/normal = SubResource("StyleBoxEmpty_ca7lo")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_f270l")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_2hvxo")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_n3pt0")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_o38qm")
+text = "QUIT"
