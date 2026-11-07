@@ -164,6 +164,7 @@
 [ext_resource type="Script" uid="uid://ddla3n5toswqw" path="res://Scripts/trigger_dancing_npc.gd" id="164_qgu6i"]
 [ext_resource type="Script" uid="uid://b0r3cbqc8vurc" path="res://Scripts/dialogue_trigger.gd" id="164_rbr4c"]
 [ext_resource type="Script" uid="uid://fy0oe4k1b46v" path="res://Scripts/pst_sound_trigger.gd" id="165_peyyu"]
+[ext_resource type="AudioStream" uid="uid://dwpupoeafbuv4" path="res://Assets/Audio/textdialoguesfx.wav" id="166_u3hxs"]
 [ext_resource type="AudioStream" uid="uid://dcppbsaodcle8" path="res://Assets/Audio/pst.mp3" id="166_xcm6c"]
 [ext_resource type="Texture2D" uid="uid://boe5n3pyf1u8e" path="res://Assets/NPC/Character_44_Female.png" id="167_b3ai7"]
 [ext_resource type="Script" uid="uid://ct6pvwbemlahe" path="res://Scripts/dialogue_trigger_host.gd" id="168_qgu6i"]
@@ -11280,7 +11281,7 @@ _data = {
 }
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_xpe5a"]
-size = Vector3(1.7241211, 1.4961548, 4.8591614)
+size = Vector3(5.3742676, 1.4961548, 10.796116)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wo171"]
 resource_name = "BlackDog"
@@ -23655,6 +23656,7 @@ bones/32/rotation = Quaternion(-3.4716154e-16, -5.030698e-17, -4.1633363e-17, 1)
 bones/32/scale = Vector3(1, 1, 1)
 
 [node name="Character_02" type="MeshInstance3D" parent="justnpc2/Skeleton3D" unique_id=1315438921]
+transform = Transform3D(1.0000001, 0, 2.9802322e-08, 0, 1, 0, -2.9802322e-08, 0, 1.0000001, 0, 0, 0)
 mesh = SubResource("ArrayMesh_5m5d4")
 skin = SubResource("Skin_bf7ja")
 skeleton = NodePath("..")
@@ -23672,6 +23674,10 @@ npc_name = "Ido"
 [node name="CollisionShape3D" type="CollisionShape3D" parent="justnpc2/DialogueTrigger" unique_id=506402855]
 transform = Transform3D(3, 0, -1.1920929e-07, 0, 2.9999995, 0, 1.1920929e-07, 0, 3, 0.51651, 0.33132935, 4.009018)
 shape = SubResource("BoxShape3D_rtkds")
+
+[node name="TextBlip" type="AudioStreamPlayer" parent="justnpc2/DialogueTrigger" unique_id=679832220]
+stream = ExtResource("166_u3hxs")
+volume_db = -15.0
 
 [node name="DialogueCamera" type="Camera3D" parent="justnpc2" unique_id=162208954]
 transform = Transform3D(0.8000001, 0, 2.682209e-07, 0, 0.8, 0, -2.682209e-07, 0, 0.8000001, -0.101119995, 4.185769, 2.185299)
@@ -24154,10 +24160,10 @@ mesh = SubResource("ArrayMesh_t4mol")
 skin = SubResource("Skin_3llkg")
 skeleton = NodePath("..")
 
-[node name="DialogueTriggerHost" type="Area3D" parent="Host" unique_id=1531847770 node_paths=PackedStringArray("pole_camera", "dialogue_camera") groups=["Player", "player"]]
+[node name="DialogueTriggerHost" type="Area3D" parent="Host" unique_id=1531847770 node_paths=PackedStringArray("dialogue_camera", "pole_camera") groups=["Player", "player"]]
 script = ExtResource("168_qgu6i")
-pole_camera = NodePath("../../PoleCamera")
 dialogue_camera = NodePath("../DialogueCameraHost")
+pole_camera = NodePath("../../PoleCamera")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Host/DialogueTriggerHost" unique_id=1765729214]
 transform = Transform3D(0.80768174, 0.0007560362, 0.58961844, -0.0008847824, 0.9999997, -7.022751e-05, -0.5896182, -0.00046495203, 0.80768216, -4.4377556, 0.49306092, 4.5636673)
@@ -24645,7 +24651,7 @@ script = ExtResource("171_jgwad")
 dialogue_camera = NodePath("../NPCTellCamera")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="justnpc4/NPCTriggerTell" unique_id=983988327]
-transform = Transform3D(0.99996823, 0, 9.834766e-06, 0, 1, 0, -9.834766e-06, 0, 0.99996823, 0.014907837, 0.8106383, 1.9295349)
+transform = Transform3D(0.99993354, 0, 2.1189451e-05, 0, 1, 0, -2.1189451e-05, 0, 0.99993354, 0.33677673, 0.8106383, 1.3700867)
 shape = SubResource("BoxShape3D_xpe5a")
 
 [node name="NPCTellCamera" type="Camera3D" parent="justnpc4" unique_id=1068464348]
@@ -25501,7 +25507,7 @@ spot_range = 30.0
 spot_attenuation = 0.5
 
 [node name="StageLight3" type="Node3D" parent="." unique_id=1592908001]
-transform = Transform3D(-0.0032855, 0, 0.0037690166, 0, 0.005, 0, -0.0037690166, 0, -0.0032855, 288.32242, -0.86043596, 64.8092)
+transform = Transform3D(-0.0025571692, 0, 0.004296613, 0, 0.005, 0, -0.004296613, 0, -0.0025571692, 287.32242, -0.86043596, 65.8092)
 
 [node name="Sketchfab_model" type="Node3D" parent="StageLight3" unique_id=1527596697]
 transform = Transform3D(1, 0, 0, 0, 2.220446e-16, 1, 0, -1, 2.220446e-16, 0, 0, 0)
@@ -25512,6 +25518,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -170.00008, -178.48286, -3e-0
 [node name="Object_2" type="Node3D" parent="StageLight3/Sketchfab_model/Faretto B1_obj_cleaner_gles" unique_id=310970570]
 
 [node name="Object_3" type="MeshInstance3D" parent="StageLight3/Sketchfab_model/Faretto B1_obj_cleaner_gles/Object_2" unique_id=1923645196]
+transform = Transform3D(0.8434942, -0.53713846, 1.192687e-16, 0.53713846, 0.8434942, 3.4751274e-17, -1.192687e-16, 3.4751274e-17, 1, 0, 0, 0)
 mesh = SubResource("ArrayMesh_xecd6")
 
 [node name="Object_4" type="MeshInstance3D" parent="StageLight3/Sketchfab_model/Faretto B1_obj_cleaner_gles/Object_2" unique_id=1042931428]

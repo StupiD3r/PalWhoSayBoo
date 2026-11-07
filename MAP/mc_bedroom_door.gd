@@ -5,7 +5,9 @@ extends Node3D
 
 @onready var hinge: AnimatableBody3D = $Hinge
 @onready var interaction_area: Area3D = $InteractionArea
-@onready var prompt: Label3D = $Prompt
+@onready var prompt: Label3D = $Hinge/Prompt
+@onready var door_sound: AudioStreamPlayer3D = $Hinge/DoorSound
+@onready var close_sound: AudioStreamPlayer3D = $Hinge/CloseSound
 
 var nearby_player: CharacterBody3D
 var closed_transform: Transform3D
@@ -51,6 +53,13 @@ func _unhandled_input(event: InputEvent) -> void:
 func _toggle_door() -> void:
 	moving = true
 	is_open = not is_open
+
+	if is_open:
+		close_sound.stop()
+		door_sound.play()
+	else:
+		door_sound.stop()
+		close_sound.play()
 
 	prompt.text = "Opening..." if is_open else "Closing..."
 

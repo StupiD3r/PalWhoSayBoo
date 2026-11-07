@@ -168,4 +168,3 @@ func _close_records() -> void:
 	Input.mouse_mode = previous_mouse_mode
 	records_view = null
 	refresh()
-
