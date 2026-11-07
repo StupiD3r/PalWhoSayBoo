@@ -32,6 +32,7 @@ var locked_player: Node
 var previous_player_mode: Node.ProcessMode
 var restart_scene: PackedScene
 var name_prompt_generation: int = 0
+var block_initial_name_echoes: bool = true
 var overview_camera: Camera3D
 var previous_camera: Camera3D
 var overview_hud: Node
@@ -114,6 +115,7 @@ func _build_results_ui() -> void:
 	name_input.max_length = 24
 	name_input.custom_minimum_size.y = 44.0
 	name_input.text_submitted.connect(func(_text: String): _save_player_name())
+	name_input.gui_input.connect(_on_name_input_event)
 	name_form.add_child(name_input)
 	var buttons := HBoxContainer.new()
 	buttons.add_theme_constant_override("separation", 12)
@@ -169,6 +171,7 @@ func show_stats(final_score: int, peak_wpm: int, avg_wpm: int, accuracy: float) 
 	name_prompt.text = "NEW HIGH SCORE! Enter your name." if best_player.is_empty() or pending_score > best_score else "Enter your name for this run."
 	name_input.clear()
 	name_input.editable = false
+	block_initial_name_echoes = true
 	name_prompt_generation += 1
 	name_form.show()
 	status_label.hide()
@@ -181,15 +184,22 @@ func show_stats(final_score: int, peak_wpm: int, avg_wpm: int, accuracy: float) 
 
 func _focus_name_after_release(generation: int) -> void:
 	var earliest := Time.get_ticks_msec() + 200
-	# Let the fatal typing event finish and held gameplay keys come up first.
+	# Bound the delay: a held action or controller input must never lock name entry.
 	await get_tree().process_frame
-	while Input.is_anything_pressed() or Time.get_ticks_msec() < earliest:
+	while Time.get_ticks_msec() < earliest:
 		if generation != name_prompt_generation or not visible or not awaiting_name:
 			return
 		await get_tree().process_frame
 	if generation == name_prompt_generation and visible and awaiting_name:
 		name_input.editable = true
 		name_input.grab_focus()
+
+func _on_name_input_event(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed:
+		if event.echo and block_initial_name_echoes:
+			name_input.accept_event()
+		elif not event.echo:
+			block_initial_name_echoes = false
 
 func _clean_name(value: String) -> String:
 	return value.replace("\n", " ").replace("\r", " ").replace("\t", " ").strip_edges().left(24)

@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cm5u5rj1asc6w"
-path.s3tc="res://.godot/imported/Character_07.png-a8ea8b55e0e312e236a4778f1ffd536e.s3tc.ctex"
+path.s3tc="res://.godot/imported/Character_07.png-7a55b910b41ed0425162c5d962f30cee.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://Assets/NPC/Characters_psx_1.2/Characters_psx_1.2/Characters_psx_02/textures/Character_07.png"
-dest_files=["res://.godot/imported/Character_07.png-a8ea8b55e0e312e236a4778f1ffd536e.s3tc.ctex"]
+source_file="res://Assets/NPC/Characters_psx_1.2/Characters_psx_1.2/Characters_psx_02/Textures/Character_07.png"
+dest_files=["res://.godot/imported/Character_07.png-7a55b910b41ed0425162c5d962f30cee.s3tc.ctex"]
 
 [params]
 

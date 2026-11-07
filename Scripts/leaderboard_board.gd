@@ -5,8 +5,10 @@ const Store = preload("res://Scripts/leaderboard_store.gd")
 const RecordsView = preload("res://Scripts/leaderboard_view.gd")
 @export var pole_path: NodePath = NodePath("../Bamboo/BambooPole")
 @export var player_path: NodePath = NodePath("../Player")
+@export var placement_anchor_path: NodePath = NodePath("../Sketchfab_Scene4")
+@export var offset_from_anchor: Vector3 = Vector3(-22.0, 0.0, 43.0)
 @export var offset_from_pole: Vector3 = Vector3(10.0, 0.0, 6.0)
-var record_path: String = Store.DEFAULT_PATH
+var record_path: String = DEFAULT_PATH
 var player: CharacterBody3D
 var pole: Node3D
 var near_player: bool = false
@@ -24,7 +26,11 @@ var refresh_elapsed: float = 0.0
 func _ready() -> void:
 	player = get_node_or_null(player_path) as CharacterBody3D
 	pole = get_node_or_null(pole_path) as Node3D
-	if pole:
+	var anchor := get_node_or_null(placement_anchor_path) as Node3D
+	if anchor:
+		global_position = anchor.global_position + offset_from_anchor
+		look_at(global_position + Vector3.LEFT, Vector3.UP, true)
+	elif pole:
 		global_position = pole.global_position + offset_from_pole
 		look_at(Vector3(pole.global_position.x, global_position.y, pole.global_position.z), Vector3.UP, true)
 	_build_sign()
@@ -162,3 +168,4 @@ func _close_records() -> void:
 	Input.mouse_mode = previous_mouse_mode
 	records_view = null
 	refresh()
+

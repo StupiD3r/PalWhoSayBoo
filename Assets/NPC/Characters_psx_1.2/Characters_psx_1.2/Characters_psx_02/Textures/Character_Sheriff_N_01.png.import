@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b5ye0yoawbe03"
-path.s3tc="res://.godot/imported/Character_Sheriff_N_01.png-76379068f19ea96c3fbd2280785fe09a.s3tc.ctex"
+path.s3tc="res://.godot/imported/Character_Sheriff_N_01.png-6b0e6a29a4544ebf4d3e56d9b78104ff.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://Assets/NPC/Characters_psx_1.2/Characters_psx_1.2/Characters_psx_02/textures/Character_Sheriff_N_01.png"
-dest_files=["res://.godot/imported/Character_Sheriff_N_01.png-76379068f19ea96c3fbd2280785fe09a.s3tc.ctex"]
+source_file="res://Assets/NPC/Characters_psx_1.2/Characters_psx_1.2/Characters_psx_02/Textures/Character_Sheriff_N_01.png"
+dest_files=["res://.godot/imported/Character_Sheriff_N_01.png-6b0e6a29a4544ebf4d3e56d9b78104ff.s3tc.ctex"]
 
 [params]
 
