@@ -16,6 +16,7 @@ var hover_tweens: Dictionary = {}
 func _ready() -> void:
 	bgm.play()
 	_create_dialogs()
+	_create_facebook_button()
 
 	# Connect pressed signals
 	start_button.pressed.connect(_start_pressed)
@@ -43,6 +44,64 @@ func _ready() -> void:
 
 		button.mouse_entered.connect(_set_button_glow.bind(button, true))
 		button.mouse_exited.connect(_set_button_glow.bind(button, false))
+
+func _create_facebook_button() -> void:
+	var facebook_logo := Image.new()
+	facebook_logo.load_svg_from_string("""
+		<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24">
+		  <circle cx="12" cy="12" r="12" fill="#0866ff"/>
+		  <path fill="#fff" d="M13.9 24v-9.3H17l.5-3.6h-3.6V8.8c0-1 .3-1.8 1.8-1.8h1.9V3.8c-.3 0-1.5-.1-2.8-.1-2.8 0-4.7 1.7-4.7 4.8v2.6H7v3.6h3.1V24z"/>
+		</svg>
+	""")
+	var facebook_button := Button.new()
+	facebook_button.icon = ImageTexture.create_from_image(facebook_logo)
+	facebook_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	facebook_button.custom_minimum_size = Vector2(44, 44)
+	facebook_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	facebook_button.tooltip_text = "PhobicPhilia on Facebook"
+	facebook_button.mouse_entered.connect(_play_hover_sound)
+	facebook_button.pressed.connect(func() -> void:
+		click_sound.play()
+		OS.shell_open("https://www.facebook.com/PhobicPhilia")
+	)
+	var follow_row := HBoxContainer.new()
+	follow_row.add_theme_constant_override("separation", 8)
+	follow_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(follow_row)
+	follow_row.add_child(facebook_button)
+
+	var arrow := Label.new()
+	arrow.text = "\u2190"
+	arrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	arrow.add_theme_font_size_override("font_size", 24)
+	arrow.add_theme_constant_override("outline_size", 4)
+	follow_row.add_child(arrow)
+
+	var follow_label := Label.new()
+	follow_label.text = "Follow Us"
+	follow_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	follow_label.add_theme_font_override("font", preload("res://UI/HororDramaDemoRegular.ttf"))
+	follow_label.add_theme_font_size_override("font_size", 26)
+	follow_label.add_theme_constant_override("outline_size", 4)
+	follow_row.add_child(follow_label)
+
+	follow_row.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
+	follow_row.position += Vector2(16, -16)
+
+	follow_label.resized.connect(func() -> void:
+		follow_label.pivot_offset = follow_label.size * 0.5
+	)
+	follow_label.pivot_offset = follow_label.size * 0.5
+
+	var dance := follow_label.create_tween().set_loops()
+	dance.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	dance.tween_property(follow_label, "rotation_degrees", -8.0, 0.16)
+	dance.parallel().tween_property(follow_label, "scale", Vector2(1.1, 1.1), 0.16)
+	dance.tween_property(follow_label, "rotation_degrees", 8.0, 0.23)
+	dance.tween_property(follow_label, "rotation_degrees", -5.0, 0.19)
+	dance.tween_property(follow_label, "rotation_degrees", 0.0, 0.18)
+	dance.parallel().tween_property(follow_label, "scale", Vector2.ONE, 0.18)
+	dance.tween_interval(0.8)
 
 func _create_dialogs() -> void:
 	# --- Settings Window ---
@@ -89,7 +148,7 @@ func _create_dialogs() -> void:
 	
 	# Team Members Label (Edit these 3 names to match your actual team!)
 	var members_label := Label.new()
-	members_label.text = "Der/Nifer \nBlack Siren \n Hazuxa"
+	members_label.text = "D3r / NiFer \nBlack Siren \n Hazuxa"
 	members_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	members_label.add_theme_font_size_override("font_size", 18)
 	credits_vbox.add_child(members_label)
@@ -101,6 +160,8 @@ func _create_dialogs() -> void:
 	godot_label.add_theme_font_size_override("font_size", 14)
 	godot_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6)) # Gray color
 	credits_vbox.add_child(godot_label)
+
+
 
 	# --- Start Window (Temporary) ---
 	start_dialog = AcceptDialog.new()
